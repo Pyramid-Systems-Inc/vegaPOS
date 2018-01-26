@@ -148,13 +148,35 @@ function fetchKOT(kot){
     } else {
           var kotfile = JSON.parse(data); //now it an object
           var kotfileJSON = JSON.stringify(kotfile); //convert it back to json 
-          //console.log(kotfileJSON)
+          console.log(kotfileJSON)
 }});
    } else {
       console.log("File Doesn\'t Exist.")
    }  
 }
 
+function printKOT(kot) {  
+   
+   if(fs.existsSync(kot+'.json')) {
+        fs.readFile(kot+'.json', 'utf8', function readFileCallback(err, data){
+       if (err){
+           console.log(err);
+       } else {
+         obj = JSON.parse(data);
+         obj.orderStatus = "2";
+         json = JSON.stringify(obj); //convert it back to json
+         fs.writeFileSync(kot+'.json', json, 'utf8', (err) => {
+            if(err)
+             console.log(err)
+         });
+   }});      
+   } else {
+      console.log("File Doesn\'t Exist.")
+   }
+}
+
 //createKOT("Abhijith C S","9043960876","Maneesh","9848010922","T1",{ "name": "Chicken Shawarma", "code": "1086", "qty": 1, "isCustom": true, "variant": "Paratha Roll", "price": "75", "comments": "" },"Allergic to Tomato")
 //addItem("KOT1002",{ "code": "1081", "name": "Boneless BBQ Fish", "qty": 1, "isCustom": false, "price": "220", "comments": "Make it less spicy" })
 //deleteItem("KOT1002","1081")
+// printKOT("KOT1002")
+// fetchKOT("KOT1002")
