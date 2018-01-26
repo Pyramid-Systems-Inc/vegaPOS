@@ -3,202 +3,82 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>VEGA POS</title>
+    <title id="clientName">Jafry's Kitchen</title>
 
     <link href="css/styles.css" rel="stylesheet" type="text/css" />
-    
+    <script type="text/javascript" src="js/layoutFunctions.js"></script>
+
 </head>
 
-<body class="skin-green sidebar-collapse sidebar-mini pos">
+<body class="skin-green sidebar-mini pos sidebar-collapse">
     <div class="wrapper rtl rtl-inv">
         <header class="main-header">
-            <a href="https://spos.tecdiary.com/" class="logo">
-                <span class="logo-mini">POS</span>
-                <span class="logo-lg">Simple<b>POS</b></span>
+            <a href="#" class="logo" onclick="activateSidebar()">
+                <span class="logo-mini"><i class="fa fa-bars"></i></span>
+                <span class="logo-lg">Jafry's Kitchen</span>
             </a>
+
             <nav class="navbar navbar-static-top" role="navigation">
+
                 <ul class="nav navbar-nav pull-left">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="https://spos.tecdiary.com/themes/default/assets/images/english.png" alt="english"></a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="https://spos.tecdiary.com/pos/language/arabic"><img src="https://spos.tecdiary.com/themes/default/assets/images/arabic.png" class="language-img"> &nbsp;&nbsp;Arabic</a>
-                            </li>
-                            <li>
-                                <a href="https://spos.tecdiary.com/pos/language/english"><img src="https://spos.tecdiary.com/themes/default/assets/images/english.png" class="language-img"> &nbsp;&nbsp;English</a>
-                            </li>
-                        </ul>
+
+                    <li>
+                        <a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a>
                     </li>
                 </ul>
+
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
-                        <li>
-                            <a href="#" class="clock"></a>
-                        </li>
-                        <li><a href="https://spos.tecdiary.com/"><i class="fa fa-dashboard"></i></a></li>
-                        <li><a href="https://spos.tecdiary.com/settings"><i class="fa fa-cogs"></i></a></li>
-                        <li><a href="https://spos.tecdiary.com/pos/view_bill" target="_blank"><i class="fa fa-desktop"></i></a></li>
-                        <li class="hidden-xs hidden-sm"><a href="https://spos.tecdiary.com/pos/shortcuts" data-toggle="ajax"><i class="fa fa-key"></i></a></li>
-                        <li><a href="https://spos.tecdiary.com/pos/register_details" data-toggle="ajax">Register Details</a></li>
-                        <li><a href="https://spos.tecdiary.com/pos/today_sale" data-toggle="ajax">Today's Sale</a></li>
-                        <li><a href="https://spos.tecdiary.com/pos/close_register" data-toggle="ajax">Close Register</a></li>
+                        <li><a href="#">Live Orders</a></li>
+                        <li><a href="#">Today's Sales</a></li>
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="https://spos.tecdiary.com/uploads/avatars/thumbs/male.png" class="user-image" alt="Avatar" />
-                                <span>Admin Admin</span>
+                                <img src="images/default_user.png" class="user-image" alt="Avatar" />
+                                <span>Anas Jafry</span>
                             </a>
-                            <ul class="dropdown-menu">
-                                <li class="user-header">
-                                    <img src="https://spos.tecdiary.com/uploads/avatars/male.png" class="img-circle" alt="Avatar" />
-                                    <p>
-                                        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bbdadfd6d2d5fbcfded8dfd2dac9c295d8d4d6">[email&#160;protected]</a> <small>Member since Thu 25 Jun 2015 11:59 AM</small>
-                                    </p>
-                                </li>
-                                <li class="user-footer">
-                                    <div class="pull-left">
-                                        <a href="https://spos.tecdiary.com/users/profile/1" class="btn btn-default btn-flat">Profile</a>
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="https://spos.tecdiary.com/logout" class="btn btn-default btn-flat sign_out">Sign Out</a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="control-sidebar" class="sidebar-icon"><i class="fa fa-folder sidebar-icon"></i></a>
                         </li>
                     </ul>
                 </div>
+
             </nav>
+
         </header>
 
         <aside class="main-sidebar">
             <section class="sidebar">
                 <ul class="sidebar-menu">
-                    <li class="mm_welcome"><a href="https://spos.tecdiary.com/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-                    <li class="mm_pos"><a href="https://spos.tecdiary.com/pos"><i class="fa fa-th"></i> <span>POS</span></a></li>
-                    <li class="treeview mm_products">
-                        <a href="#">
-                            <i class="fa fa-barcode"></i>
-                            <span>Products</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="products_index"><a href="https://spos.tecdiary.com/products"><i class="fa fa-circle-o"></i> List Products</a></li>
-                            <li id="products_add"><a href="https://spos.tecdiary.com/products/add"><i class="fa fa-circle-o"></i> Add Products</a></li>
-                            <li id="products_import"><a href="https://spos.tecdiary.com/products/import"><i class="fa fa-circle-o"></i> Import Products</a></li>
-                            <li class="divider"></li>
-                            <li id="products_print_barcodes">
-                                <a onclick="window.open('https://spos.tecdiary.com/products/print_barcodes', 'pos_popup', 'width=900,height=600,menubar=yes,scrollbars=yes,status=no,resizable=yes,screenx=0,screeny=0'); return false;" href="#"><i class="fa fa-circle-o"></i> Print Barcodes</a>
-                            </li>
-                            <li id="products_print_labels">
-                                <a onclick="window.open('https://spos.tecdiary.com/products/print_labels', 'pos_popup', 'width=900,height=600,menubar=yes,scrollbars=yes,status=no,resizable=yes,screenx=0,screeny=0'); return false;" href="#"><i class="fa fa-circle-o"></i> Print Labels</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="treeview mm_categories">
-                        <a href="#">
-                            <i class="fa fa-folder"></i>
-                            <span>Categories</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="categories_index"><a href="https://spos.tecdiary.com/categories"><i class="fa fa-circle-o"></i> List Categories</a></li>
-                            <li id="categories_add"><a href="https://spos.tecdiary.com/categories/add"><i class="fa fa-circle-o"></i> Add Category</a></li>
-                            <li id="categories_import"><a href="https://spos.tecdiary.com/categories/import"><i class="fa fa-circle-o"></i> Import Categories</a></li>
-                        </ul>
-                    </li>
-                    <li class="treeview mm_sales">
-                        <a href="#">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>Sales</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="sales_index"><a href="https://spos.tecdiary.com/sales"><i class="fa fa-circle-o"></i> List Sales</a></li>
-                            <li id="sales_opened"><a href="https://spos.tecdiary.com/sales/opened"><i class="fa fa-circle-o"></i> List Opened Bills</a></li>
-                        </ul>
-                    </li>
-                    <li class="treeview mm_purchases">
-                        <a href="#">
-                            <i class="fa fa-plus"></i>
-                            <span>Purchases</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="purchases_index"><a href="https://spos.tecdiary.com/purchases"><i class="fa fa-circle-o"></i> List Purchases</a></li>
-                            <li id="purchases_add"><a href="https://spos.tecdiary.com/purchases/add"><i class="fa fa-circle-o"></i> Add Purchase</a></li>
-                            <li class="divider"></li>
-                            <li id="purchases_expenses"><a href="https://spos.tecdiary.com/purchases/expenses"><i class="fa fa-circle-o"></i> List Expenses</a></li>
-                            <li id="purchases_add_expense"><a href="https://spos.tecdiary.com/purchases/add_expense"><i class="fa fa-circle-o"></i> Add Expense</a></li>
-                        </ul>
-                    </li>
-                    <li class="treeview mm_gift_cards">
-                        <a href="#">
-                            <i class="fa fa-credit-card"></i>
-                            <span>Gift Card</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="gift_cards_index"><a href="https://spos.tecdiary.com/gift_cards"><i class="fa fa-circle-o"></i> List Gift Cards</a></li>
-                            <li id="gift_cards_add"><a href="https://spos.tecdiary.com/gift_cards/add"><i class="fa fa-circle-o"></i> Add Gift Card</a></li>
-                        </ul>
-                    </li>
-                    <li class="treeview mm_auth mm_customers mm_suppliers">
-                        <a href="#">
-                            <i class="fa fa-users"></i>
-                            <span>People</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="auth_users"><a href="https://spos.tecdiary.com/users"><i class="fa fa-circle-o"></i> List Users</a></li>
-                            <li id="auth_add"><a href="https://spos.tecdiary.com/users/add"><i class="fa fa-circle-o"></i> Add User</a></li>
-                            <li class="divider"></li>
-                            <li id="customers_index"><a href="https://spos.tecdiary.com/customers"><i class="fa fa-circle-o"></i> List Customers</a></li>
-                            <li id="customers_add"><a href="https://spos.tecdiary.com/customers/add"><i class="fa fa-circle-o"></i> Add Customer</a></li>
-                            <li class="divider"></li>
-                            <li id="suppliers_index"><a href="https://spos.tecdiary.com/suppliers"><i class="fa fa-circle-o"></i> List Suppliers</a></li>
-                            <li id="suppliers_add"><a href="https://spos.tecdiary.com/suppliers/add"><i class="fa fa-circle-o"></i> Add Supplier</a></li>
-                        </ul>
-                    </li>
-                    <li class="treeview mm_settings">
-                        <a href="#">
-                            <i class="fa fa-cogs"></i>
-                            <span>Settings</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="settings_index"><a href="https://spos.tecdiary.com/settings"><i class="fa fa-circle-o"></i> Settings</a></li>
-                            <li class="divider"></li>
-                            <li id="settings_stores"><a href="https://spos.tecdiary.com/settings/stores"><i class="fa fa-circle-o"></i> Stores</a></li>
-                            <li id="settings_add_store"><a href="https://spos.tecdiary.com/settings/add_store"><i class="fa fa-circle-o"></i> Add Store</a></li>
-                            <li class="divider"></li>
-                            <li id="settings_printers"><a href="https://spos.tecdiary.com/settings/printers"><i class="fa fa-circle-o"></i> Printers</a></li>
-                            <li id="settings_add_printer"><a href="https://spos.tecdiary.com/settings/add_printer"><i class="fa fa-circle-o"></i> Add Printer</a></li>
-                            <li class="divider"></li>
-                            <li id="settings_backups"><a href="https://spos.tecdiary.com/settings/backups"><i class="fa fa-circle-o"></i> Backups</a></li>
+                    <li class="mm_welcome"><a href="index.html"><i class="fa fa-plus"></i> <span>New Order</span></a></li>
+                    <li class="mm_pos"><a href="liveorders.html"><i class="fa fa-retweet"></i> <span>Live Orders</span></a></li>
 
-                        </ul>
-                    </li>
-                    <li class="treeview mm_reports">
+                    <li class="mm_pos"><a href="onlineorders.html"><i class="fa fa-globe"></i> <span>Online Orders</span></a></li>
+                    <li class="mm_pos"><a href="settledbills.html"><i class="fa fa-check"></i> <span>Settled Bills</span></a></li>
+                    <li class="mm_pos"><a href="seatingstatus.html"><i class="fa fa-th"></i> <span>Seating Status</span></a></li>
+                    <li class="mm_pos"><a href="rewardpoints.html"><i class="fa fa-gift"></i> <span>Reward Points</span></a></li>
+                    <li id="sidebarTools" class="treeview mm_products" onclick="activateSidebarElement('sidebarTools')">
                         <a href="#">
-                            <i class="fa fa-bar-chart-o"></i>
-                            <span>Reports</span>
-                            <i class="fa fa-angle-left pull-right"></i>
+                            <i class="fa fa-wrench"></i>
+                            <span>Tools</span>
+                            <i class="fa fa-angle-right pull-right"></i>
                         </a>
                         <ul class="treeview-menu">
-                            <li id="reports_daily_sales"><a href="https://spos.tecdiary.com/reports/daily_sales"><i class="fa fa-circle-o"></i> Daily Sales</a></li>
-                            <li id="reports_monthly_sales"><a href="https://spos.tecdiary.com/reports/monthly_sales"><i class="fa fa-circle-o"></i> Monthly Sales</a></li>
-                            <li id="reports_index"><a href="https://spos.tecdiary.com/reports"><i class="fa fa-circle-o"></i> Sales Report</a></li>
-                            <li class="divider"></li>
-                            <li id="reports_payments"><a href="https://spos.tecdiary.com/reports/payments"><i class="fa fa-circle-o"></i> Payments Report</a></li>
-                            <li class="divider"></li>
-                            <li id="reports_registers"><a href="https://spos.tecdiary.com/reports/registers"><i class="fa fa-circle-o"></i> Registers Report</a></li>
-                            <li class="divider"></li>
-                            <li id="reports_top_products"><a href="https://spos.tecdiary.com/reports/top_products"><i class="fa fa-circle-o"></i> Top Products</a></li>
-                            <li id="reports_products"><a href="https://spos.tecdiary.com/reports/products"><i class="fa fa-circle-o"></i> Products Report</a></li>
+                            <li id="products_index"><a href="salessummary.html"><i class="fa fa-circle-o"></i> Sales Summary</a></li>
+                            <li id="products_index"><a href="menu.html"><i class="fa fa-circle-o"></i> Edit Menu</a></li>
                         </ul>
                     </li>
+
+                    <li id="sidebarSettings" class="treeview mm_products" onclick="activateSidebarElement('sidebarSettings')">
+                        <a href="#">
+                            <i class="fa fa-cog"></i>
+                            <span>Settings</span>
+                            <i class="fa fa-angle-right pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li id="products_index"><a href="tablelayout.html"><i class="fa fa-circle-o"></i> Table Layout</a></li>
+                            <li id="products_index"><a href="billsettings.html"><i class="fa fa-circle-o"></i> Bill Settings</a></li>
+                            <li id="products_index"><a href="usersettings.html"><i class="fa fa-circle-o"></i> Users Settings</a></li>
+                        </ul>
+                    </li>
+
                 </ul>
             </section>
         </aside>
@@ -207,7 +87,7 @@
                 <tr>
                     <td style="width: 460px;">
                         <div id="pos">
-                            <form action="https://spos.tecdiary.com/pos" id="pos-sale-form" method="post" accept-charset="utf-8">
+                            <form action=".." id="pos-sale-form" method="post" accept-charset="utf-8">
                                 <input type="hidden" name="spos_token" value="9a1dde223a4b5358b00294200ecd1189" />
                                 <div class="well well-sm" id="leftdiv">
                                     <div id="lefttop" style="margin-bottom:5px;">
@@ -260,7 +140,64 @@
                                                         <th style="width: 20px;" class="satu"><i class="fa fa-trash-o"></i></th>
                                                     </tr>
                                                 </thead>
-                                                <tbody></tbody>
+                                                <tbody>
+
+                                                    <tr id="1516883446564" class="2 danger" data-item-id="2">
+                                                        <td>
+                                                            <input name="product_id[]" type="hidden" class="rid" value="2">
+                                                            <input name="item_comment[]" type="hidden" class="ritem_comment" value="">
+                                                            <input name="product_code[]" type="hidden" value="TOY02">
+                                                            <input name="product_name[]" type="hidden" value="Minion Banana">
+                                                            <button type="button" class="btn btn-block btn-xs edit btn-warning" id="1516883446564" data-item="2"><span class="sname" id="name_1516883446564">Minion Banana (TOY02)</span></button>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input class="realuprice" name="real_unit_price[]" type="hidden" value="15.00">
+                                                            <input class="rdiscount" name="product_discount[]" type="hidden" id="discount_1516883446564" value="0"><span class="text-right sprice" id="sprice_1516883446564">15.00</span></td>
+                                                        <td>
+                                                            <input name="item_was_ordered[]" type="hidden" class="riwo" value="0">
+                                                            <input class="form-control input-qty kb-pad text-center rquantity" name="quantity[]" type="text" value="2" data-id="1516883446564" data-item="2" id="quantity_1516883446564" onclick="this.select();">
+                                                        </td>
+                                                        <td class="text-right"><span class="text-right ssubtotal" id="subtotal_1516883446564">30.00</span></td>
+                                                        <td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446564" title="Remove"></i></td>
+                                                    </tr>
+                                                    <tr id="1516883446559" class="4 danger" data-item-id="4">
+                                                        <td>
+                                                            <input name="product_id[]" type="hidden" class="rid" value="4">
+                                                            <input name="item_comment[]" type="hidden" class="ritem_comment" value="">
+                                                            <input name="product_code[]" type="hidden" value="11225536654">
+                                                            <input name="product_name[]" type="hidden" value="COCA COLA">
+                                                            <button type="button" class="btn btn-block btn-xs edit btn-warning" id="1516883446559" data-item="4"><span class="sname" id="name_1516883446559">COCA COLA (11225536654)</span></button>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input class="realuprice" name="real_unit_price[]" type="hidden" value="800.00">
+                                                            <input class="rdiscount" name="product_discount[]" type="hidden" id="discount_1516883446559" value="0"><span class="text-right sprice" id="sprice_1516883446559">800.00</span></td>
+                                                        <td>
+                                                            <input name="item_was_ordered[]" type="hidden" class="riwo" value="0">
+                                                            <input class="form-control input-qty kb-pad text-center rquantity" name="quantity[]" type="text" value="2" data-id="1516883446559" data-item="4" id="quantity_1516883446559" onclick="this.select();">
+                                                        </td>
+                                                        <td class="text-right"><span class="text-right ssubtotal" id="subtotal_1516883446559">1,600.00</span></td>
+                                                        <td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446559" title="Remove"></i></td>
+                                                    </tr>
+                                                    <tr id="1516883446547" class="4 danger" data-item-id="4">
+                                                        <td>
+                                                            <input name="product_id[]" type="hidden" class="rid" value="4">
+                                                            <input name="item_comment[]" type="hidden" class="ritem_comment" value="">
+                                                            <input name="product_code[]" type="hidden" value="11225536654">
+                                                            <input name="product_name[]" type="hidden" value="COCA COLA">
+                                                            <button type="button" class="btn btn-block btn-xs edit btn-warning" id="1516883446547" data-item="4"><span class="sname" id="name_1516883446547">COCA COLA (11225536654)</span></button>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input class="realuprice" name="real_unit_price[]" type="hidden" value="800.00">
+                                                            <input class="rdiscount" name="product_discount[]" type="hidden" id="discount_1516883446547" value="0"><span class="text-right sprice" id="sprice_1516883446547">800.00</span></td>
+                                                        <td>
+                                                            <input name="item_was_ordered[]" type="hidden" class="riwo" value="0">
+                                                            <input class="form-control input-qty kb-pad text-center rquantity" name="quantity[]" type="text" value="2" data-id="1516883446547" data-item="4" id="quantity_1516883446547" onclick="this.select();">
+                                                        </td>
+                                                        <td class="text-right"><span class="text-right ssubtotal" id="subtotal_1516883446547">1,600.00</span></td>
+                                                        <td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446547" title="Remove"></i></td>
+                                                    </tr>
+
+                                                </tbody>
                                             </table>
                                         </div>
                                         <div style="clear:both;"></div>
@@ -288,7 +225,9 @@
                                                         </td>
                                                         <td class="text-right" colspan="2" style="font-weight:bold;"><span id="total-payable">0</span></td>
                                                     </tr>
+
                                                 </tbody>
+
                                             </table>
                                         </div>
                                     </div>
@@ -354,27 +293,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="product-nav">
-                                <div class="btn-group btn-group-justified">
-                                    <div class="btn-group">
-                                        <button style="z-index:10002;" class="btn btn-warning pos-tip btn-flat" type="button" id="previous"><i class="fa fa-chevron-left"></i></button>
-                                    </div>
-                                    <div class="btn-group">
-                                        <button style="z-index:10003;" class="btn btn-success pos-tip btn-flat" type="button" id="sellGiftCard"><i class="fa fa-credit-card" id="addIcon"></i> Sell Gift Card</button>
-                                    </div>
-                                    <div class="btn-group">
-                                        <button style="z-index:10004;" class="btn btn-warning pos-tip btn-flat" type="button" id="next"><i class="fa fa-chevron-right"></i></button>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </td>
                 </tr>
             </table>
         </div>
     </div>
-
-<script src = "data/static/kot.js" ></script>
 </body>
 
 </html>
