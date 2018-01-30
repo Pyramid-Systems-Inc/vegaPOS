@@ -1,157 +1,210 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <title id="clientName">Jafry's Kitchen</title>
-
-    <link href="css/styles.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/layoutFunctions.js"></script>
-
-</head>
-
-<body class="skin-green sidebar-mini pos sidebar-collapse">
-    <div class="wrapper rtl rtl-inv">
-        <header class="main-header">
+   <head>
+      <meta charset="UTF-8">
+      <title id="clientName">Jafry's Kitchen</title>
+      <link href="css/styles.css" rel="stylesheet" type="text/css" />
+      <link href="css/custom.css" rel="stylesheet" type="text/css" />
+   </head>
+   <body class="skin-green sidebar-mini pos sidebar-collapse">
+      <div class="wrapper rtl rtl-inv">
+         <header class="main-header">
             <a href="#" class="logo" onclick="activateSidebar()">
-                <span class="logo-mini"><i class="fa fa-bars"></i></span>
-                <span class="logo-lg">Jafry's Kitchen</span>
+            <span class="logo-mini"><i class="fa fa-bars"></i></span>
+            <span class="logo-lg">Jafry's Kitchen</span>
             </a>
-
             <nav class="navbar navbar-static-top" role="navigation">
-
-                <ul class="nav navbar-nav pull-left">
-
-                    <li>
-                        <a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a>
-                    </li>
-                </ul>
-
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                        <li><a href="#">Live Orders</a></li>
-                        <li><a href="#">Today's Sales</a></li>
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="images/default_user.png" class="user-image" alt="Avatar" />
-                                <span>Anas Jafry</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
+               <ul class="nav navbar-nav pull-left">
+                  <li>
+                     <a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a>
+                  </li>
+               </ul>
+               <div class="navbar-custom-menu">
+                  <ul class="nav navbar-nav">
+                     <li><a href="#">Live Orders</a></li>
+                     <li><a href="#">Today's Sales</a></li>
+                     <li class="dropdown user user-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="images/default_user.png" class="user-image" alt="Avatar" />
+                        <span>Anas Jafry</span>
+                        </a>
+                     </li>
+                  </ul>
+               </div>
             </nav>
-
-        </header>
-
-        <aside class="main-sidebar">
+         </header>
+         <aside class="main-sidebar">
             <section class="sidebar">
-                <ul class="sidebar-menu">
-                    <li class="mm_welcome"><a href="index.html"><i class="fa fa-plus"></i> <span>New Order</span></a></li>
-                    <li class="mm_pos"><a href="liveorders.html"><i class="fa fa-retweet"></i> <span>Live Orders</span></a></li>
-
-                    <li class="mm_pos"><a href="onlineorders.html"><i class="fa fa-globe"></i> <span>Online Orders</span></a></li>
-                    <li class="mm_pos"><a href="settledbills.html"><i class="fa fa-check"></i> <span>Settled Bills</span></a></li>
-                    <li class="mm_pos"><a href="seatingstatus.html"><i class="fa fa-th"></i> <span>Seating Status</span></a></li>
-                    <li class="mm_pos"><a href="rewardpoints.html"><i class="fa fa-gift"></i> <span>Reward Points</span></a></li>
-                    <li id="sidebarTools" class="treeview mm_products" onclick="activateSidebarElement('sidebarTools')">
-                        <a href="#">
-                            <i class="fa fa-wrench"></i>
-                            <span>Tools</span>
-                            <i class="fa fa-angle-right pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="products_index"><a href="salessummary.html"><i class="fa fa-circle-o"></i> Sales Summary</a></li>
-                            <li id="products_index"><a href="menu.html"><i class="fa fa-circle-o"></i> Edit Menu</a></li>
-                        </ul>
-                    </li>
-
-                    <li id="sidebarSettings" class="treeview mm_products" onclick="activateSidebarElement('sidebarSettings')">
-                        <a href="#">
-                            <i class="fa fa-cog"></i>
-                            <span>Settings</span>
-                            <i class="fa fa-angle-right pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="products_index"><a href="tablelayout.html"><i class="fa fa-circle-o"></i> Table Layout</a></li>
-                            <li id="products_index"><a href="billsettings.html"><i class="fa fa-circle-o"></i> Bill Settings</a></li>
-                            <li id="products_index"><a href="usersettings.html"><i class="fa fa-circle-o"></i> Users Settings</a></li>
-                        </ul>
-                    </li>
-
-                </ul>
+               <ul class="sidebar-menu">
+                  <li class="mm_welcome"><a href="index.html"><i class="fa fa-plus"></i> <span>New Order</span></a></li>
+                  <li class="mm_pos"><a href="liveorders.html"><i class="fa fa-retweet"></i> <span>Live Orders</span></a></li>
+                  <li class="mm_pos"><a href="onlineorders.html"><i class="fa fa-globe"></i> <span>Online Orders</span></a></li>
+                  <li class="mm_pos"><a href="settledbills.html"><i class="fa fa-check"></i> <span>Settled Bills</span></a></li>
+                  <li class="mm_pos"><a href="seatingstatus.html"><i class="fa fa-th"></i> <span>Seating Status</span></a></li>
+                  <li class="mm_pos"><a href="rewardpoints.html"><i class="fa fa-gift"></i> <span>Reward Points</span></a></li>
+                  <li id="sidebarTools" class="treeview mm_products" onclick="activateSidebarElement('sidebarTools')">
+                     <a href="#">
+                     <i class="fa fa-wrench"></i>
+                     <span>Tools</span>
+                     <i class="fa fa-angle-right pull-right"></i>
+                     </a>
+                     <ul class="treeview-menu">
+                        <li id="products_index"><a href="salessummary.html"><i class="fa fa-circle-o"></i> Sales Summary</a></li>
+                        <li id="products_index"><a href="menu.html"><i class="fa fa-circle-o"></i> Edit Menu</a></li>
+                     </ul>
+                  </li>
+                  <li id="sidebarSettings" class="treeview mm_products" onclick="activateSidebarElement('sidebarSettings')">
+                     <a href="#">
+                     <i class="fa fa-cog"></i>
+                     <span>Settings</span>
+                     <i class="fa fa-angle-right pull-right"></i>
+                     </a>
+                     <ul class="treeview-menu">
+                        <li id="products_index"><a href="tablelayout.html"><i class="fa fa-circle-o"></i> Table Layout</a></li>
+                        <li id="products_index"><a href="billsettings.html"><i class="fa fa-circle-o"></i> Bill Settings</a></li>
+                        <li id="products_index"><a href="usersettings.html"><i class="fa fa-circle-o"></i> Users Settings</a></li>
+                     </ul>
+                  </li>
+               </ul>
             </section>
-        </aside>
-
-<div class="content-wrapper" style="height: 1000px">
-    <section class="content-header">
-        <h1>Users Management</h1>
-    </section>
-    <div class="col-lg-12 alerts">
-        <div id="custom-alerts" style="display:none;">
-            <div class="alert alert-dismissable">
-                <div class="custom-msg"></div>
-            </div>
-        </div>
-    </div>
-    <div class="clearfix"></div>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/d07b1474/cloudflare-static/email-decode.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-
-            $('#search_table').on('keyup change', function(e) {
-                var code = (e.keyCode ? e.keyCode : e.which);
-                if (((code == 13 && table.search() !== this.value) || (table.search() !== '' && this.value === ''))) {
-                    table.search(this.value).draw();
-                }
-            });
-
-        });
-    </script>
-    <section class="content">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="box box-primary">
-                    <div class="box-header">
-                        <h3 class="box-title">Please use the table below to navigate or filter the results.</h3>
-                    </div>
-                    <div class="box-body">
-                        <div class="table-responsive">
-                            <table id="StData" class="table table-bordered table-hover table-striped">
-                                <thead>
+         </aside>
+         <div class="content-wrapper" style="height: 1000px">
+            <section class="content-header">
+               <h1>Users Management</h1>
+            </section>
+            <section class="content">
+               <div class="row">
+                  <div class="col-xs-8">
+                     <div class="box box-primary">
+                        <div class="box-body">
+                           <div class="box-header" style="padding: 10px 0px">
+                              <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Registered Users</h3>
+                              <button class="btn btn-success btn-sm" id="openNewUserButton" onclick="openNewUser()" style="float: right">New User</button>
+                           </div>
+                           <div class="table-responsive">
+                              <table id="StData" class="table">
+                                 <thead style="background: #f4f4f4;">
                                     <tr>
-                                        <th style="max-width:30px;">ID</th>
-                                        <th>Name</th>
-                                        <th>Code</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>Address line 1</th>
-                                        <th>City</th>
-                                        <th style="width:65px;">Actions</th>
+                                       <th style="text-align: left">ID</th>
+                                       <th style="text-align: left">Name</th>
+                                       <th style="text-align: left">Role</th>
+                                       <th style="text-align: left">Phone</th>
+                                       <th style="text-align: left">Actions</th>
                                     </tr>
-                                </thead>
-<tbody>
-
-<tr role="row" class="odd"><td>SimplePOS</td><td>POS</td><td>012345678</td><td>store@tecdiary.com</td><td>Address Line 1</td><td>Petaling Jaya</td><td><div class="text-center"><a href="https://spos.tecdiary.com/settings/edit_store/1" class="tip" title="Edit Store"><i class="fa fa-edit"></i></a></div></td></tr></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="8" class="p0">
-                                            <input type="text" class="form-control b0" name="search_table" id="search_table" placeholder="Type & hit enter to search the table" style="width:100%;">
-                                        </td>
+                                 </thead>
+                                 <tbody>
+                                    <tr role="row" class="odd">
+                                       <td>#1</td>
+                                       <td>Anas Jafry</td>
+                                       <td>Admin</td>
+                                       <td>9884179675</td>
+                                       <td onclick="openEditUserModal()">
+                                          <i class="fa fa-edit"></i>
+                                       </td>
                                     </tr>
-                                </tfoot>
-                            </table>
+                                 </tbody>
+                              </table>
+                           </div>
+                           <div class="clearfix"></div>
                         </div>
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
+                     </div>
+                  </div>
+                  <div class="col-xs-4" style="display: none" id="newUserArea">
+                     <div class="box box-primary">
+                        <div class="box-body">
+                           <div class="box-header" style="padding: 10px 0px">
+                              <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Add New User</h3>
+                           </div>
+                           <div class="col-lg-12">
+                              <form action="" method="post" accept-charset="utf-8">
+                                 <div class="form-group">
+                                    <label for="group">Group</label> 
+                                    <select name="group" id="group" data-placeholder="Select Group" class="form-control input-tip select2" style="width:100%;">
+                                       <option value="" selected="selected"></option>
+                                       <option value="1">admin</option>
+                                       <option value="2">staff</option>
+                                    </select>
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="first_name">First Name</label> <input type="text" name="first_name" value="" class="form-control tip" id="first_name" required="required" />
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="phone">Phone</label> <input type="text" name="phone" value="" class="form-control tip" id="phone" required="required" />
+                                 </div>
+                                 <div class="form-group">
+                                    <input type="submit" style="float: right" name="add_user" value="Add User" class="btn btn-primary" />
+
+                                    <button type="button" class="btn btn-default" onclick="hideNewUser()" >Cancel</button>
+
+
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="clearfix"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </section>
+         </div>
+      </div>
+      <!-- Modal -->
+      <div id="newUserModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" onclick="closeEditUserModal()" style="float: right;" class="btn clearButton">X</button>
+                  <h4 class="modal-title">Edit User</h4>
+               </div>
+               <div class="modal-body" style="max-height: 420px; overflow: scroll">
+                  <form action="" method="post" accept-charset="utf-8">
+                     <div class="row">
+                        <div class="col-lg-12">
+                           <div class="form-group">
+                              <label for="first_name">First Name</label> <input type="text" name="first_name" value="" class="form-control tip" id="first_name" required="required" />
+                           </div>
+                        </div>
+                        <div class="col-lg-12">
+                           <div class="form-group">
+                              <label for="group">Group</label> 
+                              <select name="group" id="group" data-placeholder="Select Group" class="form-control input-tip select2" style="width:100%;">
+                                 <option value="" selected="selected"></option>
+                                 <option value="1">admin</option>
+                                 <option value="2">staff</option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="row">
+                        <div class="col-lg-12">
+                           <div class="form-group">
+                              <label for="phone">Phone</label> <input type="text" name="phone" value="" class="form-control tip" id="phone" required="required" />
+                           </div>
+                        </div>
+                     </div>
+                     <div class="row">
+                        <div class="col-lg-6">
+                           <div class="form-group">
+                              <label for="password">Password</label> <input type="password" name="password" value="" class="form-control tip" id="password" required="required" />
+                           </div>
+                        </div>
+                        <div class="col-lg-6">
+                           <div class="form-group">
+                              <label for="confirm_password">Confirm Password</label> <input type="password" name="confirm_password" value="" class="form-control tip" id="confirm_password" required="required" />
+                           </div>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" onclick="closeEditUserModal()" style="float: left">Cancel</button>
+                  <button type="button" class="btn btn-success">Save</button>
+               </div>
             </div>
-        </div>
-    </section>
-</div>
-
-    </div>
-
-</body>
-
+         </div>
+      </div>
+      <script type="text/javascript" src="js/layoutFunctions.js"></script>
+      <script type="text/javascript" src="js/controllers/usersettings.js"></script>
+   </body>
 </html>

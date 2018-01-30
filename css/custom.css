@@ -1,0 +1,41 @@
+
+.tableTileGreen{
+
+	width: 140px; text-align: center; display: inline-block; max-width: 32%; 
+	height: 80px; margin: 3px; padding: 2px; background: #1abc9c;
+
+}
+
+.tableTileRed{
+
+	width: 140px; text-align: center; display: inline-block; max-width: 32%; 
+	height: 80px; margin: 3px; padding: 2px;  background: #e74c3c;
+
+}
+
+.tableTitle{
+	display: block; color: #FFF; font-weight: 600; font-size: 24px;
+}
+
+.tableCapacity{
+	display: block; color: #ecf0f5
+}
+
+.tableInfo{
+	display: block; color: #f1c40f
+}
+
+
+.clearButton{
+background: none;     color: #d2d6de;
+}
+
+.clearButton:hover, .clearButton:active, .clearButton:focus{
+	background: none;
+	box-shadow: none;
+	 outline: none !important;
+}
+
+.clearButton:focus{
+	color: #e74c3c;
+}
