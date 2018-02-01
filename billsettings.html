@@ -6,7 +6,7 @@
     <title id="clientName">Jafry's Kitchen</title>
 
     <link href="css/styles.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/layoutFunctions.js"></script>
+    <link href="css/custom.css" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -19,16 +19,11 @@
             </a>
 
             <nav class="navbar navbar-static-top" role="navigation">
-
-                <ul class="nav navbar-nav pull-left">
-
-                    <li>
-                        <a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a>
-                    </li>
-                </ul>
-
+                <page class="commonPageName">Bill Settings</page>
+                
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
+                        <li><a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a></li>
                         <li><a href="#">Live Orders</a></li>
                         <li><a href="#">Today's Sales</a></li>
                         <li class="dropdown user user-menu">
@@ -84,9 +79,6 @@
         </aside>
 
 <div class="content-wrapper" style="height: 1000px">
-    <section class="content-header">
-        <h1>Bill Settings</h1>
-    </section>
 
     <section class="content">
         <div class="row">
@@ -97,7 +89,7 @@
                         
                         <div class="box-header" style="padding: 10px 0px">
                            <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Billing Extras</h3>
-                           <button class="btn btn-success btn-sm" style="float: right">Add New</button>
+                           <button class="btn btn-success btn-sm" id="openNewBillButton" onclick="openNewBill()"  style="float: right">Add New</button>
                         </div>
 
                         <div class="table-responsive">
@@ -148,12 +140,64 @@
                 </div>
             </div>
 
+
+            <div class="col-xs-4" style="display: none" id="newBillArea">
+                     <div class="box box-primary">
+                        <div class="box-body">
+                           <div class="box-header" style="padding: 10px 0px">
+                              <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Add Billing Parameter</h3>
+                           </div>
+                           <div class="col-lg-12">
+                              <form action="" method="post" accept-charset="utf-8">
+                                 <div class="form-group">
+                                    <label for="first_name">Name</label> <input type="text" name="first_name" value="" class="form-control tip" id="first_name" required="required" />
+                                 </div>                                 
+                                 <div class="form-group">
+                                    <label for="group">Is Compulsary?</label> 
+                                    <select name="group" id="group" data-placeholder="Select Group" class="form-control input-tip select2" style="width:100%;">
+                                       <option value="YES" selected="selected">Yes</option>
+                                       <option value="NO">No</option>
+                                    </select>
+                                 </div>
+
+                                 <div class="form-group">
+                                    <label for="phone">Value</label> <input type="text" name="phone" value="0.00" class="form-control tip" id="phone" required="required" />
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="group">Unit</label> 
+                                    <select name="group" id="group" data-placeholder="Select Group" class="form-control input-tip select2" style="width:100%;">
+                                       <option value="PERCENTAGE" selected="selected">Percentage (%)</option>
+                                       <option value="FIXED">Fixed Amount (Rs)</option>
+                                    </select>
+                                 </div>
+
+                                 <div class="form-group">
+                                    <input type="submit" style="float: right" name="add_user" value="Add Parameter" class="btn btn-primary" />
+
+                                    <button type="button" class="btn btn-default" onclick="hideNewBill()" >Cancel</button>
+
+
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="clearfix"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+
         
         </div>
     </section>
 </div>
 
     </div>
+
+
+      <script type="text/javascript" src="js/layoutFunctions.js"></script>
+      <script type="text/javascript" src="js/controllers/billsettings.js"></script>
+
 
 </body>
 
