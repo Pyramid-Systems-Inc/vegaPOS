@@ -1,3 +1,12 @@
+.commonPageName{
+  position: absolute;
+    font-size: 21px;
+    font-weight: 600;
+    color: #FFF;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
 
 .tableTileGreen{
 
@@ -38,4 +47,221 @@ background: none;     color: #d2d6de;
 
 .clearButton:focus{
 	color: #e74c3c;
+}
+
+
+/* For Sticky Bills */
+.kotListing ul,li{
+  list-style:none;
+}
+.kotListing ul{
+  overflow:hidden;
+  padding:3em;
+}
+.kotListing ul li a{
+  text-decoration:none;
+  color:#000;
+  background:#ffc;
+  display:block;
+  height: 240px;
+  width: 200px;
+  padding: 10px;
+  overflow: hidden;
+  -moz-box-shadow:5px 5px 7px rgba(33,33,33,1);
+  -webkit-box-shadow: 5px 5px 7px rgba(33,33,33,.7);
+  box-shadow: 5px 5px 7px rgba(33,33,33,.7);
+  -moz-transition:-moz-transform .15s linear;
+  -o-transition:-o-transform .15s linear;
+  -webkit-transition:-webkit-transform .15s linear;
+}
+.kotListing ul li{
+  margin:1em;
+  float:left;
+}
+.kotListing ul li h2{
+	margin-top: 5px;
+  font-size:140%;
+  font-weight:bold;
+  padding-bottom:10px;
+}
+.kotListing ul li p{
+  font-family:"Reenie Beanie",arial,sans-serif;
+  font-size: 14px;
+}
+.kotListing ul li a{
+  -webkit-transform: rotate(-6deg);
+  -o-transform: rotate(-6deg);
+  -moz-transform:rotate(-6deg);
+}
+.kotListing ul li:nth-child(even) a{
+  -o-transform:rotate(4deg);
+  -webkit-transform:rotate(4deg);
+  -moz-transform:rotate(4deg);
+  position:relative;
+  top:5px;
+  background:#cfc;
+}
+.kotListing ul li:nth-child(3n) a{
+  -o-transform:rotate(-3deg);
+  -webkit-transform:rotate(-3deg);
+  -moz-transform:rotate(-3deg);
+  position:relative;
+  top:-5px;
+  background:#ccf;
+}
+.kotListing ul li:nth-child(5n) a{
+  -o-transform:rotate(5deg);
+  -webkit-transform:rotate(5deg);
+  -moz-transform:rotate(5deg);
+  position:relative;
+  top:-10px;
+}
+.kotListing ul li a:hover,ul li a:focus{
+  box-shadow:10px 10px 7px rgba(0,0,0,.7);
+  -moz-box-shadow:10px 10px 7px rgba(0,0,0,.7);
+  -webkit-box-shadow: 10px 10px 7px rgba(0,0,0,.7);
+  -webkit-transform: scale(1.25);
+  -moz-transform: scale(1.25);
+  -o-transform: scale(1.25);
+  position:relative;
+  z-index:5;
+}
+.kotListing ol{text-align:center;}
+.kotListing ol li{display:inline;padding-right:1em;}
+.kotListing ol li a{color:#fff;}
+
+.kotListing .tableName{
+	background: #444; color: #fff; border-radius: 30px; padding: 4px 8px; float: right;
+}
+
+.kotListing .bottomTag{
+	background: rgba(68, 68, 68, 0.4); color: #FFF; width: 100%; position: fixed; bottom: 0; left: 0; padding: 5px;
+}
+
+.kotListing .tagSteward{
+	padding: 0; margin:0; font-weight: bold; font-size: 14px; text-align: center;
+}
+
+.kotListing .tagUpdate{
+	font-style: italic; font-size: 12px; text-align: center; margin:0;
+}
+
+.kotListing .itemsTag{
+	width: 180px;
+    max-height: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kotListing .more{
+	background: #00a65a;
+	color: #FFF;
+	font-size: 12px;
+	padding: 0px 6px;
+	border-radius: 20px; 
+
+    position: fixed;
+    bottom: 50px;
+    right: 5px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    display: none;
+}
+
+.itemList{
+    max-height: 140px;
+    overflow: hidden;
+}
+.itemList .price{
+	width: 30px;
+	text-align: right;
+}
+
+.itemList .name{
+	width: 150px;
+}
+
+
+/* Edit Menu */
+.subMenuList{
+  background-color: #f9f9f9;
+}
+
+.subMenuList:hover, .subMenuList:active, .subMenuList:focus{
+  background-color: #d8d8d8;
+}
+
+.notavailTag{
+  background: #e74c3c;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.availTag{
+  background: #2ecc71;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.itemPriceTag{
+  background: none;
+}
+
+
+/* Sales Summary */
+.summaryCount{
+  font-size: 11px; 
+  color: grey;
+}
+
+.summaryLine1{
+  color: #6f20ab;
+}
+
+.summaryLine2{
+  color: #43a3de;
+}
+
+.summaryLine3{
+  color: #55bd9c;
+}
+
+.summaryRowHighlight{
+  background: #fdfde4;
+}
+
+.summaryRowTitle{
+  font-weight: bold;
+}
+
+
+
+/*rewards*/
+.rewardsCount{
+  font-size: 48px;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.rewardsRs{
+color: #f4f4f4; padding-left: 5px; font-size: 60%; font-weight: 400
+}
+
+.rewardsButton{
+  width: 100%;
+  font-size: 18px;
+  color: #FFF;
+  text-transform: uppercase;
+  height: 60px;
+}
+
+.rewardsName{
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }

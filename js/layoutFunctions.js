@@ -22,10 +22,14 @@ function activateSidebar(){
 
 
 /* Open KOT Modal */
-
-let $ = require('jquery')
-
 function viewKOTModal(){
 	console.log('Viewing Modal')
-	$('#KOTViewModal').modal('show');
+}
+
+
+/* KOTs */
+function checkOverflow(element){
+	if(element.scrollHeight > element.clientHeight){
+		element.getElementsByClassName("more")[0].style.display = 'block';
+	}
 }
