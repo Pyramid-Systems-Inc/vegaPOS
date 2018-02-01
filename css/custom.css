@@ -265,3 +265,53 @@ color: #f4f4f4; padding-left: 5px; font-size: 60%; font-weight: 400
   letter-spacing: 2px;
   text-transform: uppercase;
 }
+
+
+
+/* Online Delivery */
+.deliveryAddress{
+  border: 1px solid gray;
+    padding: 10px;
+}
+
+.deliveryTitle{
+      margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #444;
+    font-size: 80%;
+}
+
+.deliveryText{
+  margin: 0;
+  color: #000;
+}
+
+.deliveryComment{
+    margin: 0;
+  color: #000;
+  font-weight: bold;
+}
+
+.onlinePrepaid{
+    font-size: 12px;
+    float: right;
+    margin-left: 10px;
+    padding: 4px 6px;
+    border: 1px solid #2980b9;
+    color: #2980b9;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.onlineCOD{
+    font-size: 12px;
+    float: right;
+    margin-left: 10px;
+    padding: 4px 6px;
+    border: 1px solid #2ecc71;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #2ecc71; color: #FFF;
+}
+
