@@ -211,8 +211,9 @@
                      </div>
                      <input type="hidden" id="new_item_choice_count" value="0"/>
                      <div id="newItemChoicesArea"></div>
-                  </form>                
-                  <button type="button" class="btn btn-default" id="addChoiceButton" onclick="addChoice()">Add Choices</button>
+                  </form>  
+                  <button type="button" style="float: left; background: none; display: none" class="btn btn-sm  btn-default" id="removeChoiceButton" onclick="removeChoice()">Clear Choices</button>           
+                  <button type="button" style="float: right" class="btn btn-sm btn-default" id="addChoiceButton" onclick="addChoice()">Add Choice</button>
                </div>
                <div class="modal-footer">
                   <button type="button" class="btn btn-default" onclick="hideNewMenuItem()" style="float: left">Cancel</button>
