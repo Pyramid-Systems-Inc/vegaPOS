@@ -1,7 +1,6 @@
 
 
 function openEditUserModal(){
-
 	document.getElementById("newUserModal").style.display = "block";
 
 } 
@@ -14,7 +13,6 @@ function closeEditUserModal(){
 
 
 function openNewUser(){
-	
 	document.getElementById("newUserArea").style.display = "block";
 	document.getElementById("openNewUserButton").style.display = "none";
 }

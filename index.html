@@ -6,7 +6,7 @@
     <title id="clientName">Jafry's Kitchen</title>
 
     <link href="css/styles.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/layoutFunctions.js"></script>
+    <link href="css/custom.css" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -20,15 +20,11 @@
 
             <nav class="navbar navbar-static-top" role="navigation">
 
-                <ul class="nav navbar-nav pull-left">
-
-                    <li>
-                        <a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a>
-                    </li>
-                </ul>
-
+                <page class="commonPageName">Punch Order</page>
+                
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
+                        <li><a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a></li>
                         <li><a href="#">Live Orders</a></li>
                         <li><a href="#">Today's Sales</a></li>
                         <li class="dropdown user user-menu">
@@ -39,7 +35,6 @@
                         </li>
                     </ul>
                 </div>
-
             </nav>
 
         </header>
@@ -284,35 +279,21 @@
                     <td>
                         <div class="contents" id="right-col">
                             <div id="item-list">
-                                <h1>Starter</h1>
-                                <div class="items">
-                                    <div>
-                                        <button type="button" data-name="Minion Hi" id="product-0101" type="button" value='TOY01' class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/6988655f95602f9394f9315165f920fe.png" alt="Minion Hi" style="width: 100px; height: 100px;"></span><span><span>Minion Hi</span></span>
-                                        </button>
-                                        <button type="button" data-name="Minion Banana" id="product-0102" type="button" value='TOY02' class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>Minion Banana</span></span>
-                                        </button>
-                                    </div>
-
-
-                                    <h1>Starter</h1>
-                                    <div class="items">
-                                    <div>
-                                        <button type="button" data-name="Minion Hi" id="product-0101" type="button" value='TOY01' class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/6988655f95602f9394f9315165f920fe.png" alt="Minion Hi" style="width: 100px; height: 100px;"></span><span><span>Minion Hi</span></span>
-                                        </button>
-                                        <button type="button" data-name="Minion Banana" id="product-0102" type="button" value='TOY02' class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>Minion Banana</span></span>
-                                        </button>
-                                    </div>
-                                </div>
-
-
-                                </div>
+                                <p style="text-align: center">Loading Menu ...</p>
                             </div>
                         </div>
                     </td>
+
                 </tr>
             </table>
         </div>
     </div>
+
+
+    <script type="text/javascript" src="js/layoutFunctions.js"></script>
+    <script type="text/javascript" src="js/controllers/orderpunching.js"></script>
+
+
 
 </body>
 
