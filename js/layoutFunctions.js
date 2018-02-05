@@ -33,3 +33,14 @@ function checkOverflow(element){
 		element.getElementsByClassName("more")[0].style.display = 'block';
 	}
 }
+
+/*Toast*/
+function showToast(message, color){
+        var x = document.getElementById("infobar")
+        if(color){
+        	x.style.background = color;
+        }
+		x.innerHTML = message;
+		x.className = "show";
+		setTimeout(function(){ x.className = x.className.replace("show", ""); }, 5000);   	
+}
