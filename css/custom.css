@@ -1,3 +1,13 @@
+html, body {
+        height: 100%;
+        margin: 0px;
+        background: #FFF;
+}
+
+.content{
+  height: 100vh;
+}
+
 .commonPageName{
   position: absolute;
     font-size: 21px;
