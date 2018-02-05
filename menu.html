@@ -10,7 +10,7 @@
 
 </head>
 
-<body class="skin-green sidebar-mini pos sidebar-collapse">
+<body class="skin-green sidebar-mini pos sidebar-collapse" onload="fetchAllCategories()">
     <div class="wrapper rtl rtl-inv">
         <header class="main-header">
             <a href="#" class="logo" onclick="activateSidebar()">
@@ -92,10 +92,8 @@
                            </div>
                            <div class="table-responsive">
                               <table class="table" style="margin: 0">
-                                 <tbody>
-                                    <tr role="row" class="subMenuList" onclick="openSubMenu('Starters')">
-                                       <td>Starters</td>
-                                    </tr>
+                                 <tbody id="categoryArea">
+
                                     <tr role="row" class="subMenuList" onclick="openSubMenu('Main Course')">
                                        <td>Main Course</td>
                                     </tr>    
@@ -113,33 +111,13 @@
                   <div class="col-xs-6" style="display: none" id="menuDeatilsArea">
                      <div class="box box-primary">
                         <div class="box-body">
-                           <div class="box-header" style="padding: 10px 0px">
+                           <div class="box-header" id="menuRenderTitle" style="padding: 10px 0px">
                               <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Starters</h3>
-                              <button class="btn btn-success btn-sm" id="openNewMenuItemButton" onclick="openNewMenuItem('Starter')" style="float: right">New Starter</button>
+                              <button class="btn btn-success btn-sm" id="openNewMenuItemButton" onclick="openNewMenuItem('Main Course')" style="float: right">New Starter</button>
                            </div>
                            <div class="col-lg-12" style="padding: 0">
                               <table class="table" style="margin: 0">
-                                 <tbody>
-                                    <tr>
-                                       <td>Chicken 65</td>
-                                       <td><button class="btn btn-sm itemPriceTag"><i class="fa fa-inr"></i> 120</button></td>
-                                       <td><span class="label availTag">Available</span></td>
-                                    </tr>
-                                    <tr>
-                                       <td>Chicken Roll</td>
-                                       <td><button class="btn btn-sm itemPriceTag"><i class="fa fa-inr"></i> 80</button></td>
-                                       <td><span class="label availTag">Available</span></td>
-                                    </tr>     
-                                    <tr>
-                                       <td>Teriyaki Chicken</td>
-                                       <td><button class="btn btn-sm itemPriceTag"><i class="fa fa-inr"></i> 180</button></td>
-                                       <td><span class="label notavailTag">Out of Stock</span></td>
-                                    </tr>
-                                    <tr>
-                                       <td>Malay Pakkoda</td>
-                                       <td><button class="btn btn-sm itemPriceTag"><i class="fa fa-inr"></i> 25</button></td>
-                                       <td><span class="label availTag">Available</span></td>
-                                    </tr>                                                                                                     
+                                 <tbody id="menuRenderContent">                                                                                                  
                                  </tbody>
                               </table>
                            </div>
@@ -193,10 +171,10 @@
             <div class="modal-content">
                <div class="modal-header">
                   <button type="button" onclick="hideNewMenuItem()" style="float: right;" class="btn clearButton">X</button>
-                  <h4 class="modal-title">New Item</h4>
+                  <h4 class="modal-title" id="newItemModalTitle">New Item</h4>
                </div>
                <div class="modal-body" style="max-height: 420px; overflow: scroll">
-                  <form action="" method="post" accept-charset="utf-8" id="newItemArea">
+                  <form id="newItemArea">
                      <div class="row">
                         <div class="col-lg-8">
                            <div class="form-group">
@@ -214,16 +192,42 @@
                   </form>  
                   <button type="button" style="float: left; background: none; display: none" class="btn btn-sm  btn-default" id="removeChoiceButton" onclick="removeChoice()">Clear Choices</button>           
                   <button type="button" style="float: right" class="btn btn-sm btn-default" id="addChoiceButton" onclick="addChoice()">Add Choice</button>
+
                </div>
                <div class="modal-footer">
                   <button type="button" class="btn btn-default" onclick="hideNewMenuItem()" style="float: left">Cancel</button>
-                  <button type="button" class="btn btn-success">Add</button>
+                  <button type="button" onclick="readNewItem()" class="btn btn-success">Add</button>
                </div>
             </div>
          </div>
       </div>
 
 
+
+
+      <!-- Modal -->
+      <div id="editMenuItemPriceModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" onclick="hideEditMenuItemPrice()" style="float: right;" class="btn clearButton">X</button>
+                  <h4 class="modal-title" id="editItemPriceModalTitle">Edit Item</h4>
+               </div>
+               <div class="modal-body" style="max-height: 420px; overflow: scroll">
+                  <form id="editItemArea"></form>  
+                  <div id="extraChoicesArea"></div>
+
+                  <button type="button" style="float: left; background: none; display: none" class="btn btn-sm  btn-default" id="removeExtraChoiceButton" onclick="removeExtraChoice()">Clear Choices</button>           
+                  <button type="button" style="float: right;" class="btn btn-sm btn-default" id="addExtraChoiceButton" onclick="editAddMoreChoice()">Add Choice</button>                  
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" onclick="hideEditMenuItemPrice()" style="float: left">Cancel</button>
+                  <button type="button" onclick="reviewItemPrice()" class="btn btn-success">Save</button>
+               </div>
+            </div>
+         </div>
+      </div>
 
 
 
