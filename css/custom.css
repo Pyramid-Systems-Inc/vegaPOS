@@ -208,6 +208,7 @@ background: none;     color: #d2d6de;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  float: right;
 }
 
 .availTag{
@@ -215,6 +216,7 @@ background: none;     color: #d2d6de;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  float: right;
 }
 
 .itemPriceTag{
@@ -325,3 +327,29 @@ color: #f4f4f4; padding-left: 5px; font-size: 60%; font-weight: 400
     background: #2ecc71; color: #FFF;
 }
 
+
+.deleteButtonGrey{
+  color: #f4f4f4;
+  margin-left: 5px; 
+  background: none;
+      width: 30px;
+    height: 25px;
+    display: inherit;
+}
+
+.deleteButtonGrey:hover, .deleteButtonGrey:active, .deleteButtonGrey:focus{
+  color: #e74c3c;
+}  
+
+.editButtonGrey{
+  color: #f4f4f4;
+  margin-left: 15px; 
+  background: none;
+      width: 30px;
+    height: 25px;
+    display: inherit;
+}
+
+.editButtonGrey:hover, .editButtonGrey:active, .editButtonGrey:focus{
+  color: #3498db;
+}  

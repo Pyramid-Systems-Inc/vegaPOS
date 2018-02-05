@@ -5,6 +5,7 @@ let fs = require('fs');
 
 /* read categories */
 function fetchAllCategories(){
+
 		if(fs.existsSync('menuCategories.json')) {
 	      fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
@@ -18,7 +19,7 @@ function fetchAllCategories(){
 				for (i=0; i<categories.length; i++){
 					categoryTag = categoryTag + '<tr class="subMenuList" onclick="openSubMenu(\''+categories[i]+'\')"><td>'+categories[i]+'</td></tr>';
 				}
-				
+
 				document.getElementById("categoryArea").innerHTML = categoryTag; 
 		}
 		});
@@ -244,7 +245,9 @@ function openSubMenu(menuCategory){
 
 				
 				document.getElementById("menuRenderTitle").innerHTML = '<div class="box-header" id="menuRenderTitle" style="padding: 10px 0px">'+
-                              '<h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">'+menuCategory+'</h3>'+
+                              '<h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">'+menuCategory+
+                              '<span class="editButtonGrey" onclick="openEditCategoryName(\''+menuCategory+'\')"><i class="fa fa-edit"></i></span>'+
+                              '<span class="deleteButtonGrey" onclick="openDeleteConfirmation(\''+menuCategory+'\')"><i class="fa fa-trash-o"></i></span></h3>'+
                               '<button class="btn btn-success btn-sm" id="openNewMenuItemButton" onclick="openNewMenuItem(\''+menuCategory+'\')" style="float: right">New '+menuCategory+'</button>'+
                            '</div>';
 
@@ -379,3 +382,240 @@ function readNewItem(){
 	/* VALIDATE BEFORE ADDING TO DATA FILE */
 	console.log(item);
 }
+
+
+
+/* add new category */
+function addCategory() {  
+
+	var name = document.getElementById("add_new_category_name").value;
+   
+   var letterNumber = /^[0-9a-zA-Z]+$/;
+   if(!name.match(letterNumber)) {
+      console.log("Only Alphanumeric Characters allowed")
+   }
+   else{ 
+      //Check if file exists
+      if(fs.existsSync('menuCategories.json')) {
+         fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+       if (err){
+           console.log(err);
+       } else {
+         if(data==""){
+            obj = []
+            obj.push(name); //add some data
+            fs.writeFile('menuCategories.json', obj, 'utf8', (err) => {
+                if(err)
+                  console.log(err)
+            });
+         }
+         else{
+             flag=0;
+             obj = JSON.parse(data);
+             for (i=0; i<obj.length; i++) {
+               if (obj[i] == name){
+                  flag=1;
+                  break;
+               }
+             }
+             if(flag==1){
+               console.log("Duplicate Entry not Allowed")
+             }
+             else{
+                console.log(obj)
+                obj.push(name);
+                json = JSON.stringify(obj);
+                fs.writeFile('menuCategories.json', json, 'utf8', (err) => {
+                     if(err)
+                        console.log(err)
+                  });  
+                fetchAllCategories(); //refresh the list
+                hideNewMenuCategory();
+             }
+                 
+         }
+          
+   }});
+      } else {
+         console.log("File Doesn\'t Exist. Creating new file.")
+         obj.push(name);
+         fs.writeFile('menuCategories.json', obj, 'utf8', (err) => {
+            if(err)
+               console.log(err)
+         });
+      }
+   }
+}
+
+
+/* delete items in a given category */
+function deleteCategoryFromMaster(menuCategory){
+
+		if(fs.existsSync('mastermenu.json')) {
+	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        console.log(err);
+	    } else {
+	          var mastermenu = JSON.parse(data); 
+				for (i=0; i<mastermenu.length; i++){
+
+					if(menuCategory == mastermenu[i].category){
+						mastermenu.splice(i,1);
+						break;
+					}
+
+				}
+		       
+		       var newjson = JSON.stringify(mastermenu);
+		       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
+		         if(err)
+		            console.log(err)
+		       }); 
+
+		}
+		});
+	    } else {
+	      console.log("File Doesn\'t Exist.")
+	    }
+
+}
+
+
+/* delete a category */
+function deleteCategory(name) {  
+
+	/* delete from cateogry list and delete all the entries from master menu as well */
+
+   //Check if file exists
+   if(fs.existsSync('menuCategories.json')) {
+       fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+       if (err){
+           console.log(err);
+       } else {
+       obj = JSON.parse(data); //now it an object
+       //console.log(obj.length)
+       for (i=0; i<obj.length; i++) {  
+         if (obj[i] == name){
+            obj.splice(i,1);
+            break;
+         }
+       }
+       console.log(obj)
+       var newjson = JSON.stringify(obj);
+       fs.writeFile('menuCategories.json', newjson, 'utf8', (err) => {
+         if(err)
+            console.log(err)
+
+          deleteCategoryFromMaster(name);
+       }); 
+      }});
+   } else {
+      console.log("File Doesn\'t Exist.")
+   }
+
+   /* on successful delete */
+   //document.getElementById("menuDeatilsArea").style.display = "none";
+   //document.getElementById("categoryDeleteConfirmation").style.display = 'none';
+   location.reload();
+
+}
+
+function openDeleteConfirmation(type){
+	document.getElementById("deleteConfirmationConsent").innerHTML = '<button type="button" class="btn btn-default" onclick="cancelDeleteConfirmation()" style="float: left">Cancel</button>'+
+                  							'<button type="button" class="btn btn-danger" onclick="deleteCategory(\''+type+'\')">Delete</button>';
+
+	document.getElementById("deleteConfirmationText").innerHTML = 'All the items in the <b>'+type+'</b> category will also be deleted. Are you sure want to delete this category?';
+	document.getElementById("categoryDeleteConfirmation").style.display = 'block';
+}
+
+function cancelDeleteConfirmation(){
+	document.getElementById("categoryDeleteConfirmation").style.display = 'none';
+}
+
+/*edit category name alone */
+function renameCategoryFromMaster(current, newName){
+		
+		if(fs.existsSync('mastermenu.json')) {
+	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        console.log(err);
+	    } else {
+	          var mastermenu = JSON.parse(data); 
+				for (i=0; i<mastermenu.length; i++){
+
+					if(current == mastermenu[i].category){
+						mastermenu[i].category = newName;
+						break;
+					}
+
+				}
+		       
+		       var newjson = JSON.stringify(mastermenu);
+		       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
+		         if(err)
+		            console.log(err)
+		       }); 
+
+		}
+		});
+	    } else {
+	      console.log("File Doesn\'t Exist.")
+	    }
+}
+
+function saveNewCategoryName(currentName){
+
+	var newName = document.getElementById("edit_category_new_name").value;
+
+	if(currentName != newName){ /* replace category name*/
+		   //Check if file exists
+		   if(fs.existsSync('menuCategories.json')) {
+		       fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+		       if (err){
+		           console.log(err);
+		       } else {
+		       obj = JSON.parse(data); //now it an object
+		       //console.log(obj.length)
+		       for (i=0; i<obj.length; i++) {  
+		         if (obj[i] == currentName){
+		            obj[i] = newName;
+		            break;
+		         }
+		       }
+
+		       var newjson = JSON.stringify(obj);
+		       fs.writeFile('menuCategories.json', newjson, 'utf8', (err) => {
+		         if(err)
+		            console.log(err)
+
+		          	renameCategoryFromMaster(currentName, newName);
+		       }); 
+		      }});
+		   } else {
+		      console.log("File Doesn\'t Exist.")
+		   }
+	}
+
+	document.getElementById("categoryEditNameConfirmation").style.display = 'none';
+}
+
+
+function openEditCategoryName(current){
+	document.getElementById("editCategoryNameConsent").innerHTML = '<button type="button" class="btn btn-default" onclick="hideEditCategoryName()" style="float: left">Cancel</button>'+
+                  							'<button type="button" onclick="saveNewCategoryName(\''+current+'\')" class="btn btn-success">Save</button>';
+	
+	document.getElementById("editCategoryNameArea").innerHTML = '<div class="row">'+
+	                        '<div class="col-lg-12">'+
+	                           '<div class="form-group">'+
+	                              '<input style="border: none; border-bottom: 1px solid" placeholder="Enter a Name" type="text" id="edit_category_new_name" value="'+current+'" class="form-control tip"/>'+
+	                           '</div>'+
+	                        '</div>'+                  
+	                     '</div>';
+
+	document.getElementById("categoryEditNameConfirmation").style.display = 'block';
+}
+
+function hideEditCategoryName(){
+	document.getElementById("categoryEditNameConfirmation").style.display = 'none';
+}
+
