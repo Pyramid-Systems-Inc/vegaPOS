@@ -9,7 +9,7 @@ function fetchAllCategories(){
 		if(fs.existsSync('menuCategories.json')) {
 	      fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
-	        console.log(err);
+	        showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
 	          
 	          	var categories = JSON.parse(data);
@@ -20,11 +20,15 @@ function fetchAllCategories(){
 					categoryTag = categoryTag + '<tr class="subMenuList" onclick="openSubMenu(\''+categories[i]+'\')"><td>'+categories[i]+'</td></tr>';
 				}
 
-				document.getElementById("categoryArea").innerHTML = categoryTag; 
+				if(!categoryTag)
+					categoryTag = '<p style="color: #bdc3c7">No Category added yet.</p>';
+			
+
+				document.getElementById("categoryArea").innerHTML = categoryTag;
 		}
 		});
 	    } else {
-	      console.log("File Doesn\'t Exist.")
+	      showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
 	    }	
 }
 
@@ -45,7 +49,7 @@ function markAvailability(code){
 }
 
 /*edit price of the item*/
-function editItemPrice(encodedItem){
+function editItemPrice(encodedItem, inCateogry){
 
 	//removes cache
 	document.getElementById("extraChoicesArea").innerHTML = ''; 
@@ -60,6 +64,8 @@ function editItemPrice(encodedItem){
 
 	document.getElementById("editMenuItemPriceModal").style.display = "block";
 	document.getElementById("editItemPriceModalTitle").innerHTML = 'Edit <b>'+item.name+'</b>';
+	document.getElementById("editPriceModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="hideEditMenuItemPrice()" style="float: left">Cancel</button>'+
+                  												   '<button type="button" onclick="reviewItemPrice(\''+inCateogry+'\')" class="btn btn-success">Save</button>';
 	
 	if(item.isCustom){
 			for(i=1; i<=item.customOptions.length; i++){
@@ -110,6 +116,7 @@ function editItemPrice(encodedItem){
 	}
 
 	document.getElementById("editItemArea").innerHTML = editContent;
+	document.getElementById("editItemCodeSecret").innerHTML = '<input type="hidden" id="item_main_code_secret" value="'+item.code+'"/>';
 
 	//If it has choices already, show CLEAR Choice buttons 
 	if(item.isCustom){
@@ -177,26 +184,6 @@ function removeExtraChoice(){
 }
 
 
-/*read and validate form with edited item details*/
-function reviewItemPrice(){
-	var item = {};
-	item.name = document.getElementById("item_main_name").value;
-	item.price = document.getElementById("item_main_price").value;
-
-		var custom = [];
-		var i = 1;
-		while($("#edit_choiceName_"+i).length != 0){
-			custom.push({'customName': $("#edit_choiceName_"+i).val(), 'customPrice': $("#edit_choicePrice_"+i).val()});
-			i++;
-		}
-
-		item.customOptions = custom;	
-
- 		custom.length > 0 ? item.isCustom = true : item.isCustom = false;
-
-	/* VALIDATE BEFORE ADDING TO DATA FILE */
-	console.log(item);
-}
 
 
 
@@ -204,12 +191,14 @@ function reviewItemPrice(){
 
 function openSubMenu(menuCategory){	
 
+	console.log('opening... '+menuCategory)
+
 	//read menu
 
 		if(fs.existsSync('mastermenu.json')) {
 	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
-	        console.log(err);
+	        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
 	          var mastermenu = JSON.parse(data); 
 	          var itemsInCategory = "";
@@ -233,7 +222,7 @@ function openSubMenu(menuCategory){
 
 							itemsInCategory = itemsInCategory + '<tr>'+
 							                                       '<td>'+mastermenu[i].items[j].name+'</td>'+
-							                                       '<td><button class="btn btn-sm itemPriceTag" onclick="editItemPrice(\''+encodeURI(JSON.stringify(mastermenu[i].items[j]))+'\')"><i class="fa fa-inr"></i> '+mastermenu[i].items[j].price+'</button></td>'+
+							                                       '<td><button class="btn btn-sm itemPriceTag" onclick="editItemPrice(\''+encodeURI(JSON.stringify(mastermenu[i].items[j]))+'\', \''+menuCategory+'\')"><i class="fa fa-inr"></i> '+mastermenu[i].items[j].price+'</button></td>'+
 							                                       '<td>'+availabilityTag+'</td>'+
 							                                    '</tr>';
 				
@@ -245,11 +234,59 @@ function openSubMenu(menuCategory){
 
 				
 				document.getElementById("menuRenderTitle").innerHTML = '<div class="box-header" id="menuRenderTitle" style="padding: 10px 0px">'+
-                              '<h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">'+menuCategory+
-                              '<span class="editButtonGrey" onclick="openEditCategoryName(\''+menuCategory+'\')"><i class="fa fa-edit"></i></span>'+
-                              '<span class="deleteButtonGrey" onclick="openDeleteConfirmation(\''+menuCategory+'\')"><i class="fa fa-trash-o"></i></span></h3>'+
-                              '<button class="btn btn-success btn-sm" id="openNewMenuItemButton" onclick="openNewMenuItem(\''+menuCategory+'\')" style="float: right">New '+menuCategory+'</button>'+
+                              '<h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">'+menuCategory+'</h3>'+
                            '</div>';
+
+               	//Submenu options
+               	var subOptions = '<div class="floaty" style="right: -85px; top: 10px">'+
+                                  '<div class="floaty-btn" onclick="openNewMenuItem(\''+menuCategory+'\')">'+
+                                    '<span class="floaty-btn-label">Add a New '+menuCategory+'</span>'+
+                                    '<svg width="24" height="24" viewBox="0 0 24 24" class="floaty-btn-icon floaty-btn-icon-plus absolute-center">'+
+										'<path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" fill="#fff"/>'+
+    									'<path d="M0-.75h24v24H0z" fill="none"/>'+
+                                    '</svg>'+
+                                    '<svg width="24" height="24" viewBox="0 0 24 24" class="floaty-btn-icon floaty-btn-icon-create absolute-center">'+
+                                      '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#fff"/>'+
+                                      '<path d="M0 0h24v24H0z" fill="none"/>'+
+                                    '</svg>'+
+                                  '</div>'+
+                                  '<ul class="floaty-list">'+
+                                    '<li class="floaty-list-item floaty-list-item--blue" onclick="openEditCategoryName(\''+menuCategory+'\')">'+
+                                      '<span class="floaty-list-item-label">Edit Category Name</span>'+
+                                      '<svg width="20" height="20" viewBox="0 0 24 24" class="absolute-center">'+
+                                        '<path d="M5 17v2h14v-2H5zm4.5-4.2h5l.9 2.2h2.1L12.75 4h-1.5L6.5 15h2.1l.9-2.2zM12 5.98L13.87 11h-3.74L12 5.98z"/>'+
+                                        '<path d="M0 0h24v24H0z" fill="none"/>'+
+                                      '</svg>'+
+                                    '</li>'+
+                                    '<li class="floaty-list-item floaty-list-item--red" onclick="openDeleteConfirmation(\''+menuCategory+'\')">'+
+                                      '<span class="floaty-list-item-label">Delete '+menuCategory+'</span>'+
+                                      '<svg width="20" height="20" viewBox="0 0 24 24" class="absolute-center">'+
+                                          '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>'+
+                                          '<path d="M0 0h24v24H0z" fill="none"/>'+
+                                      '</svg>'+
+                                    '</li>'+     
+                                  '</ul>'+
+                                '</div>';
+
+                document.getElementById("submenuOptions").innerHTML = subOptions;
+
+				//Floating Button Animation
+				var $floaty = $('.floaty');
+
+				$floaty.on('mouseover click', function(e) {
+				  $floaty.addClass('is-active');
+				  e.stopPropagation();
+				});
+
+				$floaty.on('mouseout', function() {
+				  $floaty.removeClass('is-active');
+				});
+
+				$('.container').on('click', function() {
+				  $floaty.removeClass('is-active');
+				});
+
+
 
                 if(!itemsInCategory)
                 	itemsInCategory = '<p style="color: #bdc3c7">No items found in '+menuCategory+'</p>';
@@ -258,7 +295,7 @@ function openSubMenu(menuCategory){
 		}
 		});
 	    } else {
-	      console.log("File Doesn\'t Exist.")
+	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    }		
 
 	//menuRenderArea
@@ -292,17 +329,18 @@ function openNewMenuItem(category){
 	document.getElementById("new_item_choice_count").value = 0;
 	document.getElementById("removeChoiceButton").style.display = 'none';
 
-	if(category)
+	if(category){
 		document.getElementById("newItemModalTitle").innerHTML = "Add New <b>"+category+"</b>";
+		document.getElementById("newItemModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="hideNewMenuItem()" style="float: left">Cancel</button>'+
+                  								'<button type="button" onclick="readNewItem(\''+category+'\')" class="btn btn-success">Add</button>';
+	}
+		
 
 	document.getElementById("newMenuItemModal").style.display = "block";
-	document.getElementById("openNewMenuItemButton").style.display = "none";
 }
 
-function hideNewMenuItem(){
-	
+function hideNewMenuItem(){	
 	document.getElementById("newMenuItemModal").style.display = "none";
-	document.getElementById("openNewMenuItemButton").style.display = "block";
 }
 
 
@@ -361,7 +399,232 @@ function removeChoice(id){
 
 
 /*read and validate form with new item details*/
-function readNewItem(){
+function validateMenuItem(item){
+
+	var error = '';
+
+	if(item.name == ''){
+		error = 'Item Name can not be empty.';
+		return {'status': false, 'error': error}
+	}
+	else if(!item.isCustom && item.price == ''){
+		error = 'Item Price can not be empty.';
+		return {'status': false, 'error': error}		
+	}
+	else if(!item.isCustom && isNaN(item.price)){
+		error = 'Item Price has to be a valid Number.';
+		return {'status': false, 'error': error}		
+	}
+	else if(item.isCustom){
+
+		var i = 0;
+		while(item.customOptions[i]){
+			
+			if(item.customOptions[i].customName == ''){
+				error = 'Choice Names can not be empty.';
+				return {'status': false, 'error': error}
+			}
+			else if(item.customOptions[i].customPrice == ''){
+				error = 'Choice Prices can not be empty.';
+				return {'status': false, 'error': error}
+			}
+			else if(isNaN(item.customOptions[i].customPrice)){
+				error = 'Choice Prices must be valid Numbers.';
+				return {'status': false, 'error': error}
+			}
+
+			i++;
+		}	
+
+		error = '';
+		return {'status': true, 'error': error}	
+	}	
+	else{
+		error = '';
+		return {'status': true, 'error': error}		
+	}
+}
+
+
+function saveItemToFile(category, item, editFlag) {  
+
+
+
+		/*to find the latest item code*/
+		if(fs.existsSync('mastermenu.json')) {
+	      	fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+			    if (err){
+			        showToast('System Error: Failed to read Menu data. Could not create an Item Code. Please contact Accelerate Support.', '#e74c3c');
+			    } else {
+
+			          	var mastermenu = JSON.parse(data);
+			          	var lastKey = 0; //To generate the item code
+
+			          	if(!editFlag){
+							for (i=0; i<mastermenu.length; i++){
+									for(j=0; j<mastermenu[i].items.length; j++){
+										if(mastermenu[i].items[j].code > lastKey){
+											lastKey = mastermenu[i].items[j].code;
+										}
+									}
+							}	
+
+							item.code = lastKey + 1;		          		
+			          	}
+
+
+						//Proceed to Save
+					      
+					      /*begin save*/
+
+
+					      /*beautify item price if Custom item*/
+					      if(item.isCustom){
+					      	var min = 0;
+					      	var max = 0;
+					      	var i = 0;
+					      	while(item.customOptions[i]){
+					      		if(i == 0){
+					      			min = item.customOptions[i].customPrice;
+					      		}
+
+					      		if(max < item.customOptions[i].customPrice){
+					      			max = item.customOptions[i].customPrice;
+					      		}
+					      		
+					      		if(min > item.customOptions[i].customPrice){
+					      			min = item.customOptions[i].customPrice;
+					      		}
+
+					      		i++;
+					      	}
+
+					      	if(min < max){
+					      		item.price = min+'-'+max;
+					      	}
+					      	else{
+					      		item.price = max;
+					      	}
+
+					      }
+
+					      if(fs.existsSync('mastermenu.json')) {
+					         fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+					       if (err){
+					           showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
+					       } else {
+					         if(data==""){
+					            obj = []
+					            obj.push({"category": category, "items": item}); //add some data
+					             json = JSON.stringify(obj); //convert it back to json
+					             fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
+					            if(err){
+					               showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
+					           }else{
+					                     	showToast('Succes! '+item.name+' is added to the Menu.', '#2ecc71');
+					                     
+					                 }
+					                     	
+					               });
+					         }
+					         else{
+					             flag=0; //Category exists or not
+					             obj = JSON.parse(data); //now it an object
+					             for (i=0; i<obj.length; i++) {
+					               if (obj[i].category == category){
+					                  flag=1;
+					                  break;
+					               }
+					             }
+					             if(flag==1){ //category exists
+					               var dupflag = 0;
+					               //var sub = obj[i].items;
+					               //console.log(sub.length)
+					               for (j=0; j<obj[i].items.length; j++){
+					                 if(obj[i].items[j].code==item.code){
+					                    dupflag=1;
+					                    break;
+					                 }
+					               }
+					               if(dupflag==1){
+					               		if(editFlag){ //Found
+							                 obj[i].items[j] = item
+							                 json = JSON.stringify(obj); //convert it back to json
+							                 fs.writeFileSync('mastermenu.json', json, 'utf8', (err) => {
+									            if(err){
+									               showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
+									           }else{
+									                     	showToast('Succes! '+item.name+' is added to the Menu.', '#2ecc71');
+									                     }
+
+							                   }); 
+					               		}
+					               		else{
+					               			showToast('Warning: Item Code already exists. Please choose a different code.', '#e67e22');
+					               		}
+					                 
+					               }       
+					               else{
+					                 obj[i].items[j] = item
+					                 json = JSON.stringify(obj); //convert it back to json
+					                 fs.writeFileSync('mastermenu.json', json, 'utf8', (err) => {
+							            if(err){
+							               showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
+							           }else{
+							                     	showToast('Succes! '+item.name+' is added to the Menu.', '#2ecc71');
+							                     }
+
+					                   }); 
+					               }
+
+					             }
+					             else{ //no category found -> create one and then save
+					                var menuitem = []
+					                menuitem.push(item)
+					                obj.push({"category": category, "items": menuitem}); //add some data
+					                json = JSON.stringify(obj); //convert it back to json
+					                fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
+					                    					            if(err){
+					               showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
+					           }else{
+					                     	showToast('Succes! '+item.name+' is added to the Menu.', '#2ecc71');
+					                     }
+					                  });  
+					             }
+					                 
+					         }
+					          
+					   		}});
+					      } else {
+					         //var itemjson = JSON.stringify(item);
+					         var menuitem = []
+					         menuitem.push(item)
+					         obj.push({"category": category, "items": menuitem});
+					         var json = JSON.stringify(obj);
+					         fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
+					            if(err){
+					               showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
+					           }else{
+					                     	showToast('Succes! '+item.name+' is added to the Menu.', '#2ecc71');
+					                     }
+					         });
+					      }
+
+					      /* end of save*/
+
+				}
+					
+			});
+			
+	    } 
+	    else {
+	   		showToast('System Error: Failed to read Menu data. Could not create an Item Code. Please contact Accelerate Support.', '#e74c3c');
+	    }   
+}
+
+
+
+function readNewItem(category){
 	var item = {};
 	item.name = document.getElementById("new_item_name").value;
 	item.price = document.getElementById("new_item_price").value;
@@ -380,33 +643,68 @@ function readNewItem(){
 	}
 
 	/* VALIDATE BEFORE ADDING TO DATA FILE */
-	console.log(item);
+	var response = validateMenuItem(item);
+
+	if(response.status){
+		item.isAvailable = true;
+		saveItemToFile(category, item, false);
+		document.getElementById("newMenuItemModal").style.display = 'none';
+	}
+	else{
+		showToast('Warning: '+response.error, '#e67e22');
+	}
 }
 
+/*read and validate form with edited item details*/
+function reviewItemPrice(category){
+	var item = {};
+	item.name = document.getElementById("item_main_name").value;
+	item.price = document.getElementById("item_main_price").value;
+	item.code = document.getElementById("item_main_code_secret").value;
+
+		var custom = [];
+		var i = 1;
+		while($("#edit_choiceName_"+i).length != 0){
+			custom.push({'customName': $("#edit_choiceName_"+i).val(), 'customPrice': $("#edit_choicePrice_"+i).val()});
+			i++;
+		}
+
+		item.customOptions = custom;	
+
+ 		custom.length > 0 ? item.isCustom = true : item.isCustom = false;
+
+	/* VALIDATE BEFORE ADDING TO DATA FILE */
+	var response = validateMenuItem(item);
+
+	if(response.status){
+		item.isAvailable = true;
+		saveItemToFile(category, item, true);
+		document.getElementById("editMenuItemPriceModal").style.display = 'none';
+	}
+	else{
+		showToast('Warning: '+response.error, '#e67e22');
+	}
+}
 
 
 /* add new category */
 function addCategory() {  
 
 	var name = document.getElementById("add_new_category_name").value;
-   
-   var letterNumber = /^[0-9a-zA-Z]+$/;
-   if(!name.match(letterNumber)) {
-      console.log("Only Alphanumeric Characters allowed")
-   }
-   else{ 
+
+
       //Check if file exists
       if(fs.existsSync('menuCategories.json')) {
          fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
        if (err){
-           console.log(err);
+           showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
        } else {
          if(data==""){
             obj = []
             obj.push(name); //add some data
             fs.writeFile('menuCategories.json', obj, 'utf8', (err) => {
                 if(err)
-                  console.log(err)
+                  showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
             });
          }
          else{
@@ -419,15 +717,14 @@ function addCategory() {
                }
              }
              if(flag==1){
-               console.log("Duplicate Entry not Allowed")
+               showToast('Warning: Category already exists. Please choose a different name.', '#e67e22');
              }
              else{
-                console.log(obj)
                 obj.push(name);
                 json = JSON.stringify(obj);
                 fs.writeFile('menuCategories.json', json, 'utf8', (err) => {
                      if(err)
-                        console.log(err)
+                        showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
                   });  
                 fetchAllCategories(); //refresh the list
                 hideNewMenuCategory();
@@ -437,14 +734,13 @@ function addCategory() {
           
    }});
       } else {
-         console.log("File Doesn\'t Exist. Creating new file.")
          obj.push(name);
          fs.writeFile('menuCategories.json', obj, 'utf8', (err) => {
             if(err)
-               console.log(err)
+               showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
          });
       }
-   }
+  
 }
 
 
@@ -454,7 +750,7 @@ function deleteCategoryFromMaster(menuCategory){
 		if(fs.existsSync('mastermenu.json')) {
 	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
-	        console.log(err);
+	        showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
 	          var mastermenu = JSON.parse(data); 
 				for (i=0; i<mastermenu.length; i++){
@@ -469,13 +765,13 @@ function deleteCategoryFromMaster(menuCategory){
 		       var newjson = JSON.stringify(mastermenu);
 		       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
 		         if(err)
-		            console.log(err)
+		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 		       }); 
 
 		}
 		});
 	    } else {
-	      console.log("File Doesn\'t Exist.")
+	      showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    }
 
 }
@@ -490,7 +786,7 @@ function deleteCategory(name) {
    if(fs.existsSync('menuCategories.json')) {
        fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
        if (err){
-           console.log(err);
+           showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
        } else {
        obj = JSON.parse(data); //now it an object
        //console.log(obj.length)
@@ -500,17 +796,16 @@ function deleteCategory(name) {
             break;
          }
        }
-       console.log(obj)
        var newjson = JSON.stringify(obj);
        fs.writeFile('menuCategories.json', newjson, 'utf8', (err) => {
          if(err)
-            console.log(err)
+            showToast('System Error: Unable to make changes in Categories data. Please contact Accelerate Support.', '#e74c3c');
 
           deleteCategoryFromMaster(name);
        }); 
       }});
    } else {
-      console.log("File Doesn\'t Exist.")
+      showToast('System Error: Unable to modify Categories data. Please contact Accelerate Support.', '#e74c3c');
    }
 
    /* on successful delete */
@@ -538,7 +833,7 @@ function renameCategoryFromMaster(current, newName){
 		if(fs.existsSync('mastermenu.json')) {
 	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
-	        console.log(err);
+	        showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
 	          var mastermenu = JSON.parse(data); 
 				for (i=0; i<mastermenu.length; i++){
@@ -553,13 +848,13 @@ function renameCategoryFromMaster(current, newName){
 		       var newjson = JSON.stringify(mastermenu);
 		       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
 		         if(err)
-		            console.log(err)
+		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 		       }); 
 
 		}
 		});
 	    } else {
-	      console.log("File Doesn\'t Exist.")
+	      showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    }
 }
 
@@ -572,7 +867,7 @@ function saveNewCategoryName(currentName){
 		   if(fs.existsSync('menuCategories.json')) {
 		       fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
 		       if (err){
-		           console.log(err);
+		           showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 		       } else {
 		       obj = JSON.parse(data); //now it an object
 		       //console.log(obj.length)
@@ -586,13 +881,13 @@ function saveNewCategoryName(currentName){
 		       var newjson = JSON.stringify(obj);
 		       fs.writeFile('menuCategories.json', newjson, 'utf8', (err) => {
 		         if(err)
-		            console.log(err)
+		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 
 		          	renameCategoryFromMaster(currentName, newName);
 		       }); 
 		      }});
 		   } else {
-		      console.log("File Doesn\'t Exist.")
+		      showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 		   }
 	}
 
@@ -618,4 +913,7 @@ function openEditCategoryName(current){
 function hideEditCategoryName(){
 	document.getElementById("categoryEditNameConfirmation").style.display = 'none';
 }
+
+//showToast('Hello from Abhijith', 'blue');
+
 
