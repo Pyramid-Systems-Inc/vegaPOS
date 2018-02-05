@@ -11,7 +11,8 @@ function fetchAllCategories(){
 	        console.log(err);
 	    } else {
 	          
-	          	var categories = JSON.parse(data); 
+	          	var categories = JSON.parse(data);
+	          	categories.sort(); //alphabetical sorting 
 	          	var categoryTag = '';
 
 				for (i=0; i<categories.length; i++){
@@ -216,6 +217,10 @@ function openSubMenu(menuCategory){
 				for (i=0; i<mastermenu.length; i++){
 
 					if(menuCategory == mastermenu[i].category){
+
+						//alphabetical sorting
+						mastermenu[i].items.sort();
+
 						for(j=0; j<mastermenu[i].items.length; j++){
 
 							if(mastermenu[i].items[j].isAvailable){
