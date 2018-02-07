@@ -2,24 +2,32 @@ let fs = require('fs')
 
 /*Add Item to Cart */
 function additemtocart(encodedItem){
-	
-	var item = JSON.parse(decodeURI(encodedItem));
 
-	console.log(item)
+	var productToAdd = JSON.parse(decodeURI(encodedItem));
 
-/*
-	if(item.isCustom){
+	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+
+	if(productToAdd.isCustom){
 		//Pop up
 	}
 
-	else{
-		console.log("success")
-		//add directly
-		var cart_products = !_.isUndefined(window.localStorage.cart) ?  JSON.parse(window.localStorage.cart) : [];
-		cart_products.push(item);
-		window.localStorage.cart = JSON.stringify(cart_products);
-	}
-*/	
+	else if(!productToAdd.isCustom){
+		var existing_product = false
+		var i = 0 
+		while(i < cart_products.length){
+          if(cart_products[i].code == productToAdd.code){
+          	existing_product = true
+            cart_products[i].qty++
+            break
+          }
+          i++;
+        }
+        if(existing_product==false){
+			cart_products.push({"name": productToAdd.name, "price": productToAdd.price, "isCustom": productToAdd.isCustom, "isAvailable": productToAdd.isAvailable, "code": productToAdd.code, "qty": 1});
+		}
+		window.localStorage.zaitoon_cart = JSON.stringify(cart_products)
+		renderCart()
+	}	
 
 	//window.localstorage("cart") =
 }
@@ -27,6 +35,20 @@ function additemtocart(encodedItem){
 function renderCart(){
 	//Render Cart Items based on local storage
 	//Calculate Tax
+	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+	var i = 0
+	var temp = '';
+	var totqty = 0 
+	var tot = 0
+	while(i < cart_products.length){
+		totqty = totqty + cart_products[i].qty
+		tot = tot + (cart_products[i].price*cart_products[i].qty)
+		temp = temp + '<tr class="danger"><td><button type="button" class="btn btn-block btn-xs edit btn-warning"><span class="sname">'+cart_products[i].name+'</span></button></td><td class="text-right"> <span class="text-right sprice">'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onclick="this.select();"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td> <td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446564" title="Remove"></i></td></tr>'
+		i++
+	}
+	var bill = '<tbody> <tr class="info"> <td width="25%">Total Items</td> <td class="text-right" style="padding-right:10px;"><span id="count">'+totqty+'</span></td> <td width="25%">Total</td> <td class="text-right" colspan="2"><span id="total"><i class="fa fa-rupee"></i>'+tot+'</span></td> </tr> <tr class="info"> <td width="25%"><a href="#" id="add_discount">Discount</a></td> <td class="text-right" style="padding-right:10px;"><span id="ds_con">0</span></td> <td width="25%"><a href="#" id="add_tax">Order Tax</a></td> <td class="text-right"><span id="ts_con">0</span></td> </tr> <tr class="success"> <td colspan="2" style="font-weight:bold;"> Total Payable <a role="button" data-toggle="modal" data-target="#noteModal"> <i class="fa fa-comment"></i> </a> </td> <td class="text-right" colspan="2" style="font-weight:bold;"><span id="total-payable"><i class="fa fa-rupee"></i>'+tot+'</span></td> </tr> </tbody>'
+	document.getElementById("cartDetails").innerHTML = temp;
+	document.getElementById("totaltbl").innerHTML = bill;
 
 }
 
