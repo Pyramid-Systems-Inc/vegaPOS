@@ -11,7 +11,9 @@ function fetchAllCategories(){
 	    if (err){
 	        showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
-	          
+
+	    		if(data == ''){ data = '[]'; }
+
 	          	var categories = JSON.parse(data);
 	          	categories.sort(); //alphabetical sorting 
 	          	var categoryTag = '';
@@ -35,16 +37,55 @@ function fetchAllCategories(){
 
 /* mark an item unavailable */
 function markAvailability(code){
-	/* Just invert the item availability status here*/
+		
+		/* Just invert the item availability status here*/
+		if(fs.existsSync('mastermenu.json')) {
+	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
 
-	if(document.getElementById("item_avail_"+code).innerHTML != 'Available'){
-		document.getElementById("item_avail_"+code).innerHTML = 'Available';
-		document.getElementById("item_avail_"+code).style.background = "#2ecc71";	
-	}
-	else{
-		document.getElementById("item_avail_"+code).innerHTML = 'Out of Stock';
-		document.getElementById("item_avail_"+code).style.background = "#e74c3c";		
-	}
+				if(data == ''){ data = '[]'; }
+	          
+	          	var mastermenu = JSON.parse(data); 
+				for (i=0; i<mastermenu.length; i++){
+					for(j=0; j<mastermenu[i].items.length; j++){
+
+						if(mastermenu[i].items[j].code == code){
+
+							mastermenu[i].items[j].isAvailable = !mastermenu[i].items[j].isAvailable;
+
+							if(document.getElementById("item_avail_"+code).innerHTML != 'Available'){
+								document.getElementById("item_avail_"+code).innerHTML = 'Available';
+								document.getElementById("item_avail_"+code).style.background = "#2ecc71";	
+							}
+							else{
+								document.getElementById("item_avail_"+code).innerHTML = 'Out of Stock';
+								document.getElementById("item_avail_"+code).style.background = "#e74c3c";		
+							}
+
+					       var newjson = JSON.stringify(mastermenu);
+					       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
+					         if(err){
+					            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+					         }
+					         else{
+					         	return '';
+					         }
+					       }); 
+
+						}
+				
+					}					
+				}
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+
+
+
 
 }
 
@@ -200,6 +241,7 @@ function openSubMenu(menuCategory){
 	    if (err){
 	        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
+	    		if(data == ''){ data = '[]'; }
 	          var mastermenu = JSON.parse(data); 
 	          var itemsInCategory = "";
 	          var availabilityTag = "";
@@ -456,7 +498,7 @@ function saveItemToFile(category, item, editFlag) {
 			    if (err){
 			        showToast('System Error: Failed to read Menu data. Could not create an Item Code. Please contact Accelerate Support.', '#e74c3c');
 			    } else {
-
+			    		if(data == ''){ data = '[]'; }
 			          	var mastermenu = JSON.parse(data);
 			          	var lastKey = 0; //To generate the item code
 
@@ -515,7 +557,10 @@ function saveItemToFile(category, item, editFlag) {
 					       } else {
 					         if(data==""){
 					            obj = []
-					            obj.push({"category": category, "items": item}); //add some data
+					            var menuitem = []
+					         	menuitem.push(item)
+					            obj.push({"category": category, "items": menuitem}); //add some data
+					            
 					             json = JSON.stringify(obj); //convert it back to json
 					             fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
 					            if(err){
@@ -529,6 +574,7 @@ function saveItemToFile(category, item, editFlag) {
 					         }
 					         else{
 					             flag=0; //Category exists or not
+					             if(data == ''){ data = '[]'; }
 					             obj = JSON.parse(data); //now it an object
 					             for (i=0; i<obj.length; i++) {
 					               if (obj[i].category == category){
@@ -581,6 +627,7 @@ function saveItemToFile(category, item, editFlag) {
 					             else{ //no category found -> create one and then save
 					                var menuitem = []
 					                menuitem.push(item)
+
 					                obj.push({"category": category, "items": menuitem}); //add some data
 					                json = JSON.stringify(obj); //convert it back to json
 					                fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
@@ -702,13 +749,17 @@ function addCategory() {
          if(data==""){
             obj = []
             obj.push(name); //add some data
-            fs.writeFile('menuCategories.json', obj, 'utf8', (err) => {
+            json = JSON.stringify(obj);
+            fs.writeFile('menuCategories.json', json, 'utf8', (err) => {
                 if(err)
                   showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
             });
+                fetchAllCategories(); //refresh the list
+                hideNewMenuCategory();
          }
          else{
              flag=0;
+             if(data == ''){ data = '[]'; }
              obj = JSON.parse(data);
              for (i=0; i<obj.length; i++) {
                if (obj[i] == name){
@@ -752,6 +803,7 @@ function deleteCategoryFromMaster(menuCategory){
 	    if (err){
 	        showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
+	    	if(data == ''){ data = '[]'; }
 	          var mastermenu = JSON.parse(data); 
 				for (i=0; i<mastermenu.length; i++){
 
@@ -788,6 +840,7 @@ function deleteCategory(name) {
        if (err){
            showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
        } else {
+       	if(data == ''){ data = '[]'; }
        obj = JSON.parse(data); //now it an object
        //console.log(obj.length)
        for (i=0; i<obj.length; i++) {  
@@ -835,6 +888,7 @@ function renameCategoryFromMaster(current, newName){
 	    if (err){
 	        showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
+	    	if(data == ''){ data = '[]'; }
 	          var mastermenu = JSON.parse(data); 
 				for (i=0; i<mastermenu.length; i++){
 
@@ -869,6 +923,7 @@ function saveNewCategoryName(currentName){
 		       if (err){
 		           showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 		       } else {
+		       	if(data == ''){ data = '[]'; }
 		       obj = JSON.parse(data); //now it an object
 		       //console.log(obj.length)
 		       for (i=0; i<obj.length; i++) {  
