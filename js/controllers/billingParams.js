@@ -11,8 +11,8 @@ function addParam(id,parameter,percentage,isCompulsary) {
    }
    else{ 
       //Check if file exists
-      if(fs.existsSync('billingparameters.json')) {
-         fs.readFile('billingparameters.json', 'utf8', function readFileCallback(err, data){
+      if(fs.existsSync('./data/static/billingparameters.json')) {
+         fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -20,7 +20,7 @@ function addParam(id,parameter,percentage,isCompulsary) {
             obj = []
             obj.push({"id": id, "parameter": parameter, "percentage":percentage, "isCompulsary": isCompulsary}); //add some data
              json = JSON.stringify(obj); //convert it back to json
-             fs.writeFile('billingparameters.json', json, 'utf8', (err) => {
+             fs.writeFile('./data/static/billingparameters.json', json, 'utf8', (err) => {
                   if(err)
                      console.log(err)
                });
@@ -40,7 +40,7 @@ function addParam(id,parameter,percentage,isCompulsary) {
              else{
                 obj.push({"id": id, "parameter": parameter, "percentage":percentage, "isCompulsary": isCompulsary}); //add some data
                 json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('billingparameters.json', json, 'utf8', (err) => {
+                fs.writeFile('./data/static/billingparameters.json', json, 'utf8', (err) => {
                      if(err)
                         console.log(err)
                   });  
@@ -53,7 +53,7 @@ function addParam(id,parameter,percentage,isCompulsary) {
          console.log("File Doesn\'t Exist. Creating new file.")
          obj.push({"id": id, "parameter": parameter, "percentage":percentage, "isCompulsary": isCompulsary});
          var json = JSON.stringify(obj);
-         fs.writeFile('billingparameters.json', json, 'utf8', (err) => {
+         fs.writeFile('./data/static/billingparameters.json', json, 'utf8', (err) => {
             if(err)
                console.log(err)
          });
@@ -64,8 +64,8 @@ function addParam(id,parameter,percentage,isCompulsary) {
 function deleteParam(id) {  
    
    //Check if file exists
-   if(fs.existsSync('billingparameters.json')) {
-       fs.readFile('billingparameters.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/billingparameters.json')) {
+       fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -79,7 +79,7 @@ function deleteParam(id) {
        }
        console.log(obj)
        var newjson = JSON.stringify(obj);
-       fs.writeFile('billingparameters.json', newjson, 'utf8', (err) => {
+       fs.writeFile('./data/static/billingparameters.json', newjson, 'utf8', (err) => {
          if(err)
             console.log(err)
        }); 
@@ -96,8 +96,8 @@ function editParam(id,percentage,isCompulsary) {
    }
    else{
       //Check if file exists
-   if(fs.existsSync('billingparameters.json')) {
-       fs.readFile('billingparameters.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/billingparameters.json')) {
+       fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -112,7 +112,7 @@ function editParam(id,percentage,isCompulsary) {
        }
        console.log(obj)
        var newjson = JSON.stringify(obj);
-       fs.writeFile('billingparameters.json', newjson, 'utf8', (err) => {
+       fs.writeFile('./data/static/billingparameters.json', newjson, 'utf8', (err) => {
          if(err)
             console.log(err)
        }); 
@@ -125,8 +125,8 @@ function editParam(id,percentage,isCompulsary) {
 
 
 function fetchAllParam(){
-   if(fs.existsSync('billingparameters.json')) {
-      fs.readFile('billingparameters.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/billingparameters.json')) {
+      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
     if (err){
         console.log(err);
     } else {

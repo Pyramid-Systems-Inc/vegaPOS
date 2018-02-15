@@ -17,7 +17,7 @@ function createWindow () {
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
+    pathname: path.join(__dirname, 'views/index.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -33,6 +33,9 @@ function createWindow () {
     mainWindow = null
   })
 }
+
+
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

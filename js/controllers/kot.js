@@ -12,7 +12,7 @@ function createKOT(custName,custMob,stewName,stewCode,table,cart,spremarks) {
       var kot;
       //Check if file exists
 
-      fs.readFile('lastKOT.txt', 'utf8', function readFileCallback(err, data){
+      fs.readFile('./data/static/lastKOT.txt', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else{
@@ -49,12 +49,12 @@ function createKOT(custName,custMob,stewName,stewCode,table,cart,spremarks) {
 
           obj = {"KOTNumber": kot, "table": table, "customerName": custName, "customerMobile": custMob, "stewardName": stewName, "stewardCode": stewCode, "orderStatus": 1, "date": today, "timePunch": time, "timeKOT": "", "timeBill": "", "timeSettle": "", "cart": cartArr, "specialRemarks": spremarks}; 
           json = JSON.stringify(obj); //convert it back to json
-          var file = kot+'.json';
+          var file = './data/KOT/'+kot+'.json';
           fs.writeFile(file, json, 'utf8', (err) => {
               if(err)
                  console.log(err)
            });
-          fs.writeFile("lastKOT.txt", num, 'utf8', (err) => {
+          fs.writeFile("./data/static/lastKOT.txt", num, 'utf8', (err) => {
               if(err)
                  console.log(err)
            });
@@ -64,8 +64,8 @@ function createKOT(custName,custMob,stewName,stewCode,table,cart,spremarks) {
 }
 function deleteItem(kot,itemCode) {  
    
-   if(fs.existsSync(kot+'.json')) {
-        fs.readFile(kot+'.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/KOT/'+kot+'.json')) {
+        fs.readFile('./data/KOT/'+kot+'.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -79,7 +79,7 @@ function deleteItem(kot,itemCode) {
             }
          }
          json = JSON.stringify(obj); //convert it back to json
-         fs.writeFileSync(kot+'.json', json, 'utf8', (err) => {
+         fs.writeFileSync('./data/KOT/'+kot+'.json', json, 'utf8', (err) => {
             if(err)
              console.log(err)
          });
@@ -91,8 +91,8 @@ function deleteItem(kot,itemCode) {
 
 function editItem(kot,itemCode,qty) {  
    
-   if(fs.existsSync(kot+'.json')) {
-        fs.readFile(kot+'.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/KOT/'+kot+'.json')) {
+        fs.readFile('./data/KOT/'+kot+'.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -105,7 +105,7 @@ function editItem(kot,itemCode,qty) {
             }
          }
          json = JSON.stringify(obj); //convert it back to json
-         fs.writeFileSync(kot+'.json', json, 'utf8', (err) => {
+         fs.writeFileSync('./data/KOT/'+kot+'.json', json, 'utf8', (err) => {
             if(err)
              console.log(err)
          });
@@ -116,8 +116,8 @@ function editItem(kot,itemCode,qty) {
 }
 
 function addItem(kot,item) {  
-  if(fs.existsSync(kot+'.json')) {
-        fs.readFile(kot+'.json', 'utf8', function readFileCallback(err, data){
+  if(fs.existsSync('./data/KOT/'+kot+'.json')) {
+        fs.readFile('./data/KOT/'+kot+'.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -127,7 +127,7 @@ function addItem(kot,item) {
          //var retstr = item.name+" added ";
          var retstr = item.name+"("+item.qty+" qty)"+" added "+" to Table "+obj.table+" by "+obj.stewardName;
          json = JSON.stringify(obj); //convert it back to json
-         fs.writeFileSync(kot+'.json', json, 'utf8', (err) => {
+         fs.writeFileSync('./data/KOT/'+kot+'.json', json, 'utf8', (err) => {
             if(err)
              console.log(err)
          });
@@ -141,8 +141,8 @@ function addItem(kot,item) {
 }
 
 function fetchKOT(kot){
-   if(fs.existsSync(kot+'.json')) {
-      fs.readFile(kot+'.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/KOT/'+kot+'.json')) {
+      fs.readFile('./data/KOT/'+kot+'.json', 'utf8', function readFileCallback(err, data){
     if (err){
         console.log(err);
     } else {
@@ -157,15 +157,15 @@ function fetchKOT(kot){
 
 function printKOT(kot) {  
    
-   if(fs.existsSync(kot+'.json')) {
-        fs.readFile(kot+'.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/KOT/'+kot+'.json')) {
+        fs.readFile('./data/KOT/'+kot+'.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
          obj = JSON.parse(data);
          obj.orderStatus = "2";
          json = JSON.stringify(obj); //convert it back to json
-         fs.writeFileSync(kot+'.json', json, 'utf8', (err) => {
+         fs.writeFileSync('./data/KOT/'+kot+'.json', json, 'utf8', (err) => {
             if(err)
              console.log(err)
          });

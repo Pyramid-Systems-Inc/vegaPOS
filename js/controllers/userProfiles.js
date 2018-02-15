@@ -8,8 +8,8 @@ function addUser(code,name,role,password) {
       console.log("Only Alphanumeric Characters allowed")
    }
    else{ 
-      if(fs.existsSync('userprofiles.json')) {
-         fs.readFile('userprofiles.json', 'utf8', function readFileCallback(err, data){
+      if(fs.existsSync('./data/static/userprofiles.json')) {
+         fs.readFile('./data/static/userprofiles.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -17,7 +17,7 @@ function addUser(code,name,role,password) {
             obj = []
             obj.push({"code": code, "name": name, "role":role, "password": password}); //add some data
              json = JSON.stringify(obj); //convert it back to json
-             fs.writeFile('userprofiles.json', json, 'utf8', (err) => {
+             fs.writeFile('./data/static/userprofiles.json', json, 'utf8', (err) => {
                   if(err)
                      console.log(err)
                });
@@ -37,7 +37,7 @@ function addUser(code,name,role,password) {
              else{
                 obj.push({"code": code, "name": name, "role":role, "password": password}); //add some data
                 json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('userprofiles.json', json, 'utf8', (err) => {
+                fs.writeFile('./data/static/userprofiles.json', json, 'utf8', (err) => {
                      if(err)
                         console.log(err)
                   });  
@@ -49,7 +49,7 @@ function addUser(code,name,role,password) {
          console.log("File Doesn\'t Exist. Creating new file.")
          obj.push({"code": code, "name": name, "role":role, "password": password});
          var json = JSON.stringify(obj);
-         fs.writeFile('userprofiles.json', json, 'utf8', (err) => {
+         fs.writeFile('./data/static/userprofiles.json', json, 'utf8', (err) => {
             if(err)
                console.log(err)
          });
@@ -59,8 +59,8 @@ function addUser(code,name,role,password) {
 
 function deleteUser(code) {  
    
-   if(fs.existsSync('userprofiles.json')) {
-       fs.readFile('userprofiles.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/userprofiles.json')) {
+       fs.readFile('./data/static/userprofiles.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -74,7 +74,7 @@ function deleteUser(code) {
        }
        console.log(obj)
        var newjson = JSON.stringify(obj);
-       fs.writeFile('userprofiles.json', newjson, 'utf8', (err) => {
+       fs.writeFile('./data/static/userprofiles.json', newjson, 'utf8', (err) => {
          if(err)
             console.log(err)
        }); 
@@ -86,8 +86,8 @@ function deleteUser(code) {
 
 function changePass(code,currpass,newpass,confpass) {  
    
-   if(fs.existsSync('userprofiles.json')) {
-       fs.readFile('userprofiles.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/userprofiles.json')) {
+       fs.readFile('./data/static/userprofiles.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -110,7 +110,7 @@ function changePass(code,currpass,newpass,confpass) {
            if(newpass==confpass){
                obj[i].password = newpass;
                var newjson = JSON.stringify(obj);
-               fs.writeFile('userprofiles.json', newjson, 'utf8', (err) => {
+               fs.writeFile('./data/static/userprofiles.json', newjson, 'utf8', (err) => {
                  if(err)
                     console.log(err)
                }); 
