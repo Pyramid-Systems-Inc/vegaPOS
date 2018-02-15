@@ -3,7 +3,10 @@ let fs = require('fs')
 /*Add Item to Cart */
 function additemtocart(encodedItem){
 
+
+
 	var productToAdd = JSON.parse(decodeURI(encodedItem));
+	console.log(productToAdd)
 
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
 
@@ -90,6 +93,8 @@ function renderCart(){
 	document.getElementById("totaltbl").innerHTML = bill;
 }
 
+renderCart();
+
 function renderMenu(subtype){
 	
 	if(subtype){
@@ -97,8 +102,8 @@ function renderMenu(subtype){
 	}
 	
 	else{
-		if(fs.existsSync('mastermenu.json')) {
-	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        console.log(err);
 	    } else {
@@ -113,6 +118,7 @@ function renderMenu(subtype){
 
 					subMenu = '<div class="items"><h1>'+mastermenu[i].category+'</h1>';
 
+					itemsInSubMenu = '';
 					for(j=0; j<mastermenu[i].items.length; j++){
 						var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
 						itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';

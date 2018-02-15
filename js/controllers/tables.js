@@ -11,8 +11,8 @@ function addTable(name,code,capacity,type) {
    }
    else{ 
       //Check if file exists
-      if(fs.existsSync('tables.json')) {
-         fs.readFile('tables.json', 'utf8', function readFileCallback(err, data){
+      if(fs.existsSync('./data/static/tables.json')) {
+         fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -20,7 +20,7 @@ function addTable(name,code,capacity,type) {
             obj = []
             obj.push({"name": name, "code": code, "capacity":capacity, "type": type}); //add some data
              json = JSON.stringify(obj); //convert it back to json
-             fs.writeFile('tables.json', json, 'utf8', (err) => {
+             fs.writeFile('./data/static/tables.json', json, 'utf8', (err) => {
                   if(err)
                      console.log(err)
                });
@@ -40,7 +40,7 @@ function addTable(name,code,capacity,type) {
              else{
                 obj.push({"name": name, "code": code, "capacity":capacity, "type": type}); //add some data
                 json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('tables.json', json, 'utf8', (err) => {
+                fs.writeFile('./data/static/tables.json', json, 'utf8', (err) => {
                      if(err)
                         console.log(err)
                   });  
@@ -53,7 +53,7 @@ function addTable(name,code,capacity,type) {
          console.log("File Doesn\'t Exist. Creating new file.")
          obj.push({"name": name, "code": code, "capacity":capacity, "type": type});
          var json = JSON.stringify(obj);
-         fs.writeFile('tables.json', json, 'utf8', (err) => {
+         fs.writeFile('./data/static/tables.json', json, 'utf8', (err) => {
             if(err)
                console.log(err)
          });
@@ -64,8 +64,8 @@ function addTable(name,code,capacity,type) {
 function deleteTable(code) {  
    
    //Check if file exists
-   if(fs.existsSync('tables.json')) {
-       fs.readFile('tables.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/tables.json')) {
+       fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -79,7 +79,7 @@ function deleteTable(code) {
        }
        console.log(obj)
        var newjson = JSON.stringify(obj);
-       fs.writeFile('tables.json', newjson, 'utf8', (err) => {
+       fs.writeFile('./data/static/tables.json', newjson, 'utf8', (err) => {
          if(err)
             console.log(err)
        }); 
@@ -90,12 +90,12 @@ function deleteTable(code) {
 }
 
 function deleteAll(){
-   fs.unlinkSync('tables.json');
+   fs.unlinkSync('./data/static/tables.json');
 }
 
 function fetchAll(){
-   if(fs.existsSync('tables.json')) {
-      fs.readFile('tables.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/tables.json')) {
+      fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
     if (err){
         console.log(err);
     } else {

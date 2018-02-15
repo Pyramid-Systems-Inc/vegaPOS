@@ -11,8 +11,8 @@ function addSession(name,startTime,endTime) {
    }
    else{ 
       //Check if file exists
-      if(fs.existsSync('sessions.json')) {
-         fs.readFile('sessions.json', 'utf8', function readFileCallback(err, data){
+      if(fs.existsSync('./data/static/sessions.json')) {
+         fs.readFile('./data/static/sessions.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -20,7 +20,7 @@ function addSession(name,startTime,endTime) {
             obj = []
             obj.push({"name": name, "StartTime": startTime, "EndTime":endTime}); //add some data
              json = JSON.stringify(obj); //convert it back to json
-             fs.writeFile('sessions.json', json, 'utf8', (err) => {
+             fs.writeFile('./data/static/sessions.json', json, 'utf8', (err) => {
                   if(err)
                      console.log(err)
                });
@@ -40,7 +40,7 @@ function addSession(name,startTime,endTime) {
              else{
                 obj.push({"name": name, "StartTime": startTime, "EndTime":endTime}); //add some data
                 json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('sessions.json', json, 'utf8', (err) => {
+                fs.writeFile('./data/static/sessions.json', json, 'utf8', (err) => {
                      if(err)
                         console.log(err)
                   });  
@@ -53,7 +53,7 @@ function addSession(name,startTime,endTime) {
          console.log("File Doesn\'t Exist. Creating new file.")
          obj.push({"name": name, "StartTime": startTime, "EndTime":endTime});
          var json = JSON.stringify(obj);
-         fs.writeFile('sessions.json', json, 'utf8', (err) => {
+         fs.writeFile('./data/static/sessions.json', json, 'utf8', (err) => {
             if(err)
                console.log(err)
          });
@@ -70,8 +70,8 @@ function editSession(name,startTime,endTime) {
    }
    else{ 
       //Check if file exists
-      if(fs.existsSync('sessions.json')) {
-         fs.readFile('sessions.json', 'utf8', function readFileCallback(err, data){
+      if(fs.existsSync('./data/static/sessions.json')) {
+         fs.readFile('./data/static/sessions.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -94,7 +94,7 @@ function editSession(name,startTime,endTime) {
              }
              else{
                 json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('sessions.json', json, 'utf8', (err) => {
+                fs.writeFile('./data/static/sessions.json', json, 'utf8', (err) => {
                      if(err)
                         console.log(err)
                   });  
@@ -113,8 +113,8 @@ function editSession(name,startTime,endTime) {
 function deleteSession(name) {  
    
    //Check if file exists
-   if(fs.existsSync('sessions.json')) {
-       fs.readFile('sessions.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/sessions.json')) {
+       fs.readFile('./data/static/sessions.json', 'utf8', function readFileCallback(err, data){
        if (err){
            console.log(err);
        } else {
@@ -128,7 +128,7 @@ function deleteSession(name) {
        }
        //console.log(obj)
        var newjson = JSON.stringify(obj);
-       fs.writeFile('sessions.json', newjson, 'utf8', (err) => {
+       fs.writeFile('./data/static/sessions.json', newjson, 'utf8', (err) => {
          if(err)
             console.log(err)
        }); 
@@ -139,8 +139,8 @@ function deleteSession(name) {
 }
 
 function fetchAll(){
-   if(fs.existsSync('sessions.json')) {
-      fs.readFile('sessions.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/sessions.json')) {
+      fs.readFile('./data/static/sessions.json', 'utf8', function readFileCallback(err, data){
     if (err){
         console.log(err);
     } else {

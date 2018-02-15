@@ -48,8 +48,8 @@ sync();
 /* read categories */
 function fetchAllCategories(){
 
-		if(fs.existsSync('menuCategories.json')) {
-	      fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+		if(fs.existsSync('./data/static/menuCategories.json')) {
+	      fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
@@ -81,8 +81,8 @@ function fetchAllCategories(){
 function markAvailability(code){
 		
 		/* Just invert the item availability status here*/
-		if(fs.existsSync('mastermenu.json')) {
-	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
@@ -107,7 +107,7 @@ function markAvailability(code){
 							}
 
 					       var newjson = JSON.stringify(mastermenu);
-					       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
+					       fs.writeFile('./data/static/mastermenu.json', newjson, 'utf8', (err) => {
 					         if(err){
 					            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
 					         }
@@ -278,8 +278,8 @@ function openSubMenu(menuCategory){
 
 	//read menu
 
-		if(fs.existsSync('mastermenu.json')) {
-	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
@@ -383,7 +383,7 @@ function openSubMenu(menuCategory){
 	    }		
 
 	//menuRenderArea
-	document.getElementById("menuDeatilsArea").style.display = "block";
+	document.getElementById("menuDetailsArea").style.display = "block";
 }
 
 function hideNewBill(){
@@ -419,7 +419,8 @@ function openNewMenuItem(category){
                   								'<button type="button" onclick="readNewItem(\''+category+'\')" class="btn btn-success">Add</button>';
 	}
 		
-
+	document.getElementById("new_item_name").value = '';
+	document.getElementById("new_item_price").value = '';
 	document.getElementById("newMenuItemModal").style.display = "block";
 }
 
@@ -535,8 +536,8 @@ function saveItemToFile(category, item, editFlag) {
 
 
     /*to find the latest item code*/
-    if (fs.existsSync('mastermenu.json')) {
-        fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data) {
+    if (fs.existsSync('./data/static/mastermenu.json')) {
+        fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data) {
             if (err) {
                 showToast('System Error: Failed to read Menu data. Could not create an Item Code. Please contact Accelerate Support.', '#e74c3c');
             } else {
@@ -593,18 +594,13 @@ function saveItemToFile(category, item, editFlag) {
 
                 }
 
-                console.log('starting')
 
-                if (fs.existsSync('mastermenu.json')) {
+                if (fs.existsSync('./data/static/mastermenu.json')) {
+                    fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data) {
 
-                    console.log('reading check..')
-                    fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data) {
-                    	console.log('read started')
                         if (err) {
                             showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
                         } else {
-                        	console.log('read completed with data:')
-                        	console.log(data)
                             if (data == "") {
                                 var obj = []
                                 var menuitem = []
@@ -615,7 +611,7 @@ function saveItemToFile(category, item, editFlag) {
                                 }); //add some data
 
                                 json = JSON.stringify(obj); //convert it back to json
-                                fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
+                                fs.writeFile('./data/static/mastermenu.json', json, 'utf8', (err) => {
                                     if (err) {
                                         showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                     } else {
@@ -631,8 +627,7 @@ function saveItemToFile(category, item, editFlag) {
                                     data = '[]';
                                 }
                                 var obj = JSON.parse(data); //now it an object
-                                console.log('formatting data:')
-                                console.log(obj)
+
                                 for (var i = 0; i < obj.length; i++) {
                                     if (obj[i].category == category) {
                                         flag = 1;
@@ -641,8 +636,7 @@ function saveItemToFile(category, item, editFlag) {
                                 }
                                 if (flag == 1) { //category exists
                                     var dupflag = 0;
-                                    //var sub = obj[i].items;
-                                    //console.log(sub.length)
+   
                                     for (var j = 0; j < obj[i].items.length; j++) {
                                         if (obj[i].items[j].code == item.code) {
                                             dupflag = 1;
@@ -650,17 +644,17 @@ function saveItemToFile(category, item, editFlag) {
                                         }
                                     }
 
-                                    console.log('Edit Flag: '+editFlag)
                                     if (dupflag == 1) {
                                         if (editFlag) { //Found
                                         	
                                             obj[i].items[j] = item
                                             json = JSON.stringify(obj); //convert it back to json
-                                            fs.writeFileSync('mastermenu.json', json, 'utf8', (err) => {
+                                            fs.writeFileSync('./data/static/mastermenu.json', json, 'utf8', (err) => {
                                                 if (err) {
                                                     showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                                 } else {
-                                                    showToast('Succes! ' + item.name + ' is added to the Menu.', '#2ecc71');
+                                                    showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                                                    openSubMenu(category);
                                                 }
 
                                             });
@@ -669,19 +663,17 @@ function saveItemToFile(category, item, editFlag) {
                                         }
 
                                     } else {
-                                    	console.log('Check: Category found, not editing but adding a new item')
-                                        obj[i].items[j] = item;
+                                    	obj[i].items[j] = item;
                                         var json = JSON.stringify(obj); //convert it back to json
-                                        console.log('saving to fille...')
-                                        console.log(json)
-                                        fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
-                                        	console.log('starting save of file')
+                                       
+                                        fs.writeFile('./data/static/mastermenu.json', json, 'utf8', (err) => {
+                                        	
                                             if (err) {
                                                 showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                             } else {
-                                            	console.log('Successfully Added.')
-                                                showToast('Succes! ' + item.name + ' is added to the Menu.', '#2ecc71');
-                                                openSubMenu('ok')
+                                            	
+                                                showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                                                openSubMenu(category);
                                             }
 
                                         });
@@ -696,11 +688,12 @@ function saveItemToFile(category, item, editFlag) {
                                         "items": menuitem
                                     }); //add some data
                                     json = JSON.stringify(obj); //convert it back to json
-                                    fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
+                                    fs.writeFile('./data/static/mastermenu.json', json, 'utf8', (err) => {
                                         if (err) {
                                             showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                         } else {
-                                            showToast('Succes! ' + item.name + ' is added to the Menu.', '#2ecc71');
+                                            showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                                            openSubMenu(category);
                                         }
                                     });
                                 }
@@ -718,11 +711,12 @@ function saveItemToFile(category, item, editFlag) {
                         "items": menuitem
                     });
                     var json = JSON.stringify(obj);
-                    fs.writeFile('mastermenu.json', json, 'utf8', (err) => {
+                    fs.writeFile('./data/static/mastermenu.json', json, 'utf8', (err) => {
                         if (err) {
                             showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                         } else {
-                            showToast('Succes! ' + item.name + ' is added to the Menu.', '#2ecc71');
+                            showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                            openSubMenu(category);
                         }
                     });
                 }
@@ -811,8 +805,8 @@ function addCategory() {
 
 
       //Check if file exists
-      if(fs.existsSync('menuCategories.json')) {
-         fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+      if(fs.existsSync('./data/static/menuCategories.json')) {
+         fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
        if (err){
            showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
        } else {
@@ -820,12 +814,18 @@ function addCategory() {
             obj = []
             obj.push(name); //add some data
             json = JSON.stringify(obj);
-            fs.writeFile('menuCategories.json', json, 'utf8', (err) => {
-                if(err)
+            fs.writeFile('./data/static/menuCategories.json', json, 'utf8', (err) => {
+                if(err){
                   showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
-            });
+              }
+              else{
+
                 fetchAllCategories(); //refresh the list
                 hideNewMenuCategory();
+                openSubMenu(name);
+
+              }
+            });
          }
          else{
              flag=0;
@@ -843,12 +843,19 @@ function addCategory() {
              else{
                 obj.push(name);
                 json = JSON.stringify(obj);
-                fs.writeFile('menuCategories.json', json, 'utf8', (err) => {
-                     if(err)
+                fs.writeFile('./data/static/menuCategories.json', json, 'utf8', (err) => {
+                     if(err){
                         showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+                    }
+		            else{
+
+		                fetchAllCategories(); //refresh the list
+		                hideNewMenuCategory();
+		                openSubMenu(name);
+		              	
+		              }
                   });  
-                fetchAllCategories(); //refresh the list
-                hideNewMenuCategory();
+
              }
                  
          }
@@ -856,9 +863,15 @@ function addCategory() {
    }});
       } else {
          obj.push(name);
-         fs.writeFile('menuCategories.json', obj, 'utf8', (err) => {
-            if(err)
+         fs.writeFile('./data/static/menuCategories.json', obj, 'utf8', (err) => {
+            if(err){
                showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+           }
+           else{
+ 		                fetchAllCategories(); //refresh the list
+		                hideNewMenuCategory();
+		                openSubMenu(name);          	
+           }
          });
       }
   
@@ -868,8 +881,8 @@ function addCategory() {
 /* delete items in a given category */
 function deleteCategoryFromMaster(menuCategory){
 
-		if(fs.existsSync('mastermenu.json')) {
-	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
@@ -885,9 +898,11 @@ function deleteCategoryFromMaster(menuCategory){
 				}
 		       
 		       var newjson = JSON.stringify(mastermenu);
-		       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
-		         if(err)
+		       fs.writeFile('./data/static/mastermenu.json', newjson, 'utf8', (err) => {
+		         if(err){
 		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+		         }
+		         fetchAllCategories();
 		       }); 
 
 		}
@@ -905,8 +920,8 @@ function deleteCategory(name) {
 	/* delete from cateogry list and delete all the entries from master menu as well */
 
    //Check if file exists
-   if(fs.existsSync('menuCategories.json')) {
-       fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+   if(fs.existsSync('./data/static/menuCategories.json')) {
+       fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
        if (err){
            showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
        } else {
@@ -920,7 +935,7 @@ function deleteCategory(name) {
          }
        }
        var newjson = JSON.stringify(obj);
-       fs.writeFile('menuCategories.json', newjson, 'utf8', (err) => {
+       fs.writeFile('./data/static/menuCategories.json', newjson, 'utf8', (err) => {
          if(err)
             showToast('System Error: Unable to make changes in Categories data. Please contact Accelerate Support.', '#e74c3c');
 
@@ -932,9 +947,9 @@ function deleteCategory(name) {
    }
 
    /* on successful delete */
-   //document.getElementById("menuDeatilsArea").style.display = "none";
-   //document.getElementById("categoryDeleteConfirmation").style.display = 'none';
-   location.reload();
+   document.getElementById("menuDetailsArea").style.display = "none";
+   document.getElementById("categoryDeleteConfirmation").style.display = 'none';
+   //location.reload();
 
 }
 
@@ -953,8 +968,8 @@ function cancelDeleteConfirmation(){
 /*edit category name alone */
 function renameCategoryFromMaster(current, newName){
 		
-		if(fs.existsSync('mastermenu.json')) {
-	      fs.readFile('mastermenu.json', 'utf8', function readFileCallback(err, data){
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
@@ -970,9 +985,14 @@ function renameCategoryFromMaster(current, newName){
 				}
 		       
 		       var newjson = JSON.stringify(mastermenu);
-		       fs.writeFile('mastermenu.json', newjson, 'utf8', (err) => {
-		         if(err)
+		       fs.writeFile('./data/static/mastermenu.json', newjson, 'utf8', (err) => {
+		         if(err){
 		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+		           }
+		           else{
+		           	fetchAllCategories();
+		        	openSubMenu(newName);
+		        	}
 		       }); 
 
 		}
@@ -988,8 +1008,8 @@ function saveNewCategoryName(currentName){
 
 	if(currentName != newName){ /* replace category name*/
 		   //Check if file exists
-		   if(fs.existsSync('menuCategories.json')) {
-		       fs.readFile('menuCategories.json', 'utf8', function readFileCallback(err, data){
+		   if(fs.existsSync('./data/static/menuCategories.json')) {
+		       fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
 		       if (err){
 		           showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 		       } else {
@@ -1004,11 +1024,14 @@ function saveNewCategoryName(currentName){
 		       }
 
 		       var newjson = JSON.stringify(obj);
-		       fs.writeFile('menuCategories.json', newjson, 'utf8', (err) => {
-		         if(err)
-		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+		       fs.writeFile('./data/static/menuCategories.json', newjson, 'utf8', (err) => {
+		         if(err){
 
+
+		            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+		        }else{
 		          	renameCategoryFromMaster(currentName, newName);
+		          }
 		       }); 
 		      }});
 		   } else {
