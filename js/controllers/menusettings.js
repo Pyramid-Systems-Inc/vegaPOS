@@ -649,7 +649,7 @@ function saveItemToFile(category, item, editFlag) {
                                         	
                                             obj[i].items[j] = item
                                             json = JSON.stringify(obj); //convert it back to json
-                                            fs.writeFileSync('./data/static/mastermenu.json', json, 'utf8', (err) => {
+                                            fs.writeFile('./data/static/mastermenu.json', json, 'utf8', (err) => {
                                                 if (err) {
                                                     showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                                 } else {
