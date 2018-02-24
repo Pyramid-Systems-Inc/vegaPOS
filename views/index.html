@@ -8,9 +8,6 @@
     <link href="../css/styles.css" rel="stylesheet" type="text/css" />
     <link href="../css/custom.css" rel="stylesheet" type="text/css" />
 
-
-        <link rel="stylesheet" href="../lib/mlkeyboard/mlkeyboard.css">
-
 </head>
 
 <body class="skin-green sidebar-mini pos sidebar-collapse">
@@ -110,6 +107,9 @@
                                         <div class="form-group" style="margin-bottom:5px;">
                                             <input type="text" name="hold_ref" value="" id="hold_ref" class="form-control kb-text" placeholder="Reference Note" />
                                         </div>
+                                        <div class="form-group" style="margin-bottom:5px;">
+                                            <input type="text" name="hold_ref" value="" id="hold_user" class="form-control kb-text" placeholder="User Name" />
+                                        </div>                                        
                                         <div class="form-group" style="margin-bottom:5px;">
                                             <input type="text" name="code" id="add_item" class="form-control" placeholder="Search product by code or name, you can scan barcode too" />
                                         </div>
@@ -271,25 +271,8 @@
          </div>
       </div>
 
-
-
-
-
-<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-
-
     <script type="text/javascript" src="../js/layoutFunctions.js"></script>
     <script type="text/javascript" src="../js/controllers/orderpunching.js"></script>
-
-
-    <script src="../lib/jquery-1.11.0.min.js"></script>
-    <script src="../lib/mlkeyboard/mlkeyboard.js"></script>
-
-
-    <script>if (window.module) module = window.module;</script>
-    <script>
-        $('hold_ref').mlKeyboard({layout: 'en_US'}); 
-    </script>
 
 
 </body>
