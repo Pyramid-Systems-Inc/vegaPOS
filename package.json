@@ -11,13 +11,12 @@
     "POS",
     "Restaurant"
   ],
-  "author": "GitHub",
+  "author": "Accelerate",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.7.8"
   },
   "dependencies": {
-    "jq-keyboard": "^1.0.1",
     "jquery": "^3.3.1",
     "leveldown": "^3.0.0",
     "mkdirp": "^0.5.1"

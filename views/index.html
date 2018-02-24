@@ -8,6 +8,8 @@
     <link href="../css/styles.css" rel="stylesheet" type="text/css" />
     <link href="../css/custom.css" rel="stylesheet" type="text/css" />
 
+
+
 </head>
 
 <body class="skin-green sidebar-mini pos sidebar-collapse">
@@ -271,8 +273,40 @@
          </div>
       </div>
 
+
+
+
+
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+
     <script type="text/javascript" src="../js/layoutFunctions.js"></script>
     <script type="text/javascript" src="../js/controllers/orderpunching.js"></script>
+
+
+  <script src="../lib/jquery/jquery.min.js"></script>
+  <script src="../lib/jquery/jquery-ui.min.js"></script>
+
+  <script src="../lib/keyboard/keyboard.js"></script>
+  <script src="../lib/keyboard/jqk.layout.en-bg.js"></script>
+  <link rel="stylesheet" href="../lib/keyboard/keyboard.css" />
+
+
+<script>if (window.module) module = window.module;</script>
+
+
+
+<script>
+
+    $(function () {
+        "use strict";
+
+        console.log('Initialising Keyboard...')
+
+        jqKeyboard.init();
+    });
+
+</script>
 
 
 </body>
