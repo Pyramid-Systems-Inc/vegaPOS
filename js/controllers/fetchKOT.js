@@ -9,7 +9,7 @@ function renderKOT(){
       console.log(err);
       return;
     }
-    var fullKOT = "";
+    
     
     filenames.forEach(function(filename) {
       fs.readFile(dirname + '/' + filename, 'utf-8', function(err, data) {
@@ -19,10 +19,11 @@ function renderKOT(){
         } else{
         	var kot = JSON.parse(data);
         	var i = 0;
+        	var fullKOT = "";
         	var begKOT = "";
         	var itemsInCart = "";
         	var items = "";
-        	begKOT = '<li> <a href="#"> <h2>'+JSON.stringify(data.KOTNumber)+' <tag class="tableName">T1</tag></h2><div class="itemList"> <table>';
+        	begKOT = '<li> <a href="#"> <h2>'+JSON.stringify(kot.KOTNumber)+' <tag class="tableName">T1</tag></h2><div class="itemList"> <table>';
         	while(i < kot.cart.length){
         		itemsInCart = itemsInCart + '<tr> <td class="name">'+JSON.stringify(kot.cart[i].name)+'</td> <td class="price">x '+JSON.stringify(kot.cart[i].qty)+'</td> </tr>';
         		i++;
@@ -42,6 +43,6 @@ function renderKOT(){
   	//console.log(fullKOT)
 }
 function finalRender(fullKOT){
-	document.getElementById("fullKOT").innerHTML = fullKOT;
+	document.getElementById("fullKOT").innerHTML = document.getElementById("fullKOT").innerHTML + fullKOT;
 }
 renderKOT()
