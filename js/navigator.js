@@ -1,104 +1,70 @@
-
 const settings = require('electron-settings')
 
 let $ = require('jquery');
 
-document.body.addEventListener('click', (event) => {
+/*
+	* 	Link all the pages in this file.
+	*	renderPage loads the view from its template.
+	* 	fetchInitFunctions contains the list of functions to be called, 
+		while that particular page is loaded.
+*/
 
-	console.log('Click Triggered... ')
-  if (event.target.dataset.section) {
-    handleSectionTrigger(event)
-  } else if (event.target.dataset.modal) {
-    handleModalTrigger(event)
-  } else if (event.target.classList.contains('modal-hide')) {
-    hideAllModals()
-  }
-})
-
-function handleSectionTrigger (event) {
-  console.log('Section Triggered')
-  hideAllSectionsAndDeselectButtons()
-
-  // Highlight clicked button and show view
-  event.target.classList.add('is-selected')
-
-  // Display the current section
-  const sectionId = `${event.target.dataset.section}-section`
-  document.getElementById(sectionId).classList.add('is-shown')
-
-  // Save currently active button in localStorage
-  const buttonId = event.target.getAttribute('id')
-  settings.set('activeSectionButtonId', buttonId)
-}
-
-function activateDefaultSection () {
-
- // document.getElementById('appRenderArea').innerHTML = attachView('new-orders');
-}
-
-function showMainContent () {
-  document.querySelector('.js-nav').classList.add('is-shown')
-  document.querySelector('.js-content').classList.add('is-shown')
-}
-
-function handleModalTrigger (event) {
-  hideAllModals()
-  const modalId = `${event.target.dataset.modal}-modal`
-  document.getElementById(modalId).classList.add('is-shown')
-}
-
-function hideAllModals () {
-  const modals = document.querySelectorAll('.modal.is-shown')
-  Array.prototype.forEach.call(modals, (modal) => {
-    modal.classList.remove('is-shown')
-  })
-  showMainContent()
-}
-
-function hideAllSectionsAndDeselectButtons () {
-  const sections = document.querySelectorAll('.js-section.is-shown')
-  Array.prototype.forEach.call(sections, (section) => {
-    section.classList.remove('is-shown')
-  })
-
-  const buttons = document.querySelectorAll('.nav-button.is-selected')
-  Array.prototype.forEach.call(buttons, (button) => {
-    button.classList.remove('is-selected')
-  })
-}
-
-function displayAbout () {
- // document.querySelector('#about-modal').classList.add('is-shown')
-}
-
-// Default to the view that was active the last time the app was open
-const sectionId = settings.get('activeSectionButtonId')
-if (sectionId) {
-  showMainContent()
-  const section = document.getElementById(sectionId)
-  if (section) section.click()
-} else {
-  activateDefaultSection()
-  displayAbout()
-}
-
-function fetchInitFunctions(pageName){
-	switch (pageName){
-		case 'new-orders':{
+function fetchInitFunctions(pageReference){
+	switch (pageReference){
+		case 'new-order':{
 			renderCart();
 			renderMenu();
 			break;
 		}
 		case 'live-orders':{
-			alert('FOUND')
+			renderKOT();
 			break;
 		}
+		case 'online-orders':{
+
+			break;
+		}
+		case 'settled-bills':{
+
+			break;
+		}	
+		case 'seaing-status':{
+
+			break;
+		}
+		case 'reward-points':{
+
+			break;
+		}				
+		case 'sales-summary':{
+
+			break;
+		}
+		case 'manage-menu':{
+			fetchAllCategories();
+			break;
+		}	
+		case 'table-layout':{
+
+			break;
+		}
+		case 'bill-settings':{
+
+			break;
+		}				
+		case 'user-settings':{
+
+			break;
+		}		
 	}
 }
 
 
-function attachView(name){
-	const links = document.querySelectorAll('link[for="'+name+'"]')
+
+
+
+function renderPage(pageReference, title){
+	const links = document.querySelectorAll('link[for="'+pageReference+'"]')
 
 	if(links.length == 1){
 		  // Import and add  page to the DOM
@@ -107,8 +73,9 @@ function attachView(name){
 
 		  document.querySelector('.content').innerHTML = '';
 		  document.querySelector('.content').appendChild(clone);
+		  document.getElementById("renderPageTitle").innerHTML = title;
 
-		  fetchInitFunctions(name);
+		  fetchInitFunctions(pageReference);
 
 
 	}else{
@@ -117,4 +84,4 @@ function attachView(name){
 }
 
 //Default View
-attachView('new-order');
+renderPage('new-order', 'New Order');

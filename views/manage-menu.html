@@ -1,86 +1,5 @@
-<!DOCTYPE html>
-<html>
+<template class="task-template">
 
-<head>
-    <meta charset="UTF-8">
-    <title id="clientName">Jafry's Kitchen</title>
-
-    <link href="../css/styles.css" rel="stylesheet" type="text/css" />
-    <link href="../css/custom.css" rel="stylesheet" type="text/css" />
-
-</head>
-
-<body class="skin-green sidebar-mini pos sidebar-collapse" onload="fetchAllCategories()">
-    <div class="wrapper rtl rtl-inv">
-        <header class="main-header">
-            <a href="#" class="logo" onclick="activateSidebar()">
-                <span class="logo-mini"><i class="fa fa-bars"></i></span>
-                <span class="logo-lg">Jafry's Kitchen</span>
-            </a>
-
-            <nav class="navbar navbar-static-top" role="navigation">
-
-                <page class="commonPageName">Menu Options</page>
-                
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                        <li><a href="#"><i class="fa fa-clock"></i> 01:09:12 PM</a></li>
-                        <li><a href="#">Live Orders</a></li>
-                        <li><a href="#">Today's Sales</a></li>
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="../images/default_user.png" class="user-image" alt="Avatar" />
-                                <span>Anas Jafry</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-            </nav>
-
-        </header>
-
-        <aside class="main-sidebar">
-            <section class="sidebar">
-                <ul class="sidebar-menu">
-                    <li class="mm_welcome"><a href="index.html"><i class="fa fa-plus"></i> <span>New Order</span></a></li>
-                    <li class="mm_pos"><a href="liveorders.html"><i class="fa fa-retweet"></i> <span>Live Orders</span></a></li>
-
-                    <li class="mm_pos"><a href="onlineorders.html"><i class="fa fa-globe"></i> <span>Online Orders</span></a></li>
-                    <li class="mm_pos"><a href="settledbills.html"><i class="fa fa-check"></i> <span>Settled Bills</span></a></li>
-                    <li class="mm_pos"><a href="seatingstatus.html"><i class="fa fa-th"></i> <span>Seating Status</span></a></li>
-                    <li class="mm_pos"><a href="rewardpoints.html"><i class="fa fa-gift"></i> <span>Reward Points</span></a></li>
-                    <li id="sidebarTools" class="treeview mm_products" onclick="activateSidebarElement('sidebarTools')">
-                        <a href="#">
-                            <i class="fa fa-wrench"></i>
-                            <span>Tools</span>
-                            <i class="fa fa-angle-right pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="products_index"><a href="salessummary.html"><i class="fa fa-circle-o"></i> Sales Summary</a></li>
-                            <li id="products_index"><a href="menu.html"><i class="fa fa-circle-o"></i> Edit Menu</a></li>
-                        </ul>
-                    </li>
-
-                    <li id="sidebarSettings" class="treeview mm_products" onclick="activateSidebarElement('sidebarSettings')">
-                        <a href="#">
-                            <i class="fa fa-cog"></i>
-                            <span>Settings</span>
-                            <i class="fa fa-angle-right pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li id="products_index"><a href="tablelayout.html"><i class="fa fa-circle-o"></i> Table Layout</a></li>
-                            <li id="products_index"><a href="billsettings.html"><i class="fa fa-circle-o"></i> Bill Settings</a></li>
-                            <li id="products_index"><a href="usersettings.html"><i class="fa fa-circle-o"></i> Users Settings</a></li>
-                        </ul>
-                    </li>
-
-                </ul>
-            </section>
-        </aside>
-        <div class="content-wrapper" style="height: 1000px">
-
-            <section class="content">
                <div class="row">
                   <div class="col-xs-4">
                      <div class="box box-primary">
@@ -122,19 +41,7 @@
                      </div>
 
                   </div>
-
-
-                
-
-
-
                </div>
-            </section>
-
-
-        </div>
-    </div>
-
 
 
       <!-- Modal -->
@@ -266,16 +173,4 @@
          </div>
       </div>
 
-
-        <!-- INFO BAR - TOAST -->
-        <div id="infobar"></div>   
-
-        
-      <script src="../lib/pouchdb.min.js"></script>
-      <script type="text/javascript" src="../js/layoutFunctions.js"></script>
-      <script type="text/javascript" src="../js/controllers/menusettings.js"></script>
-
-
-</body>
-
-</html>
+</template>

@@ -1,6 +1,3 @@
-let $ = require('jquery')
-let fs = require('fs')
-//let filename = 'tables'
 var obj = [];
 
 function addTable(name,code,capacity,type) {  
@@ -109,4 +106,4 @@ function fetchAll(){
 
 //fetchAll()
 
-addTable("Table-","T4","4","Normal")
+//addTable("Table-","T4","4","Normal")
