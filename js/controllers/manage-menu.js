@@ -1,5 +1,5 @@
-let $ = require('jquery');
-let fs = require('fs');
+
+
 /* THIS DOC REQUIRES JQUERY AND FILE STREAM*/
 
 

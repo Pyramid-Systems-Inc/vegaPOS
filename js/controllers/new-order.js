@@ -182,7 +182,6 @@ function renderCart(){
 	document.getElementById("totaltbl").innerHTML = bill;
 }
 
-renderCart();
 
 function renderMenu(subtype){
 	
@@ -226,4 +225,3 @@ function renderMenu(subtype){
 	    }	
 	}
 }
-renderMenu()
