@@ -14423,3 +14423,11 @@ body.pos{
     width:100%;
     height:100%
 }
+
+
+/* Over writing the effects*/
+
+li>a:focus{
+    box-shadow: none !important;
+    transform: none !important;
+}
