@@ -8973,6 +8973,9 @@ body{
     right:0;
     left:0
 }
+
+
+
 .fixed .content-wrapper,.fixed .right-side{
     padding-top:50px
 }
@@ -9024,6 +9027,16 @@ a:active,a:focus,a:hover{
     max-height:100px;
     z-index:1030
 }
+
+
+.main-header{
+    overflow: hidden;
+    position: fixed; 
+    top: 0;
+    width: 100%; 
+}
+
+
 .main-header>.navbar{
     -webkit-transition:margin-left .3s ease-in-out;
     -o-transition:margin-left .3s ease-in-out;
@@ -13841,7 +13854,9 @@ body.pos{
     vertical-align:top
 }
 .pos #pos{
-    padding:15px
+    /*padding:15px*/
+    position: fixed;
+    width: 30%;
 }
 .pos .contents{
     padding:15px 65px 15px 0;
@@ -14432,4 +14447,8 @@ body.pos{
 li>a:focus{
     box-shadow: none !important;
     transform: none !important;
+}
+
+.wrapper{
+    background: #f5f5f5 !important;
 }
