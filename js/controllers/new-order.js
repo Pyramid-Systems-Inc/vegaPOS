@@ -182,13 +182,92 @@ function renderCart(){
 	document.getElementById("totaltbl").innerHTML = bill;
 }
 
+function renderCategoryTab(defaultTab){
+
+		if(fs.existsSync('./data/static/menuCategories.json')) {
+	      fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to read Menu Categories data. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	var categories = JSON.parse(data);
+	          	categories.sort(); //alphabetical sorting 
+	          	var categoryTag = '';
+
+				for (var i=0; i<categories.length; i++){
+					if(categories[i] == defaultTab)
+					{
+						categoryTag = categoryTag + '<a href="#" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</a>';
+					}	
+					else{
+						categoryTag = categoryTag + '<a href="#" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</a>';
+					}
+				}
+
+				if(!categoryTag)
+					categoryTag = '<p style="color: #dd4b39; padding: 20px; text-align: center; font-size: 14px; margin-bottom: 0px;">Menu is not added yet.</p>';
+
+				document.getElementById("posSubMenuDropdown").innerHTML = categoryTag;
+
+				
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to read Menu Categories data. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+}
+
+
+
 
 function renderMenu(subtype){
+
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        console.log(err);
+	    } else {
+	          		
+	          		var mastermenu = JSON.parse(data); 
+
+	          		var itemsInSubMenu = "";
+
+					if(!subtype){
+						subtype = mastermenu[0].category;
+					}
+
+					renderCategoryTab(subtype);
+	         
+				for (var i=0; i<mastermenu.length; i++){
+
+					if(mastermenu[i].category == subtype){
+						itemsInSubMenu = '';
+						for(var j=0; j<mastermenu[i].items.length; j++){
+							var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
+							itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
+				
+						}
+						break;
+					}
+				}
+				
+				document.getElementById("item-list").innerHTML = itemsInSubMenu;
+				document.getElementById("posSubMenuTitle").innerHTML = subtype;
+
+				if(!itemsInSubMenu){
+					document.getElementById("item-list").innerHTML = '<p style="text-align: center; font-size: 18px; color: #bfbfbf; padding: 20px;">No available items in '+subtype+'</p>';
+				}
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+
 	
-	if(subtype){
-		//Render Only the items of those subtype
-	}
-	
+
+	/*
 	else{
 		if(fs.existsSync('./data/static/mastermenu.json')) {
 	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
@@ -202,12 +281,12 @@ function renderMenu(subtype){
 	          var itemsInSubMenu = "";
 
 	         
-				for (i=0; i<mastermenu.length; i++){
+				for (var i=0; i<mastermenu.length; i++){
 
 					subMenu = '<div class="items"><h1>'+mastermenu[i].category+'</h1>';
 
 					itemsInSubMenu = '';
-					for(j=0; j<mastermenu[i].items.length; j++){
+					for(var j=0; j<mastermenu[i].items.length; j++){
 						var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
 						itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
 			
@@ -224,4 +303,5 @@ function renderMenu(subtype){
 	      console.log("File Doesn\'t Exist.")
 	    }	
 	}
+	*/
 }
