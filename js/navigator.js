@@ -45,11 +45,11 @@ function fetchInitFunctions(pageReference){
 			break;
 		}	
 		case 'table-layout':{
-
+			fetchAllTables()
+			fetchAllTableSections()
 			break;
 		}
 		case 'bill-settings':{
-
 			break;
 		}				
 		case 'user-settings':{
@@ -84,4 +84,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('new-order', 'New Order');
+renderPage('table-layout', 'New Order');
