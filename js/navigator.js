@@ -84,4 +84,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('table-layout', 'New Order');
+renderPage('new-order', 'New Order');

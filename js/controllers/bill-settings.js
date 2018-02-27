@@ -1,6 +1,5 @@
 
 function openNewBill(){
-	
 	document.getElementById("newBillArea").style.display = "block";
 	document.getElementById("openNewBillButton").style.display = "none";
 }
@@ -33,11 +32,20 @@ function hideNewPaymentMode(){
 	
 	document.getElementById("newPaymentModeArea").style.display = "none";
 	document.getElementById("openNewPaymentModeButton").style.display = "block";
+
 }
 
 
 
 function openBillSettings(id){
+	
+	/*Tweak - Hide all */
+	$( "#detailsDisplayBillSettings" ).children().css( "display", "none" );
+	$( "#detailsNewBillSettings" ).children().css( "display", "none" );
+	document.getElementById("openNewPaymentModeButton").style.display = "block";
+	document.getElementById("openNewModeButton").style.display = "block";
+	document.getElementById("openNewBillButton").style.display = "block";
+
 	document.getElementById(id).style.display = "block";
 
 	switch(id){
