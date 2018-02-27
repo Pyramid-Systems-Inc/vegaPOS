@@ -159,6 +159,16 @@ function renderCart(){
 	//Render Cart Items based on local storage
 	//Calculate Tax
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+	
+	if(cart_products.length < 1){
+		document.getElementById("cartTitleHead").innerHTML = '';
+		document.getElementById("summaryDisplay").innerHTML = '';
+		document.getElementById("cartDetails").innerHTML = '<p style="font-size: 21px; text-align: center; font-weight: 300; color: #b9b9b9; }">'+
+							'<img style="width: 30%; margin: 20px 0px 5px 0px;" src="images/common/emptycart.png"><br>Order Cart is empty!</p>'+
+							'<p style="font-size: 12px; text-align: center; color: #c3c3c3;">To add an item to the cart, enter its name in the above box or clicking on the item from the item list in the right.</p>';
+		return 0;
+	}
+
 	var i = 0
 	var temp = '';
 	var totqty = 0 
@@ -177,9 +187,37 @@ function renderCart(){
 		temp = temp + '<tr class="danger"><td><button type="button" class="btn btn-block btn-xs edit btn-warning"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice">'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td> <td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446564" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td></tr>'
 		i++
 	}
-	var bill = '<tbody> <tr class="info"> <td width="25%">Total Items</td> <td class="text-right" style="padding-right:10px;"><span id="count">'+totqty+'</span></td> <td width="25%">Total</td> <td class="text-right" colspan="2"><span id="total"><i class="fa fa-rupee"></i>'+tot+'</span></td> </tr> <tr class="info"> <td width="25%"><a href="#" id="add_discount">Discount</a></td> <td class="text-right" style="padding-right:10px;"><span id="ds_con">0</span></td> <td width="25%"><a href="#" id="add_tax">Order Tax</a></td> <td class="text-right"><span id="ts_con">0</span></td> </tr> <tr class="success"> <td colspan="2" style="font-weight:bold;"> Total Payable <a role="button" data-toggle="modal" data-target="#noteModal"> <i class="fa fa-comment"></i> </a> </td> <td class="text-right" colspan="2" style="font-weight:bold;"><span id="total-payable"><i class="fa fa-rupee"></i>'+tot+'</span></td> </tr> </tbody>'
+	
+	document.getElementById("cartTitleHead").innerHTML = '<tr class="success"> <th>Product</th> <th style="width: 15%;text-align:center;">Price</th> <th style="width: 15%;text-align:center;">Qty</th> <th style="width: 20%;text-align:center;">Subtotal</th> <th style="width: 20px;" class="satu"><i class="fa fa-trash-o"></i></th> </tr>';
 	document.getElementById("cartDetails").innerHTML = temp;
-	document.getElementById("totaltbl").innerHTML = bill;
+	
+
+	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin-bottom:10px;">'+
+                        '   <tbody>'+
+                        '     <tr class="info">'+
+                        '         <td width="25%">Total Items</td>'+
+                        '        <td class="text-right" style="padding-right:10px;"><span id="count">'+totqty+'</span></td>'+
+                        '         <td width="25%">Total</td>'+
+                        '         <td class="text-right" colspan="2"><span id="total">'+tot+'</span></td>'+
+                        '      </tr>'+
+                        '      <tr class="info">'+
+                        '         <td width="25%"><a href="#" id="add_discount">Discount</a></td>'+
+                        '         <td class="text-right" style="padding-right:10px;"><span id="ds_con">0</span></td>'+
+                        '         <td width="25%"><a href="#" id="add_tax">Order Tax</a></td>'+
+                        '         <td class="text-right"><span id="ts_con">0</span></td>'+
+                        '      </tr>'+
+                        '      <tr class="success">'+
+                        '         <td colspan="2" style="font-weight:bold;">'+
+                        '            Total Payable'+
+                        '            <a role="button" data-toggle="modal" data-target="#noteModal">'+
+                        '            <i class="fa fa-comment"></i>'+
+                        '            </a>'+
+                        '         </td>'+
+                        '         <td class="text-right" colspan="2" style="font-weight:bold;"><span id="total-payable">'+tot+'</span></td>'+
+                        '      </tr>'+
+                        '   </tbody>'+
+                        '</table>';
+
 }
 
 function renderCategoryTab(defaultTab){

@@ -274,8 +274,6 @@ function removeExtraChoice(){
 
 function openSubMenu(menuCategory){	
 
-	console.log('opening... '+menuCategory)
-
 	//read menu
 
 		if(fs.existsSync('./data/static/mastermenu.json')) {
@@ -803,6 +801,11 @@ function addCategory() {
 
 	var name = document.getElementById("add_new_category_name").value;
 
+	if(name == ''){
+		showToast('Warning: Category Name is invalid. Please set a name.', '#e67e22');
+		return ''
+	}
+
 
       //Check if file exists
       if(fs.existsSync('./data/static/menuCategories.json')) {
@@ -1006,6 +1009,11 @@ function saveNewCategoryName(currentName){
 
 	var newName = document.getElementById("edit_category_new_name").value;
 
+	if(newName == ''){
+		showToast('Warning: Name is invalid. Please set a name.', '#e67e22');
+		return ''
+	}
+
 	if(currentName != newName){ /* replace category name*/
 		   //Check if file exists
 		   if(fs.existsSync('./data/static/menuCategories.json')) {
@@ -1014,14 +1022,24 @@ function saveNewCategoryName(currentName){
 		           showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
 		       } else {
 		       	if(data == ''){ data = '[]'; }
-		       obj = JSON.parse(data); //now it an object
-		       //console.log(obj.length)
-		       for (var i=0; i<obj.length; i++) {  
-		         if (obj[i] == currentName){
-		            obj[i] = newName;
-		            break;
+		       var obj = JSON.parse(data); //now it an object
+		       var locatedPointer = '';
+
+		       for (var i=0; i<obj.length; i++) { 
+		       	 /*check if new name exists*/
+		       	 if(obj[i] == newName){
+		       	 	showToast('Warning: Name already exists. Please choose a different name.', '#e67e22');
+		       	 	return '';
+		       	 }
+
+		       	 /*find the match for name change*/ 
+		         if (obj[i] == currentName && locatedPointer == ''){
+		         	locatedPointer = i;
 		         }
 		       }
+
+		       //Change name to new name
+		       obj[locatedPointer] = newName;
 
 		       var newjson = JSON.stringify(obj);
 		       fs.writeFile('./data/static/menuCategories.json', newjson, 'utf8', (err) => {

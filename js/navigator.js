@@ -45,11 +45,11 @@ function fetchInitFunctions(pageReference){
 			break;
 		}	
 		case 'table-layout':{
-
+			fetchAllTables()
+			fetchAllTableSections()
 			break;
 		}
 		case 'bill-settings':{
-
 			break;
 		}				
 		case 'user-settings':{
