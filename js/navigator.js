@@ -55,7 +55,11 @@ function fetchInitFunctions(pageReference){
 		case 'user-settings':{
 
 			break;
-		}		
+		}	
+		case 'other-settings':{
+
+			break;
+		}
 	}
 }
 
@@ -84,4 +88,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('new-order', 'New Order');
+renderPage('other-settings', 'New Order');
