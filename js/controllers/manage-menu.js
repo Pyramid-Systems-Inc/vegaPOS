@@ -613,7 +613,7 @@ function saveItemToFile(category, item, editFlag) {
                                     if (err) {
                                         showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                     } else {
-                                        showToast('Succes! ' + item.name + ' is added to the Menu.', '#2ecc71');
+                                        showToast('Success! ' + item.name + ' is added to the Menu.', '#2ecc71');
                                         console.log('Adding item.. DONE!')
 
                                     }

@@ -13,8 +13,8 @@
 
                         <div class="billSettingsOption" onclick="openOtherSettings('dineSessions')"> Dine Sessions <tag class="billSettingsOptionIcon"><i class="fa fa-angle-right"></i></tag></div>
                         <div class="billSettingsOption" onclick="openOtherSettings('savedComments')"> Saved Comments <tag class="billSettingsOptionIcon"><i class="fa fa-angle-right"></i></tag></div>
-                        <div class="billSettingsOption" onclick="openOtherSettings('customShortcuts')"> Custom Shortcuts <tag class="billSettingsOptionIcon"><i class="fa fa-angle-right"></i></tag></div>
-                        <div class="billSettingsOption" onclick="openOtherSettings('personalOptions')"> Personalisation Options (Theme, Image Display, Keyboard)<tag class="billSettingsOptionIcon"><i class="fa fa-angle-right"></i></tag></div>
+                        <div class="billSettingsOption" onclick="openOtherSettings('keyboardShortcuts')"> Custom Shortcuts <tag class="billSettingsOptionIcon"><i class="fa fa-angle-right"></i></tag></div>
+                        <div class="billSettingsOption" onclick="openOtherSettings('personalOptions')"> Personalisation Options<tag class="billSettingsOptionIcon"><i class="fa fa-angle-right"></i></tag></div>
                         
                         <div class="clearfix"></div>
                     </div>
@@ -58,8 +58,147 @@
                 </div>
 
 
+                <!-- Personalisation Options -->
+                <div class="box box-primary" style="display: none" id="personalOptions">
+                    <div class="box-body">
+                        
+                        <div class="box-header" style="padding: 10px 0px">
+                           <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Personalisations</h3>
+                        </div>
+                        <table style="width: 100%">
+                          <col width="40%">
+                          <col width="60%">
+                          <tr>
+                            <td style="vertical-align: middle; font-weight: bold;">Theme</td>
+                            <td style="padding-top:10px">
+                                <div class="form-group">
+                                   <select onchange="changePersonalisationTheme()" id="personalisationEditTheme" class="form-control" style="width:100%;">
+                                      <option value="skin-green">Green (Dark)</option>
+                                      <option value="skin-green-light">Green (Light)</option>
+                                      <option value="skin-yellow">Yellow (Dark)</option>
+                                      <option value="skin-yellow-light">Yellow (Light)</option>
+                                      <option value="skin-red">Red (Dark)</option>
+                                      <option value="skin-red-light">Red (Light)</option>
+                                      <option value="skin-purple">Purple (Dark)</option>
+                                      <option value="skin-purple-light">Purple (Light)</option>
+                                   </select>
+                                </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="vertical-align: middle; font-weight: bold;">Display Menu Images</td>
+                            <td style="padding-top:10px">
+                                <div class="form-group">
+                                   <select onchange="changePersonalisationImage()" id="personalisationEditImage" class="form-control" style="width:100%;">
+                                      <option value="NO">No</option>
+                                      <option value="YES">Yes</option>
+                                   </select>
+                                </div>
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td style="vertical-align: middle; font-weight: bold;">Show Virtual Keyboard</td>
+                            <td style="padding-top:10px">
+                                <div class="form-group">
+                                   <select onchange="changePersonalisationKeyboard()" id="personalisationEditKeyboard" class="form-control" style="width:100%;">
+                                      <option value="0">Never</option>
+                                      <option value="1">When Input Prompted</option>
+                                      <option value="2">Always</option>
+                                   </select>
+                                </div>
+                            </td>
+                          </tr>                                                  
+                        </table>  
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+
+                <!-- Keyboard Shortcuts -->
+                <div class="box box-primary" style="display: none" id="keyboardShortcuts">
+                    <div class="box-body">
+                        
+                        <div class="box-header" style="padding: 10px 0px">
+                           <h3 class="box-title" style="padding: 5px 0px; font-size: 21px;">Keyboard Shortcuts</h3>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                               <div class="well well-sm">
+                                  <p>Please set your shortcuts as you like, you can use F1 - F2 or any other key combinations with Crtl, Alt and Shift.</p>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="focus_add_item">Focus add/search item input</label> <input type="text" name="focus_add_item" value="ALT+F1" class="form-control tip" id="focus_add_item">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="add_customer">Add Customer</label> <input type="text" name="add_customer" value="ALT+F2" class="form-control tip" id="add_customer">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="toggle_category_slider">Toggle Category Slider</label> <input type="text" name="toggle_category_slider" value="ALT+F10" class="form-control tip" id="toggle_category_slider">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="cancel_sale">Cancel Sale</label> <input type="text" name="cancel_sale" value="ALT+F5" class="form-control tip" id="cancel_sale">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="suspend_sale">Suspend Sale</label> <input type="text" name="suspend_sale" value="ALT+F6" class="form-control tip" id="suspend_sale">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="print_order">Print Order</label> <input type="text" name="print_order" value="ALT+F11" class="form-control tip" id="print_order">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="print_bill">Print Bill</label> <input type="text" name="print_bill" value="ALT+F12" class="form-control tip" id="print_bill">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="finalize_sale">Finalize Sale</label> <input type="text" name="finalize_sale" value="ALT+F8" class="form-control tip" id="finalize_sale">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="today_sale">Today's Sale</label> <input type="text" name="today_sale" value="Ctrl+F1" class="form-control tip" id="today_sale">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="open_hold_bills">Opened Bills</label> <input type="text" name="open_hold_bills" value="Ctrl+F2" class="form-control tip" id="open_hold_bills">
+                                     </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-4">
+                                     <div class="form-group">
+                                        <label for="close_register">Close Register</label> <input type="text" name="close_register" value="ALT+F7" class="form-control tip" id="close_register">
+                                     </div>
+                                  </div>
+                                  <div class="clearfix"></div>
+                               </div>
+                            </div>
+                         </div>
+
+
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
 
             </div>
+
+
+
 
 
             <div class="col-xs-4" id="detailsNewOtherSettings">
