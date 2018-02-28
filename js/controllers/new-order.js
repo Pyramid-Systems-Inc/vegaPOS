@@ -234,6 +234,23 @@ function renderCategoryTab(defaultTab){
 	          	categories.sort(); //alphabetical sorting 
 	          	var categoryTag = '';
 
+
+				for (var i=0; i<categories.length; i++){
+					if(categories[i] == defaultTab)
+					{
+						categoryTag = categoryTag + '<button type="button" class="btn btn-outline-sub activeCatTab" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</button>'
+					}	
+					else{
+						categoryTag = categoryTag + '<button type="button" class="btn btn-outline-sub" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</button>'
+					}
+				}
+
+				if(!categoryTag)
+					categoryTag = '<p style="color: #dd4b39; padding: 20px; text-align: center; font-size: 14px; margin-bottom: 0px;">Menu is not added yet.</p>';
+
+
+
+	        /*
 				for (var i=0; i<categories.length; i++){
 					if(categories[i] == defaultTab)
 					{
@@ -248,7 +265,11 @@ function renderCategoryTab(defaultTab){
 					categoryTag = '<p style="color: #dd4b39; padding: 20px; text-align: center; font-size: 14px; margin-bottom: 0px;">Menu is not added yet.</p>';
 
 				document.getElementById("posSubMenuDropdown").innerHTML = categoryTag;
+			*/
 
+
+
+			document.getElementById("subMenuSelectionArea").innerHTML = categoryTag;
 				
 		}
 		});
@@ -258,7 +279,17 @@ function renderCategoryTab(defaultTab){
 }
 
 
+function getImageCode(text){
+	text = text.replace(/[^a-zA-Z ]/g, "");
+	var words = text.split(' ');
 
+	if(words.length > 1){
+		return words[0].substring(0,1)+words[1].substring(0,1);
+	}
+	else{
+		return (text.substring(0, 2)).toUpperCase();
+	}
+}
 
 function renderMenu(subtype){
 
@@ -284,8 +315,8 @@ function renderMenu(subtype){
 						itemsInSubMenu = '';
 						for(var j=0; j<mastermenu[i].items.length; j++){
 							var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
-							itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
-				
+							itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><div id="itemImage">'+getImageCode(mastermenu[i].items[j].name)+'</div></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
+							//<img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;">
 						}
 						break;
 					}
@@ -295,7 +326,7 @@ function renderMenu(subtype){
 				document.getElementById("posSubMenuTitle").innerHTML = subtype;
 
 				if(!itemsInSubMenu){
-					document.getElementById("item-list").innerHTML = '<p style="text-align: center; font-size: 18px; color: #bfbfbf; padding: 20px;">No available items in '+subtype+'</p>';
+					document.getElementById("item-list").innerHTML = '<p style="font-size: 18px; color: #bfbfbf; padding: 20px;">No available items in '+subtype+'</p>';
 				}
 		}
 		});
