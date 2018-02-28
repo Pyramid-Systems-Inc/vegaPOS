@@ -1,1 +1,1 @@
-[]
+[{"name":"Walk In","isDiscountable":true,"extras":"","type":"PARCEL","minimumBill":0,"maxDiscount":2000},{"name":"Online Order","isDiscountable":true,"extras":"","type":"PARCEL","minimumBill":10,"maxDiscount":2000}]

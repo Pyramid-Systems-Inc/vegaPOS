@@ -280,7 +280,7 @@ function fetchAllModes(){
 	          	var modesTag = '';
 
 				for (var i=0; i<modes.length; i++){
-					modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+modes[i].name+'</td> <td>'+( modes[i].extras == ''? '-' :(modes[i].extras).toString())+'</td> <td>'+(modes[i].minimumBill != 0? '<i class="fa fa-inr"></i>'+modes[i].minimumBill :'-')+'</td> <td>'+(modes[i].isDiscountable?"Yes": "No")+'</td> <td>'+(modes[i].maxDiscount != 0? '<i class="fa fa-inr"></i>'+modes[i].maxDiscount :'-')+'</td> <td onclick="deleteModeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
+					modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td><p style="margin: 0">'+modes[i].name+'</p><p style="margin: 0; font-size: 65%; color: #f39c12;">'+modes[i].type+'</p></td> <td>'+( modes[i].extras == ''? '-' :(modes[i].extras).toString())+'</td> <td>'+(modes[i].minimumBill != 0? '<i class="fa fa-inr"></i>'+modes[i].minimumBill :'-')+'</td> <td>'+(modes[i].isDiscountable?"Yes": "No")+'</td> <td>'+(modes[i].maxDiscount != 0? '<i class="fa fa-inr"></i>'+modes[i].maxDiscount :'-')+'</td> <td onclick="deleteModeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
 				}
 
 				if(!modesTag)
@@ -305,6 +305,7 @@ function addMode() {
 	paramObj.name = document.getElementById("add_new_mode_name").value;
 	paramObj.isDiscountable = document.getElementById("add_new_mode_discountable").value == 'YES'? true: false;
 	paramObj.extras = document.getElementById("add_new_mode_extras").value;
+	paramObj.type = document.getElementById("add_new_mode_type").value;
 	paramObj.minimumBill = document.getElementById("add_new_mode_minBill").value;
 	paramObj.maxDiscount = document.getElementById("add_new_mode_maxDisc").value;
 

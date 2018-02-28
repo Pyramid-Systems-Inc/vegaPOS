@@ -6,31 +6,44 @@
          <div id="pos">
             <form action="" id="pos-sale-form" method="post" accept-charset="utf-8">
                <input type="hidden" name="spos_token" value="9a1dde223a4b5358b00294200ecd1189" />
-               <div class="well well-sm punchPOS" id="leftdiv">
+               <div class="well well-sm punchPOS" id="leftdiv" style="margin-bottom: 5px">
                   <div id="lefttop" style="margin-bottom:5px;">
 
                         <h1 class="posCartHead">New Order</h1>
-                        <hr>
+                        <hr style="margin-top: 0">
+
                         <h2 class="posCartSubHead">Customer Details</h2>
 
-
-                     <div class="form-group" style="margin-bottom:5px;">
-                        <div class="input-group">
-                           <select name="customer_id" id="spos_customer" data-placeholder="Select Customer" required="required" class="form-control select2" style="width:100%;position:absolute;">
-                              <option value="1">Walk-in Client</option>
-                           </select>
-                           <div class="input-group-addon no-print" style="padding: 2px 5px;">
-                              <a href="#" id="add-customer" class="external" data-toggle="modal" data-target="#myModal"><i class="fa fa-2x fa-plus-circle" id="addIcon"></i></a>
+                  <div class="row" style="padding: 0 15px">
+                        <div class="col-xs-9" style="padding: 0; padding-right: 2px">
+                           <div class="form-group" style="margin-bottom:5px;">
+                              <div class="input-group" style="width:100%;">
+                                    <select name="group" id="customerData_type" class="form-control input-tip select2">
+                                       <option value="WALKIN" selected="selected">Walk In Guest</option>
+                                       <option value="ONLINE">Online Order</option>
+                                    </select>
+                              </div>
+                              <div style="clear:both;"></div>
                            </div>
                         </div>
-                        <div style="clear:both;"></div>
-                     </div>
-                     <div class="form-group" style="margin-bottom:5px;">
-                        <input type="text" name="hold_ref" value="" id="hold_ref" class="form-control kb-text" placeholder="Reference Note" />
-                     </div>
-                     <div class="form-group" style="margin-bottom:5px;">
-                        <input type="text" name="hold_ref" value="" id="hold_user" class="form-control kb-text" placeholder="User Name" />
-                     </div>
+                        <div class="col-xs-3" style="padding: 0; padding-left: 2px">
+                           <div class="form-group" style="margin-bottom:5px;">
+                              <input type="text" value="" id="customerData_table" class="form-control kb-text" placeholder="Table" />
+                           </div>
+                        </div>                        
+                  </div>
+                  <div class="row" style="padding: 0 15px">
+                        <div class="col-xs-6" style="padding: 0; padding-right: 2px">
+                           <div class="form-group" style="margin-bottom:5px;">
+                              <input type="text" value="Abhijith C S" id="hold_user" class="form-control kb-text" placeholder="Name" />
+                           </div>
+                        </div>
+                        <div class="col-xs-6" style="padding: 0; padding-left: 2px">
+                           <div class="form-group" style="margin-bottom:5px;">
+                              <input type="text" value="9043960876" id="hold_user" class="form-control kb-text" placeholder="Mobile" />
+                           </div>
+                        </div>                        
+                  </div>
 
 
                         
@@ -42,15 +55,29 @@
                         <input type="text" name="code" id="add_item" class="form-control" placeholder="Search product by code or name, you can scan barcode too" />
                      </div>
                   </div>
-                  <div id="print" class="fixed-table-container">
+                  <div class="fixed-table-container">
                      <div id="list-table-div">
-                        <table id="posTable" class="table table-striped table-condensed table-hover list-table" style="margin:0px;" data-height="100">
+                        <table class="table table-striped table-condensed table-hover list-table" style="margin:0px; position: absolute; z-index: 2">
+                           <col width="10%"> 
+                           <col width="40%">
+                           <col width="15%">
+                           <col width="20%">
+                           <col width="15%">
+                                                     
                            <thead id="cartTitleHead">
                            </thead>
+                        </table>
+                        <table class="table table-striped table-condensed table-hover list-table" style="margin:0px; margin-top: 30px">
+                           <col width="10%">
+                           <col width="40%">
+                           <col width="15%">
+                           <col width="20%">
+                           <col width="15%">
                            <tbody id="cartDetails">
                            </tbody>
                         </table>
                      </div>
+
                      <div style="clear:both;"></div>
                      <div id="summaryDisplay">
                      </div>
@@ -103,8 +130,17 @@
          </div>
       -->
 
-         <div class="contents menuListingPOS">
-            <h1 class="punchMenuTitle"><tag id="posSubMenuTitle">Starters</tag></h1>
+         <div class="contents menuListingPOS" id="fullRightPanel">
+            <h1 class="punchMenuTitle"><tag id="posSubMenuTitle">...</tag>
+
+               <div class="dropdown">
+                 <button class="dropbtn"><i class="fa fa-angle-down"></i></button>
+                 <div class="dropdown-content" id="posSubMenuDropdown">
+
+                 </div>
+               </div>
+
+            </h1>
             <div id="item-list" class="menuRenderPlane">
                <p class="renderDelayText">Oops! Rendering Menu is unusually taking time.</p>
             </div>
@@ -118,6 +154,25 @@
 
       </div>
    </div>
+
+
+      <!-- Modal -->
+      <div id="clearCartConsentModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-body" style="max-height: 420px; overflow: scroll; padding: 30px 15px">
+                <p style="font-size: 16px; margin: 0; color: #e74c3c;">The order <b>will not</b> get Cancelled when you Clear the Cart. Order remains until you Cancel it separately. <br><br>Do you want to Clear the Cart?</p>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" onclick="hideClearCartModal()" style="float: left">Cancel</button>
+                  <button type="button" class="btn btn-danger" onclick="clearCart()">Clear the Cart</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+
    <!-- Modal -->
    <div id="customiseItemModal" class="modal">
       <div class="modal-dialog" style="top: 20%">

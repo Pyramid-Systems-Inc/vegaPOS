@@ -164,7 +164,7 @@ function renderCart(){
 		document.getElementById("cartTitleHead").innerHTML = '';
 		document.getElementById("summaryDisplay").innerHTML = '';
 		document.getElementById("cartDetails").innerHTML = '<p style="font-size: 21px; text-align: center; font-weight: 300; color: #b9b9b9; }">'+
-							'<img style="width: 30%; margin: 20px 0px 5px 0px;" src="images/common/emptycart.png"><br>Order Cart is empty!</p>'+
+							'<img style="width: 20%; margin: 20px 0px 5px 0px;" src="images/common/emptycart.png"><br>Order Cart is empty!</p>'+
 							'<p style="font-size: 12px; text-align: center; color: #c3c3c3;">To add an item to the cart, enter its name in the above box or clicking on the item from the item list in the right.</p>';
 		return 0;
 	}
@@ -184,15 +184,15 @@ function renderCart(){
 			variantName = ' ('+cart_products[i].variant+')';
 		}
 
-		temp = temp + '<tr class="danger"><td><button type="button" class="btn btn-block btn-xs edit btn-warning"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice">'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td> <td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446564" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td></tr>'
+		temp = '<tr class="danger"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446564" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-warning"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
 		i++
 	}
 	
-	document.getElementById("cartTitleHead").innerHTML = '<tr class="success"> <th>Product</th> <th style="width: 15%;text-align:center;">Price</th> <th style="width: 15%;text-align:center;">Qty</th> <th style="width: 20%;text-align:center;">Subtotal</th> <th style="width: 20px;" class="satu"><i class="fa fa-trash-o"></i></th> </tr>';
+	document.getElementById("cartTitleHead").innerHTML = '<tr class="success"> <th style="width: 20px;" class="satu" onclick="clearCartConsent()"><i class="fa fa-trash-o"></i></th><th>Item</th> <th style="width: 15%;text-align:center;">Price</th> <th style="width: 15%;text-align:center;">Qty</th> <th style="width: 20%;text-align:center;">Subtotal</th>  </tr>';
 	document.getElementById("cartDetails").innerHTML = temp;
 	
 
-	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin-bottom:10px;">'+
+	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin: 0">'+
                         '   <tbody>'+
                         '     <tr class="info">'+
                         '         <td width="25%">Total Items</td>'+
@@ -218,6 +218,21 @@ function renderCart(){
                         '   </tbody>'+
                         '</table>';
 
+}
+
+/*Clear cart*/
+function clearCart(){
+	window.localStorage.zaitoon_cart = "";
+	renderCart();
+	hideClearCartModal();
+}
+
+function clearCartConsent(){
+	document.getElementById("clearCartConsentModal").style.display = "block";
+}
+
+function hideClearCartModal(){
+	document.getElementById("clearCartConsentModal").style.display = "none";
 }
 
 function renderCategoryTab(defaultTab){
@@ -249,27 +264,29 @@ function renderCategoryTab(defaultTab){
 					categoryTag = '<p style="color: #dd4b39; padding: 20px; text-align: center; font-size: 14px; margin-bottom: 0px;">Menu is not added yet.</p>';
 
 
+				document.getElementById("subMenuSelectionArea").innerHTML = categoryTag;
+	        
 
-	        /*
+	        	var dropTag = '';
 				for (var i=0; i<categories.length; i++){
 					if(categories[i] == defaultTab)
 					{
-						categoryTag = categoryTag + '<a href="#" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</a>';
+						dropTag = dropTag + '<a href="#" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</a>';
 					}	
 					else{
-						categoryTag = categoryTag + '<a href="#" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</a>';
+						dropTag = dropTag + '<a href="#" onclick="renderMenu(\''+categories[i]+'\')">'+categories[i]+'</a>';
 					}
 				}
 
-				if(!categoryTag)
-					categoryTag = '<p style="color: #dd4b39; padding: 20px; text-align: center; font-size: 14px; margin-bottom: 0px;">Menu is not added yet.</p>';
+				if(!dropTag)
+					dropTag = '<p style="color: #dd4b39; padding: 20px; text-align: center; font-size: 14px; margin-bottom: 0px;">Menu is not added yet.</p>';
 
-				document.getElementById("posSubMenuDropdown").innerHTML = categoryTag;
-			*/
+				document.getElementById("posSubMenuDropdown").innerHTML = dropTag;
+			
 
 
 
-			document.getElementById("subMenuSelectionArea").innerHTML = categoryTag;
+			
 				
 		}
 		});
@@ -296,9 +313,16 @@ function renderMenu(subtype){
 		if(fs.existsSync('./data/static/mastermenu.json')) {
 	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
-	        console.log(err);
+	        
 	    } else {
-	          		
+
+	    	var customSettings = window.localStorage.appCustomSettings ?  JSON.parse(window.localStorage.appCustomSettings) : [];     
+	       	
+	   		var showPhotosFlag = false;
+	   		if(customSettings.displayMenuPhotos){
+	   			showPhotosFlag = true;
+	   		}
+
 	          		var mastermenu = JSON.parse(data); 
 
 	          		var itemsInSubMenu = "";
@@ -315,8 +339,12 @@ function renderMenu(subtype){
 						itemsInSubMenu = '';
 						for(var j=0; j<mastermenu[i].items.length; j++){
 							var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
-							itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><div id="itemImage">'+getImageCode(mastermenu[i].items[j].name)+'</div></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
-							//<img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;">
+							if(mastermenu[i].items[j].isPhoto && showPhotosFlag){
+								itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img" style="background: none !important;"><img src="data/photos/menu/1009.jpg" alt="Minion Banana" style="width: 110px; height: 110px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
+							}
+							else{
+								itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><div id="itemImage">'+getImageCode(mastermenu[i].items[j].name)+'</div></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
+							}
 						}
 						break;
 					}
@@ -327,6 +355,23 @@ function renderMenu(subtype){
 
 				if(!itemsInSubMenu){
 					document.getElementById("item-list").innerHTML = '<p style="font-size: 18px; color: #bfbfbf; padding: 20px;">No available items in '+subtype+'</p>';
+				}
+
+				/*Adjust height*/ /*TWEAK*/
+				var measures = {};
+				measures.fullHeight = document.getElementById("fullRightPanel").offsetHeight;
+				measures.menuOriginal = document.getElementById("item-list").offsetHeight;
+				measures.menuRendered = document.getElementById("item-list").scrollHeight;
+				measures.subOriginal = document.getElementById("subMenuSelectionArea").offsetHeight;
+				measures.subRendered = document.getElementById("subMenuSelectionArea").scrollHeight;
+
+				document.getElementById('subMenuSelectionArea').setAttribute("style","height: auto !important; overflow: none !important");
+
+				if(measures.menuRendered > measures.menuOriginal){
+					if(measures.subRendered + measures.menuRendered > measures.fullHeight){
+						/*Adjust Height*/
+						document.getElementById('subMenuSelectionArea').setAttribute("style","height: 17vh !important; overflow: scroll !important");
+					}
 				}
 		}
 		});
