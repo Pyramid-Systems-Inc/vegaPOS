@@ -41,6 +41,14 @@ function openOtherSettings(id){
 			fetchAllSavedComments();
 			break;
 		}	
+    case "personalOptions":{
+      renderPersonalisations();
+      break;
+    } 
+    case "keyboardShortcuts":{
+ 
+      break;
+    }     
 	}
 }
 
@@ -56,6 +64,141 @@ function openOtherDeleteConfirmation(type, functionName){
 function cancelOtherDeleteConfirmation(){
 	document.getElementById("settingsDeleteConfirmation").style.display = 'none';
 }
+
+
+/*read personalisation data*/
+function renderPersonalisations(){
+
+    if(fs.existsSync('./data/static/personalisations.json')) {
+        fs.readFile('./data/static/personalisations.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          showToast('System Error: Unable to read Personalisations data. Please contact Accelerate Support.', '#e74c3c');
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var params = JSON.parse(data);
+
+
+          //Render
+          for (var i=0; i<params.length; i++){
+            if(params[i].name == "theme"){
+              document.getElementById("personalisationEditTheme").value = params[i].value;
+            }
+            else if(params[i].name == "menuImages"){
+              document.getElementById("personalisationEditImage").value = params[i].value;
+            }
+            else if(params[i].name == "virtualKeyboard"){
+              document.getElementById("personalisationEditKeyboard").value = params[i].value;
+            }
+          }
+
+    }
+    });
+      } else {
+        showToast('System Error: Unable to read Personalisations data. Please contact Accelerate Support.', '#e74c3c');
+      }   
+}
+
+function changePersonalisationFile(type, changedValue){
+
+
+    if(fs.existsSync('./data/static/personalisations.json')) {
+        fs.readFile('./data/static/personalisations.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          showToast('System Error: Unable to modify Personalisations data. Please contact Accelerate Support.', '#e74c3c');
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var params = JSON.parse(data);
+
+
+                  for (var i=0; i<params.length; i++){
+                    if(params[i].name == type){
+                      params[i].value = changedValue;
+                      break;
+                    }
+                  }
+
+           var newjson = JSON.stringify(params);
+           fs.writeFile('./data/static/personalisations.json', newjson, 'utf8', (err) => {
+             if(err){
+                showToast('System Error: Unable to save Personalisations data. Please contact Accelerate Support.', '#e74c3c');
+               }
+           }); 
+
+    }
+    });
+      } else {
+        showToast('System Error: Unable to modify Personalisations data. Please contact Accelerate Support.', '#e74c3c');
+      }   
+ 
+}
+
+/*actions*/
+function changePersonalisationTheme(){
+  var themeName = document.getElementById("personalisationEditTheme").value;
+
+  //document.getElementById("mainAppBody").classList;
+  var tempList = document.getElementById("mainAppBody").classList.toString();
+  tempList = tempList.split(" ");
+
+  tempList[0] = themeName;
+
+  tempList = tempList.toString();
+  tempList = tempList.replace (/,/g, " ");
+
+  document.getElementById("mainAppBody").className = tempList;
+
+
+  //Update
+  window.localStorage.appCustomSettings_Theme = themeName;
+  changePersonalisationFile("theme", themeName);
+
+  showToast('Theme changed successfully', '#2ecc71');
+}
+
+
+
+
+function changePersonalisationImage(){
+  var optName = document.getElementById("personalisationEditImage").value == 'YES'? true: false;
+
+  if(optName){
+    showToast('Photos will be displayed in the Menu', '#2ecc71');
+  }
+  else{
+    showToast('Photos has been disabled in the Menu', '#2ecc71');
+  }
+
+  //Update
+  window.localStorage.appCustomSettings_ImageDisplay = optName;
+  changePersonalisationFile("menuImages", document.getElementById("personalisationEditImage").value);
+}
+
+
+function changePersonalisationKeyboard(){
+  var optName = parseFloat(document.getElementById("personalisationEditKeyboard").value);
+
+
+  if(optName == 0){
+    showToast('Virtual Keyboard disabled', '#2ecc71');
+  }
+  else if(optName == 1){
+    showToast('Virtual Keyboard gets activated on Input only', '#2ecc71');
+  }
+  else if(optName == 2){
+    showToast('Virtual Keyboard is enabled', '#2ecc71');
+  }
+
+
+  //Update
+  window.localStorage.appCustomSettings_Keyboard = optName;
+  changePersonalisationFile("virtualKeyboard", optName);
+}
+
+
 
 
 /* read dine sessions */

@@ -1,4 +1,3 @@
-let fs = require('fs')
 
 /*Add Item to Cart */
 
@@ -316,12 +315,10 @@ function renderMenu(subtype){
 	        
 	    } else {
 
-	    	var customSettings = window.localStorage.appCustomSettings ?  JSON.parse(window.localStorage.appCustomSettings) : [];     
-	       	
-	   		var showPhotosFlag = false;
-	   		if(customSettings.displayMenuPhotos){
-	   			showPhotosFlag = true;
-	   		}
+
+	    /* PERSONALISATIONS */
+		var showPhotosFlag = window.localStorage.appCustomSettings_ImageDisplay == 'true' ? true: false;
+
 
 	          		var mastermenu = JSON.parse(data); 
 
