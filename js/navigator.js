@@ -88,4 +88,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('new-order', 'New Order');
+renderPage('bill-settings', 'New Order');

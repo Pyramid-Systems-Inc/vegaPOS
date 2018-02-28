@@ -11,10 +11,51 @@ function hideNewBill(){
 }
 
 
+function addExtraToInput(name, id){
+  if(document.getElementById("add_new_mode_extras").value == "" || document.getElementById("add_new_mode_extras").value =="Choose from below list"){
+    document.getElementById("add_new_mode_extras").value = name;
+  }
+  else{
+    document.getElementById("add_new_mode_extras").value = document.getElementById("add_new_mode_extras").value + ',' +name;
+  }
+
+  document.getElementById(id).style.display = "none";
+}
+
+
 function openNewMode(){
-	
-	document.getElementById("newModeArea").style.display = "block";
-	document.getElementById("openNewModeButton").style.display = "none";
+
+  /*render extras list*/
+
+    if(fs.existsSync('./data/static/billingparameters.json')) {
+        fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var modes = JSON.parse(data);
+              modes.sort(); //alphabetical sorting 
+              var modesTag = '';
+
+        for (var i=0; i<modes.length; i++){
+          modesTag = modesTag + '<tag class="extrasSelButton" onclick="addExtraToInput(\''+modes[i].name+'\', \'extra_'+i+'\')" id="extra_'+i+'">'+modes[i].name+' ('+(modes[i].unit == 'FIXED'? 'Rs. '+modes[i].value : modes[i].value+'%')+')</tag>';
+        }
+
+        if(!modesTag){
+            document.getElementById("extrasList").innerHTML = '<i>*Please update <b style="cursor: pointer" onclick="openBillSettings(\'billingExtras\')">Taxes & Other Extras</b> first.</i>';
+        }
+        else{            
+            document.getElementById("extrasList").innerHTML = 'Extras List: '+modesTag;
+        }
+
+          document.getElementById("newModeArea").style.display = "block";
+          document.getElementById("openNewModeButton").style.display = "none";
+    }
+    });
+  }
+
 }
 
 function hideNewMode(){
@@ -116,6 +157,7 @@ function addParameter() {
 
 	var paramObj = {};
 	paramObj.name = document.getElementById("add_new_param_name").value;
+  paramObj.name = (paramObj.name).replace (/,/g, "");
 	paramObj.isCompulsary = document.getElementById("add_new_param_compulsary").value == 'YES'? true: false;
 	paramObj.value = document.getElementById("add_new_param_value").value;
 	var tempUnit = document.getElementById("add_new_param_unit").value;
