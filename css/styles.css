@@ -13899,7 +13899,7 @@ body.pos{
 .pos .contents #item-list .btn-both .bg-img{
     background:#FFF;
     height:110px;
-    padding:5px
+    /*padding:5px*/
 }
 .pos .contents #item-list .btn-both span{
     display:block;

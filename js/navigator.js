@@ -88,4 +88,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('other-settings', 'New Order');
+renderPage('new-order', 'New Order');
