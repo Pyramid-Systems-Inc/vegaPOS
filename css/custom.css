@@ -1750,3 +1750,38 @@ ol ol {
     border-color:#eea236
 }
 
+/*Other Page Common Themes*/
+/* BOX BORDER TOP*/
+.skin-yellow .box.box-primary, .skin-yellow-light .box.box-primary{
+    border-top-color:#f39c12
+}
+.skin-blue .box.box-primary, .skin-blue-light .box.box-primary{
+    border-top-color: #3c8dbc
+}
+.skin-red .box.box-primary, .skin-red-light .box.box-primary{
+    border-top-color:#dd4b39
+}
+.skin-green .box.box-primary, .skin-green-light .box.box-primary{
+    border-top-color:#1abc9c
+}
+.skin-purple .box.box-primary, .skin-purple-light .box.box-primary{
+    border-top-color:#605ca8
+}
+
+/*BIG NUMBER*/
+
+.skin-yellow .rewardsCount, .skin-yellow-light .rewardsCount{
+    color:#f39c12
+}
+.skin-blue .rewardsCount, .skin-blue-light .rewardsCount{
+    color: #3c8dbc
+}
+.skin-red .rewardsCount, .skin-red-light .rewardsCount{
+    color:#dd4b39
+}
+.skin-green .rewardsCount, .skin-green-light .rewardsCount{
+    color:#1abc9c
+}
+.skin-purple .rewardsCount, .skin-purple-light .rewardsCount{
+    color:#605ca8
+}
