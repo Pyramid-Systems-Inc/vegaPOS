@@ -6,7 +6,7 @@
          <div id="pos">
             <form action="" id="pos-sale-form" method="post" accept-charset="utf-8">
                <input type="hidden" name="spos_token" value="9a1dde223a4b5358b00294200ecd1189" />
-               <div class="well well-sm punchPOS" id="leftdiv" style="margin-bottom: 5px">
+               <div class="well well-sm punchPOS" id="leftdiv" style="padding: 2px 2px 8px 2px">
                   <div id="lefttop" style="margin-bottom:5px;">
 
                         <h1 class="posCartHead">New Order</h1>
@@ -14,36 +14,38 @@
 
                         <h2 class="posCartSubHead">Customer Details</h2>
 
-                  <div class="row" style="padding: 0 15px">
-                        <div class="col-xs-9" style="padding: 0; padding-right: 2px">
-                           <div class="form-group" style="margin-bottom:5px;">
-                              <div class="input-group" style="width:100%;">
-                                    <select name="group" id="customerData_type" class="form-control input-tip select2">
-                                       <option value="WALKIN" selected="selected">Walk In Guest</option>
-                                       <option value="ONLINE">Online Order</option>
-                                    </select>
-                              </div>
-                              <div style="clear:both;"></div>
+                        <div style="padding: 0 6px">
+                           <div class="row" style="padding: 0 15px">
+                                 <div class="col-xs-9" style="padding: 0; padding-right: 2px">
+                                    <div class="form-group" style="margin-bottom:5px;">
+                                       <div class="input-group" style="width:100%;">
+                                             <select name="group" id="customerData_type" class="form-control input-tip select2">
+                                                <option value="WALKIN" selected="selected">Walk In Guest</option>
+                                                <option value="ONLINE">Online Order</option>
+                                             </select>
+                                       </div>
+                                       <div style="clear:both;"></div>
+                                    </div>
+                                 </div>
+                                 <div class="col-xs-3" style="padding: 0; padding-left: 2px">
+                                    <div class="form-group" style="margin-bottom:5px;">
+                                       <input type="text" value="" id="customerData_table" class="form-control kb-text" placeholder="Table" />
+                                    </div>
+                                 </div>                        
+                           </div>
+                           <div class="row" style="padding: 0 15px">
+                                 <div class="col-xs-6" style="padding: 0; padding-right: 2px">
+                                    <div class="form-group" style="margin-bottom:5px;">
+                                       <input type="text" value="Abhijith C S" id="hold_user" class="form-control kb-text" placeholder="Name" />
+                                    </div>
+                                 </div>
+                                 <div class="col-xs-6" style="padding: 0; padding-left: 2px">
+                                    <div class="form-group" style="margin-bottom:5px;">
+                                       <input type="text" value="9043960876" id="hold_user" class="form-control kb-text" placeholder="Mobile" />
+                                    </div>
+                                 </div>                        
                            </div>
                         </div>
-                        <div class="col-xs-3" style="padding: 0; padding-left: 2px">
-                           <div class="form-group" style="margin-bottom:5px;">
-                              <input type="text" value="" id="customerData_table" class="form-control kb-text" placeholder="Table" />
-                           </div>
-                        </div>                        
-                  </div>
-                  <div class="row" style="padding: 0 15px">
-                        <div class="col-xs-6" style="padding: 0; padding-right: 2px">
-                           <div class="form-group" style="margin-bottom:5px;">
-                              <input type="text" value="Abhijith C S" id="hold_user" class="form-control kb-text" placeholder="Name" />
-                           </div>
-                        </div>
-                        <div class="col-xs-6" style="padding: 0; padding-left: 2px">
-                           <div class="form-group" style="margin-bottom:5px;">
-                              <input type="text" value="9043960876" id="hold_user" class="form-control kb-text" placeholder="Mobile" />
-                           </div>
-                        </div>                        
-                  </div>
 
 
                         
@@ -51,13 +53,14 @@
 
 
 
-                     <div class="form-group" style="margin-bottom:5px;">
+                     <div class="form-group" style="margin-bottom:5px; margin-right: 6px; margin-left: 6px">
                         <input type="text" name="code" id="add_item" class="form-control" placeholder="Search product by code or name, you can scan barcode too" />
                      </div>
                   </div>
+               
                   <div class="fixed-table-container">
-                     <div id="list-table-div">
-                        <table class="table table-striped table-condensed table-hover list-table" style="margin:0px; position: absolute; z-index: 2">
+                     <div style="padding: 0px 6px !important">
+                        <table class="table table-striped table-condensed table-hover list-table" style="margin:0px; z-index: 2;">
                            <col width="10%"> 
                            <col width="40%">
                            <col width="15%">
@@ -67,7 +70,9 @@
                            <thead id="cartTitleHead">
                            </thead>
                         </table>
-                        <table class="table table-striped table-condensed table-hover list-table" style="margin:0px; margin-top: 30px">
+                     </div>
+                     <div id="list-table-div" style="padding-left: 6px !important; overflow-x: hidden">
+                        <table class="table table-striped table-condensed table-hover list-table" style="margin:0px;">
                            <col width="10%">
                            <col width="40%">
                            <col width="15%">
@@ -79,9 +84,10 @@
                      </div>
 
                      <div style="clear:both;"></div>
-                     <div id="summaryDisplay">
+                     <div id="summaryDisplay" style="margin-right: 6px; margin-left: 6px">
                      </div>
                   </div>
+
 
                </div>
             </form>
@@ -97,12 +103,11 @@
                         </div>
                         <div class="col-xs-4" style="padding: 0 4px;">
                            <div class="btn-group-vertical btn-block">
-                              <button type="button" style="margin-bottom: 4px" class="btn bg-purple btn-block btn-flat" id="print_order">Print KOT</button>
-                              <button type="button" class="btn bg-navy btn-block btn-flat" id="print_bill">Print Bill</button>
+                              <button type="button" style="margin-bottom: 4px; height:71px; background: #2980b9 !important" class="btn bg-purple btn-block btn-flat" id="print_order">Print KOT</button>
                            </div>
                         </div>
                         <div class="col-xs-4" style="padding: 0;">
-                           <button type="button" class="btn btn-success btn-block btn-flat" id="payment" style="height:71px;">Payment</button>
+                           <button type="button" class="btn btn-success btn-block btn-flat" id="payment" style="height:71px;">Print Bill</button>
                         </div>
                      </div>
                   </div>
@@ -114,21 +119,6 @@
 
       </div>
       <div class="col-sm-8">
-
-      <!--
-         <div class="posSubMenuTab">
-            <h1 class="punchMenuTitle"><tag id="posSubMenuTitle">Starters</tag>
-            <div class="dropdown">
-              <button class="dropbtn"><i class="fa fa-angle-down"></i></button>
-              <div class="dropdown-content" id="posSubMenuDropdown">
-
-              </div>
-            </div>
-
-            </h1>
-
-         </div>
-      -->
 
          <div class="contents menuListingPOS" id="fullRightPanel">
             <h1 class="punchMenuTitle"><tag id="posSubMenuTitle">...</tag>

@@ -1,5 +1,63 @@
 let fs = require('fs');
 
+
+/* Apply Personalisations */
+function applyPersonalisations(){
+  
+    //Read from File, apply changes, and save to LocalStorage
+
+    if(fs.existsSync('./data/static/personalisations.json')) {
+        fs.readFile('./data/static/personalisations.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+          var params = JSON.parse(data);
+
+          //Render
+          for (var i=0; i<params.length; i++){
+            if(params[i].name == "theme"){
+
+              /*Change Theme*/
+              var tempList = document.getElementById("mainAppBody").classList.toString();
+              tempList = tempList.split(" ");
+
+              tempList[0] = params[i].value;
+
+              tempList = tempList.toString();
+              tempList = tempList.replace (/,/g, " ");
+
+              document.getElementById("mainAppBody").className = tempList; 
+
+              /*update localstorage*/             
+              window.localStorage.appCustomSettings_Theme = params[i].value;
+            }
+            else if(params[i].name == "menuImages"){
+
+              var tempVal = params[i].value == 'YES'? true: false;
+
+              /*update localstorage*/             
+              window.localStorage.appCustomSettings_ImageDisplay = tempVal;
+            }
+            else if(params[i].name == "virtualKeyboard"){
+              var tempVal = params[i].value;
+              tempVal = parseFloat(tempVal);
+              
+              /*update localstorage*/             
+              window.localStorage.appCustomSettings_Keyboard = tempVal;
+            }
+          }
+
+    }
+    });
+  }
+  
+}
+
+applyPersonalisations();
+
+
 /* Expand/Contract Sidebar */
 function activateSidebarElement(barID){
 
@@ -81,61 +139,3 @@ function getCurrentTime() {
 
 getCurrentTime();
 
-/* Apply Personalisations */
-function applyPersonalisations(){
-
-    console.log('Applying Personalisations...')
-  
-
-    //Read from File, apply changes, and save to LocalStorage
-
-    if(fs.existsSync('./data/static/personalisations.json')) {
-        fs.readFile('./data/static/personalisations.json', 'utf8', function readFileCallback(err, data){
-      if (err){
-      } else {
-
-          if(data == ''){ data = '[]'; }
-
-          var params = JSON.parse(data);
-
-          //Render
-          for (var i=0; i<params.length; i++){
-            if(params[i].name == "theme"){
-
-              /*Change Theme*/
-              var tempList = document.getElementById("mainAppBody").classList.toString();
-              tempList = tempList.split(" ");
-
-              tempList[0] = params[i].value;
-
-              tempList = tempList.toString();
-              tempList = tempList.replace (/,/g, " ");
-
-              document.getElementById("mainAppBody").className = tempList; 
-
-              /*update localstorage*/             
-              window.localStorage.appCustomSettings_Theme = params[i].value;
-            }
-            else if(params[i].name == "menuImages"){
-
-              var tempVal = params[i].value == 'YES'? true: false;
-
-              /*update localstorage*/             
-              window.localStorage.appCustomSettings_ImageDisplay = tempVal;
-            }
-            else if(params[i].name == "virtualKeyboard"){
-              var tempVal = params[i].value;
-              tempVal = parseFloat(tempVal);
-              
-              /*update localstorage*/             
-              window.localStorage.appCustomSettings_Keyboard = tempVal;
-            }
-          }
-
-    }
-    });
-  }
-  
-}
-
-applyPersonalisations();
