@@ -99,7 +99,7 @@ function markAvailability(code){
 
 							if(document.getElementById("item_avail_"+code).innerHTML != 'Available'){
 								document.getElementById("item_avail_"+code).innerHTML = 'Available';
-								document.getElementById("item_avail_"+code).style.background = "#2ecc71";	
+								document.getElementById("item_avail_"+code).style.background = "#27ae60";	
 							}
 							else{
 								document.getElementById("item_avail_"+code).innerHTML = 'Out of Stock';
@@ -613,7 +613,7 @@ function saveItemToFile(category, item, editFlag) {
                                     if (err) {
                                         showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                     } else {
-                                        showToast('Success! ' + item.name + ' is added to the Menu.', '#2ecc71');
+                                        showToast('Success! ' + item.name + ' is added to the Menu.', '#27ae60');
                                         console.log('Adding item.. DONE!')
 
                                     }
@@ -651,7 +651,7 @@ function saveItemToFile(category, item, editFlag) {
                                                 if (err) {
                                                     showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                                 } else {
-                                                    showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                                                    showToast(item.name + ' is added to the Menu.', '#27ae60');
                                                     openSubMenu(category);
                                                 }
 
@@ -670,7 +670,7 @@ function saveItemToFile(category, item, editFlag) {
                                                 showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                             } else {
                                             	
-                                                showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                                                showToast(item.name + ' is added to the Menu.', '#27ae60');
                                                 openSubMenu(category);
                                             }
 
@@ -690,7 +690,7 @@ function saveItemToFile(category, item, editFlag) {
                                         if (err) {
                                             showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                                         } else {
-                                            showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                                            showToast(item.name + ' is added to the Menu.', '#27ae60');
                                             openSubMenu(category);
                                         }
                                     });
@@ -713,7 +713,7 @@ function saveItemToFile(category, item, editFlag) {
                         if (err) {
                             showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
                         } else {
-                            showToast(item.name + ' is added to the Menu.', '#2ecc71');
+                            showToast(item.name + ' is added to the Menu.', '#27ae60');
                             openSubMenu(category);
                         }
                     });

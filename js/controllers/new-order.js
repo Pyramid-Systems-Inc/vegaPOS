@@ -183,36 +183,33 @@ function renderCart(){
 			variantName = ' ('+cart_products[i].variant+')';
 		}
 
-		temp = '<tr class="danger"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" id="1516883446564" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-warning"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
+		temp = '<tr class="success"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-success"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
 		i++
 	}
 	
-	document.getElementById("cartTitleHead").innerHTML = '<tr class="success"> <th style="width: 20px;" class="satu" onclick="clearCartConsent()"><i class="fa fa-trash-o"></i></th><th>Item</th> <th style="width: 15%;text-align:center;">Price</th> <th style="width: 15%;text-align:center;">Qty</th> <th style="width: 20%;text-align:center;">Subtotal</th>  </tr>';
+	document.getElementById("cartTitleHead").innerHTML = '<tr class="success cartTitleRow"> <th class="satu cartTitleRow" onclick="clearCartConsent()"><i class="fa fa-trash-o"></i></th><th class="cartTitleRow">Item</th> <th class="cartTitleRow">Price</th> <th class="cartTitleRow" >Qty</th> <th class="cartTitleRow">Subtotal</th>  </tr>';
 	document.getElementById("cartDetails").innerHTML = temp;
 	
 
 	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin: 0">'+
                         '   <tbody>'+
                         '     <tr class="info">'+
-                        '         <td width="25%">Total Items</td>'+
-                        '        <td class="text-right" style="padding-right:10px;"><span id="count">'+totqty+'</span></td>'+
-                        '         <td width="25%">Total</td>'+
-                        '         <td class="text-right" colspan="2"><span id="total">'+tot+'</span></td>'+
+                        '         <td width="25%" class="cartSummaryRow">Total Items</td>'+
+                        '        <td class="text-right cartSummaryRow" style="padding-right:10px;"><span id="count">'+totqty+'</span></td>'+
+                        '         <td width="25%" class="cartSummaryRow">Total</td>'+
+                        '         <td class="text-right cartSummaryRow" colspan="2"><span id="total"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
                         '      </tr>'+
                         '      <tr class="info">'+
-                        '         <td width="25%"><a href="#" id="add_discount">Discount</a></td>'+
-                        '         <td class="text-right" style="padding-right:10px;"><span id="ds_con">0</span></td>'+
-                        '         <td width="25%"><a href="#" id="add_tax">Order Tax</a></td>'+
-                        '         <td class="text-right"><span id="ts_con">0</span></td>'+
+                        '         <td width="25%" class="cartSummaryRow"><a href="#" id="add_discount">Discount</a></td>'+
+                        '         <td class="text-right cartSummaryRow " style="padding-right:10px;"><span id="ds_con">0</span></td>'+
+                        '         <td width="25%" class="cartSummaryRow"><a href="#" id="add_tax">Order Tax</a></td>'+
+                        '         <td class="text-right cartSummaryRow"><span id="ts_con">0</span></td>'+
                         '      </tr>'+
-                        '      <tr class="success">'+
-                        '         <td colspan="2" style="font-weight:bold;">'+
+                        '      <tr class="success cartSumRow">'+
+                        '         <td colspan="2" class="cartSumRow" style="font-weight: 400 !important; font-size: 16px;">'+
                         '            Total Payable'+
-                        '            <a role="button" data-toggle="modal" data-target="#noteModal">'+
-                        '            <i class="fa fa-comment"></i>'+
-                        '            </a>'+
                         '         </td>'+
-                        '         <td class="text-right" colspan="2" style="font-weight:bold;"><span id="total-payable">'+tot+'</span></td>'+
+                        '         <td class="text-right cartSumRow" colspan="2" ><span id="total-payable"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
                         '      </tr>'+
                         '   </tbody>'+
                         '</table>';

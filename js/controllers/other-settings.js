@@ -156,7 +156,7 @@ function changePersonalisationTheme(){
   window.localStorage.appCustomSettings_Theme = themeName;
   changePersonalisationFile("theme", themeName);
 
-  showToast('Theme changed successfully', '#2ecc71');
+  showToast('Theme changed successfully', '#27ae60');
 }
 
 
@@ -166,10 +166,10 @@ function changePersonalisationImage(){
   var optName = document.getElementById("personalisationEditImage").value == 'YES'? true: false;
 
   if(optName){
-    showToast('Photos will be displayed in the Menu', '#2ecc71');
+    showToast('Photos will be displayed in the Menu', '#27ae60');
   }
   else{
-    showToast('Photos has been disabled in the Menu', '#2ecc71');
+    showToast('Photos has been disabled in the Menu', '#27ae60');
   }
 
   //Update
@@ -183,13 +183,13 @@ function changePersonalisationKeyboard(){
 
 
   if(optName == 0){
-    showToast('Virtual Keyboard disabled', '#2ecc71');
+    showToast('Virtual Keyboard disabled', '#27ae60');
   }
   else if(optName == 1){
-    showToast('Virtual Keyboard gets activated on Input only', '#2ecc71');
+    showToast('Virtual Keyboard gets activated on Input only', '#27ae60');
   }
   else if(optName == 2){
-    showToast('Virtual Keyboard is enabled', '#2ecc71');
+    showToast('Virtual Keyboard is enabled', '#27ae60');
   }
 
 
