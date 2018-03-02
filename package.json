@@ -4,7 +4,9 @@
   "description": "A minimal desktop POS application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build"    
   },
   "repository": "https://github.com/Accelerate-net/vegaPOS",
   "keywords": [
@@ -13,8 +15,26 @@
   ],
   "author": "Accelerate",
   "license": "CC0-1.0",
+  "build": {
+    "appId": "yourappid",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
+  },  
   "devDependencies": {
-    "electron": "~1.7.8"
+    "electron": "~1.7.8",
+    "electron-builder": "^20.2.0"
   },
   "dependencies": {
     "electron-settings": "^3.1.4",
