@@ -13856,8 +13856,6 @@ body.pos{
 }
 .pos #pos{
     /*padding:15px*/
-    position: fixed;
-    width: 30%;
 }
 .pos .contents{
     padding:15px 65px 15px 0;

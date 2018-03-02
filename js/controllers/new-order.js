@@ -231,6 +231,129 @@ function hideClearCartModal(){
 	document.getElementById("clearCartConsentModal").style.display = "none";
 }
 
+/*customer info*/
+function renderCustomerInfo(){
+
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	var billingModesInfo = {};
+
+		if(fs.existsSync('./data/static/billingmodes.json')) {
+	      fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	billingModesInfo = JSON.parse(data);
+	          	billingModesInfo.sort(); //alphabetical sorting 
+	          	
+				/*Billing modes not set or not rendering*/
+				if(jQuery.isEmptyObject(billingModesInfo)){
+					document.getElementById("orderCustomerInfo").innerHTML = '<p style="text-align: center; color: #dd4b39;">Billing Modes not set. <tag class="extrasSelButton" onclick="renderPage(\'bill-settings\', \'Bill Settings\'); openBillSettings(\'billingModes\')">Adding Billing Modes</tag> to continue</p>';
+					showToast('Warning: Billing Modes are not set', '#e67e22');
+					return '';
+				}
+
+				if(jQuery.isEmptyObject(customerInfo)){
+					customerInfo.name = "";
+					customerInfo.mobile = "";
+					customerInfo.mode = "";
+					customerInfo.modeType = "";
+					customerInfo.mappedAddress = "";
+					customerInfo.reference = "";
+				}
+				else{
+
+					var modeOptions = '';
+					var n = 0;
+					while(billingModesInfo[n]){
+						modeOptions = modeOptions + '<option value="'+billingModesInfo[n].name+'">'+billingModesInfo[n].name+'</option>';
+						n++;
+					}
+					
+					document.getElementById("orderCustomerInfo").innerHTML = '<div class="row" style="padding: 0 15px"> '+
+			                                 '<div class="col-xs-9" style="padding: 0; padding-right: 2px">'+
+			                                    '<div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<div class="input-group" style="width:100%;">'+
+			                                             '<select name="group" onchange="changeCustomerInfo(\'mode\')" id="customer_form_data_mode" class="form-control input-tip select2">'+modeOptions+'</select>'+
+			                                       '</div>'+
+			                                       '<div style="clear:both;"></div>'+
+			                                    '</div>'+
+			                                ' </div>'+
+			                                 '<div class="col-xs-3" style="padding: 0; padding-left: 2px">'+
+			                                    '<div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<input type="text" value="'+customerInfo.mappedAddress+'" onchange="changeCustomerInfo(\'mappedAddress\')" id="customer_form_data_mappedAddress" class="form-control kb-text" placeholder="Table" />'+
+			                                    '</div>'+
+			                                 '</div> '+                       
+			                           '</div>'+
+			                           '<div class="row" style="padding: 0 15px">'+
+			                                 '<div class="col-xs-6" style="padding: 0; padding-right: 2px">'+
+			                                    '<div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'name\')" value="'+customerInfo.name+'" id="customer_form_data_name" class="form-control kb-text" placeholder="Name" />'+
+			                                    '</div>'+
+			                                 '</div>'+
+			                                 '<div class="col-xs-6" style="padding: 0; padding-left: 2px">'+
+			                                   ' <div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Mobile" />'+
+			                                    '</div>'+
+			                                 '</div>   '+                     
+			                           '</div>';	
+
+
+			        document.getElementById("customer_form_data_mode").value = customerInfo.mode;
+				}
+		}
+		});
+	    }
+	    else{
+	    	showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+
+}
+
+function changeCustomerInfo(type){
+	var value = document.getElementById("customer_form_data_"+type).value;
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+		switch(type){
+			case "name":{
+				customerInfo.name = value;
+				break;
+			}
+			case "mobile":{
+				customerInfo.mobile = value;
+				break;
+			}	
+			case "mappedAddress":{
+				customerInfo.mappedAddress = value;
+				break;
+			}	
+			case "mode":{
+				customerInfo.mode = value;
+				renderCart();
+				break;
+			}
+			case "reference":{
+				customerInfo.reference = value;
+				break;
+			}										
+		}
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+}
+
+
+
 function renderCategoryTab(defaultTab){
 
 		if(fs.existsSync('./data/static/menuCategories.json')) {
