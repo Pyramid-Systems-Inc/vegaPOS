@@ -34,7 +34,7 @@ function fetchInitFunctions(pageReference){
 			break;
 		}
 		case 'reward-points':{
-
+			renderDefaults();
 			break;
 		}				
 		case 'sales-summary':{

@@ -6,12 +6,18 @@
                                  <div class="input-group" style="padding: 10px; border: none;">
                                     <input type="text" id="rewardsSearchInput" class="form-control input-lg" style="text-align: center" value="9043960876" placeholder="Coupon or Voucher or Mobile Number">
                                     <span class="input-group-btn">
-                                    <button onclick="findUser()" class="btn btn-default btn-lg" type="button"><i class="fa fa-search"></i></button>
+                                    <button onclick="searchRequest()" class="btn btn-default btn-lg" type="button"><i class="fa fa-search"></i></button>
                                     </span>
                                  </div>
                               </div>
                            </div>
 
+                           <div class="row">
+                              <div class="col-sm-3"></div>
+                              <div class="col-sm-6" id="errorRenderArea">
+                                    
+                              </div>
+                           </div>
 
             <div class="row" style="margin-top: 50px">
                 <div class="col-xs-1"></div>
@@ -23,5 +29,62 @@
                     <div id="renderAreaUserStats"></div>
                 </div>
             </div>
+
+      <!-- Modal -->
+      <div id="loginModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" onclick="hideLoginModal()" style="float: right;" class="btn clearButton">X</button>
+                  <h4 class="modal-title">Login to Server</h4>
+               </div>
+                <div class="modal-body" style="max-height: 420px; overflow: scroll">
+                  <form>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="login_server_password">Username</label>
+                                <input style="border: none; border-bottom: 1px solid" placeholder="Username" type="text" id="login_server_username" value="" class="form-control tip">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="login_server_password">Password</label>
+                                <input style="border: none; border-bottom: 1px solid" placeholder="Password" type="password" id="login_server_password" value="" class="form-control tip">
+                            </div>
+                        </div>                        
+                    </div>
+                  </form>               
+               </div>
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="hideLoginModal()" style="float: left">Cancel</button>
+                    <button type="button" onclick="doLogin()" class="btn btn-success">Login</button>
+                </div>
+            </div>
+         </div>
+      </div>
+
+
+      <!-- Modal -->
+      <div id="couponRedeemModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" onclick="hideCouponRedeemModal()" style="float: right;" class="btn clearButton">X</button>
+                  <h4 class="modal-title">Coupon or Voucher Details</h4>
+               </div>
+                <div class="modal-body" style="max-height: 420px; overflow: scroll" id="couponRedeemConfirmation">
+                                
+               </div>
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="hideCouponRedeemModal()" style="float: left">Cancel</button>
+                    <button type="button" onclick="processRedeemCoupon()" class="btn btn-success">Redeem</button>
+                </div>
+            </div>
+         </div>
+      </div>
+
 
     </template>
