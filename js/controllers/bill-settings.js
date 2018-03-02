@@ -25,6 +25,8 @@ function addExtraToInput(name, id){
 
 function openNewMode(){
 
+  document.getElementById("add_new_mode_extras").value="";
+
   /*render extras list*/
 
     if(fs.existsSync('./data/static/billingparameters.json')) {
@@ -325,11 +327,12 @@ function fetchAllModes(){
 					modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td><p style="margin: 0">'+modes[i].name+'</p><p style="margin: 0; font-size: 65%; color: #f39c12;">'+modes[i].type+'</p></td> <td>'+( modes[i].extras == ''? '-' :(modes[i].extras).toString())+'</td> <td>'+(modes[i].minimumBill != 0? '<i class="fa fa-inr"></i>'+modes[i].minimumBill :'-')+'</td> <td>'+(modes[i].isDiscountable?"Yes": "No")+'</td> <td>'+(modes[i].maxDiscount != 0? '<i class="fa fa-inr"></i>'+modes[i].maxDiscount :'-')+'</td> <td onclick="deleteModeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
 				}
 
-				if(!modesTag)
+				if(!modesTag){
 					document.getElementById("billingModesTable").innerHTML = '<p style="color: #bdc3c7">No modes added yet.</p>';
-				else
+				}else{
 					document.getElementById("billingModesTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Mode</th> <th style="text-align: left">Extras Collected</th> <th style="text-align: left">Min Bill Amount</th> <th style="text-align: left">Discountable</th><th style="text-align: left">Max Discount</th> <th style="text-align: left"></th> </tr> </thead>'+
 																	'<tbody>'+modesTag+'</tbody>';
+        }
 		}
 		});
 	    } else {
