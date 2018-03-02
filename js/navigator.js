@@ -89,4 +89,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('new-order', 'New Order');
+renderPage('reward-points', 'New Order');
