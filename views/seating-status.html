@@ -1,19 +1,46 @@
  <template class="task-template">
+    <div id="fullSeatingRenderArea"></div>
 
-   <div class="col-lg-12" style="text-align: center;">
-        <tag onclick="viewKOTModal()" class="tableTileRed">
-            <tag class="tableTitle">T1</tag>
-            <tag class="tableCapacity">Jafry + 1</tag>
-            <tag class="tableInfo">Billed 4s ago</tag>
-        </tag>
+     
+
+    <!-- Modal -->
+      <div id="freeSeatOptionsModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-body" id="freeSeatOptionsModalContent" style="max-height: 420px; overflow: scroll; padding: 10px 10px 5px 10px">
+           
+               </div>
+            </div>
+         </div>
+      </div>
+
+    <!-- Modal -->
+      <div id="reservedSeatOptionsModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-body" id="reservedSeatOptionsModalContent" style="max-height: 420px; overflow: scroll; padding: 10px 10px 5px 10px">
+           
+               </div>
+            </div>
+         </div>
+      </div>
 
 
-        <tag onclick="viewKOTModal()" class="tableTileGreen">
-            <tag class="tableTitle">T1</tag>
-            <tag class="tableCapacity">4 Seater</tag>
-            <tag class="tableInfo">Billed 4s ago</tag>
-        </tag>
+    <!-- Modal -->
+      <div id="occuppiedSeatOptionsModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-body" id="occuppiedSeatOptionsModalContent" style="max-height: 420px; overflow: scroll; padding: 10px 10px 5px 10px">
+              
+               </div>
+            </div>
+         </div>
+      </div>
 
 
-    </div>
+
+
 </template>

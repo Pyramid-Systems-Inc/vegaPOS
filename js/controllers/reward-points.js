@@ -77,6 +77,7 @@ function forceLogout(customeError){
 
 /*To render errors - check if logged in*/
 function renderDefaults(){
+
 	if(window.localStorage.loggedInAdmin){
 		document.getElementById("errorRenderArea").innerHTML = '<p style="color: gray; font-size: 16px; font-weight: 300; text-align: center;">Enter the Coupon/Voucher Code or the Customer\'s Registered Mobile Number</p>'
 	}
@@ -84,17 +85,6 @@ function renderDefaults(){
 		document.getElementById("errorRenderArea").innerHTML = '<p style="color: #dd4b39; font-size: 18px; font-weight: 400; text-align: center;">Please <tag class="extrasSelButton" style="font-size: 16px" onclick="openLoginModal()">Login</tag> to the Server to Continue</p>';
 	}
 }
-
-
-
-/*observe key input*/
-document.addEventListener("DOMContentLoaded", function(event) {
-    document.getElementById('rewardsSearchInput').onkeyup = function(){
-    	if((document.getElementById('rewardsSearchInput').value).length == 10){
-    		searchRequest();
-    	}
-	}
-});
 
 
 

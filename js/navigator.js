@@ -29,8 +29,8 @@ function fetchInitFunctions(pageReference){
 
 			break;
 		}	
-		case 'seaing-status':{
-
+		case 'seating-status':{
+			preloadTableStatus();
 			break;
 		}
 		case 'reward-points':{
@@ -89,4 +89,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('reward-points', 'New Order');
+renderPage('seating-status', 'New Order');
