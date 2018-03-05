@@ -155,10 +155,69 @@ function changeqty(item, isCustom, variant){
 }
 
 function renderCart(){
+
 	//Render Cart Items based on local storage
-	//Calculate Tax
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+
+	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
 	
+	var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
+	var selectedBillingModeInfo = '';
+	
+	var n = 0;
+	while(billing_modes[n]){
+		if(billing_modes[n].name == selectedBillingModeName){
+			selectedBillingModeInfo = billing_modes[n];
+			break;
+		}
+		n++;
+	}
+
+
+		if(fs.existsSync('./data/static/billingparameters.json')) {
+	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	var params = JSON.parse(data);
+
+	          	var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
+	          	var cartExtrasList = [];
+
+	          	var n = 0;
+	          	var m = 0;
+	          	while(selectedModeExtrasList[n]){
+	          		m = 0;
+	          		while(params[m]){	  
+	          			if(selectedModeExtrasList[n] == params[m].name)        			
+	          				cartExtrasList.push(params[m])
+	          			
+	          			m++;
+	          		}
+	          		n++;
+	          	}
+
+	          	renderCartAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)	          	
+
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+
+}
+
+function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selectedModeExtras){
+
+	/*
+		cart_products - cart of items 
+		selectedBillingModeInfo - info relating to the particular mode like minBillAmount, isDiscountable? etc.
+		selectedModeExtras - extras of taxes to be calculated		
+	*/
+
 	if(cart_products.length < 1){
 		document.getElementById("cartTitleHead").innerHTML = '';
 		document.getElementById("summaryDisplay").innerHTML = '';
@@ -168,10 +227,12 @@ function renderCart(){
 		return 0;
 	}
 
-	var i = 0
+	var i = 0;
 	var temp = '';
-	var totqty = 0 
-	var tot = 0
+	var totqty = 0;
+	var tot = 0;
+	var grandPayableSum = 0;
+
 	var variantName = '';
 	while(i < cart_products.length){
 		variantName = '';
@@ -191,6 +252,57 @@ function renderCart(){
 	document.getElementById("cartDetails").innerHTML = temp;
 	
 
+	/*Calculate Taxes and Other Charges*/ 
+
+          var otherChargesSum = 0;        
+          var otherCharges = '';
+          var otherChargerRenderCount = 1;
+          var k = 0;
+
+          otherCharges = '<tr class="info"><td width="25%" class="cartSummaryRow">Discount</td><td class="text-right cartSummaryRow" style="padding-right:10px;">0</td>';
+          /*discount applied after kot generation only*/
+
+          if(selectedModeExtras.length > 0){
+
+          	for(k = 0; k < selectedModeExtras.length; k++){
+          		if(k%2 == 1){
+          			otherCharges = otherCharges + '</tr><tr class="info">';
+          		}
+
+          		var tempExtraTotal = 0;
+          		if(selectedModeExtras[k].value != 0){
+          			if(selectedModeExtras[k].unit == 'PERCENTAGE'){
+          				tempExtraTotal = selectedModeExtras[k].value * tot/100;
+          			}
+          			else if(selectedModeExtras[k].unit == 'FIXED'){
+          				tempExtraTotal = selectedModeExtras[k].value;
+          			}
+          		}
+
+          		tempExtraTotal = Math.round(tempExtraTotal * 100) / 100;
+
+          		otherCharges = otherCharges + '<td width="25%" class="cartSummaryRow">'+selectedModeExtras[k].name+' ('+(selectedModeExtras[k].unit == 'PERCENTAGE'? selectedModeExtras[k].value + '%': '<i class="fa fa-inr"></i>'+selectedModeExtras[k].value)+')</td><td class="text-right cartSummaryRow"><i class="fa fa-inr"></i>'+tempExtraTotal+'</td>';
+          		otherChargesSum = otherChargesSum + tempExtraTotal;
+          		
+          	}
+          }
+
+
+          otherChargerRenderCount = otherChargerRenderCount + k;
+
+          if(otherChargerRenderCount%2 == 1){
+          	otherCharges = otherCharges + '<td class="cartSummaryRow"></td><td class="cartSummaryRow"></td></tr>';
+          }
+          else{
+          	otherCharges = otherCharges + '</tr>';
+          }
+
+
+          grandPayableSum = tot + otherChargesSum;
+
+          grandPayableSum = Math.round(grandPayableSum * 100) / 100
+
+
 	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin: 0">'+
                         '   <tbody>'+
                         '     <tr class="info">'+
@@ -198,22 +310,15 @@ function renderCart(){
                         '        <td class="text-right cartSummaryRow" style="padding-right:10px;"><span id="count">'+totqty+'</span></td>'+
                         '         <td width="25%" class="cartSummaryRow">Total</td>'+
                         '         <td class="text-right cartSummaryRow" colspan="2"><span id="total"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
-                        '      </tr>'+
-                        '      <tr class="info">'+
-                        '         <td width="25%" class="cartSummaryRow"><a href="#" id="add_discount">Discount</a></td>'+
-                        '         <td class="text-right cartSummaryRow " style="padding-right:10px;"><span id="ds_con">0</span></td>'+
-                        '         <td width="25%" class="cartSummaryRow"><a href="#" id="add_tax">Order Tax</a></td>'+
-                        '         <td class="text-right cartSummaryRow"><span id="ts_con">0</span></td>'+
-                        '      </tr>'+
+                        '      </tr>'+otherCharges+
                         '      <tr class="success cartSumRow">'+
                         '         <td colspan="2" class="cartSumRow" style="font-weight: 400 !important; font-size: 16px;">'+
                         '            Total Payable'+
                         '         </td>'+
-                        '         <td class="text-right cartSumRow" colspan="2" ><span id="total-payable"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
+                        '         <td class="text-right cartSumRow" colspan="2" ><span id="total-payable"><i class="fa fa-inr"></i>'+grandPayableSum+'</span></td>'+
                         '      </tr>'+
                         '   </tbody>'+
                         '</table>';
-
 }
 
 /*Clear cart*/
@@ -241,12 +346,15 @@ function renderCustomerInfo(){
 	      fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+	    	renderCart();
 	    } else {
 
 	    		if(data == ''){ data = '[]'; }
 
 	          	billingModesInfo = JSON.parse(data);
 	          	billingModesInfo.sort(); //alphabetical sorting 
+
+	          	window.localStorage.billingModesData = data; /*For cart rendering purpose*/
 	          	
 				/*Billing modes not set or not rendering*/
 				if(jQuery.isEmptyObject(billingModesInfo)){
@@ -302,12 +410,14 @@ function renderCustomerInfo(){
 
 
 			        document.getElementById("customer_form_data_mode").value = customerInfo.mode;
+			        renderCart();
 				}
 		}
 		});
 	    }
 	    else{
 	    	showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+	    	renderCart();
 	    }	
 
 }
@@ -535,4 +645,261 @@ function renderMenu(subtype){
 	    }	
 	}
 	*/
+}
+
+
+
+
+/* Sample KOT */
+/*
+
+{
+	"KOTNumber": "KOT1001",
+	"table": "T3",
+	"customerName": "Abhijith",
+	"customerMobile": "9043960876",
+	"stewardName": "Maneesh",
+	"stewardCode": "9848010922",
+	"orderStatus": 1,
+	"date": "24-01-2018",
+	"timePunch": "2217",
+	"timeKOT": "2219",
+	"timeBill": "",
+	"timeSettle": "",
+	"cart": [{
+		"name": "Chicken Shawarma",
+		"code": "1086",
+		"qty": 1,
+		"isCustom": true,
+		"variant": "Paratha Roll",
+		"price": "75",
+		"comments": ""
+	}, {
+		"code": "1081",
+		"name": "Boneless BBQ Fish",
+		"qty": 1,
+		"isCustom": false,
+		"price": "220",
+		"comments": "Make it less spicy"
+	}],
+	"extras": [{
+		"name": "GST",
+		"value": 5,
+		"unit": "PERCENTAGE",
+		"amount": 15
+	}, {
+		"name": "Service Charge",
+		"value": 45,
+		"unit": "FIXED",
+		"amount": 45
+	}],
+	"discount": {
+		"amount": 35.4,
+		"type": "Staffs Guest",
+		"unit": "PERCENTAGE",
+		"value": "12"
+	},
+	"specialRemarks": "Allergic to Tomato"
+}
+
+*/
+
+function generateKOT(){
+
+	//Render Cart Items based on local storage
+	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+	if(cart_products.length == 0){
+		showToast('Empty Cart! Add items and try again', '#e74c3c');
+		return '';
+	}
+
+	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
+	
+	var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
+	var selectedBillingModeInfo = '';
+	
+	var n = 0;
+	while(billing_modes[n]){
+		if(billing_modes[n].name == selectedBillingModeName){
+			selectedBillingModeInfo = billing_modes[n];
+			break;
+		}
+		n++;
+	}
+
+
+		if(fs.existsSync('./data/static/billingparameters.json')) {
+	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	var params = JSON.parse(data);
+
+	          	var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
+	          	var cartExtrasList = [];
+
+	          	var n = 0;
+	          	var m = 0;
+	          	while(selectedModeExtrasList[n]){
+	          		m = 0;
+	          		while(params[m]){	  
+	          			if(selectedModeExtrasList[n] == params[m].name)        			
+	          				cartExtrasList.push(params[m])
+	          			
+	          			m++;
+	          		}
+	          		n++;
+	          	}
+
+	          	generateKOTAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)	          	
+
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+}
+
+function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selectedModeExtras){
+	/*Process Figures*/
+	var subTotal = 0;
+
+	var n = 0;
+	while(cart_products[n]){
+		subTotal = subTotal + cart_products[n].qty * cart_products[n].price;
+		n++;
+	}
+
+		  /*Calculate Taxes and Other Charges*/ 
+          var otherCharges = [];        
+          var k = 0;
+
+          if(selectedModeExtras.length > 0){
+          	for(k = 0; k < selectedModeExtras.length; k++){
+
+          		var tempExtraTotal = 0;
+          		if(selectedModeExtras[k].value != 0){
+          			if(selectedModeExtras[k].unit == 'PERCENTAGE'){
+          				tempExtraTotal = selectedModeExtras[k].value * subTotal/100;
+          			}
+          			else if(selectedModeExtras[k].unit == 'FIXED'){
+          				tempExtraTotal = selectedModeExtras[k].value;
+          			}
+          		}
+
+          		tempExtraTotal = Math.round(tempExtraTotal * 100) / 100;
+
+          		otherCharges.push({
+			 		"name": selectedModeExtras[k].name,
+					"value": selectedModeExtras[k].value,
+					"unit": selectedModeExtras[k].unit,
+					"amount": tempExtraTotal
+          		})
+          	}
+          }
+
+
+    //Get customer info.
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		showToast('Customer Details missing', '#e74c3c');
+		return '';
+	}
+
+	if(customerInfo.mappedAddress == ''){
+		showToast('Table Number or Address missing', '#e74c3c');
+		return '';
+	}
+
+	/* customerInfo.json
+		{
+			"name": "Anas Jafry",
+			"mobile": "9884179675",
+			"mode": "VIP Guest",
+			"mappedAddress": "T3",
+			"reference": "Ref. to any other API (say booking number)"
+		}
+	*/
+
+	var stewName = '';
+	var stewCode = '9884169765';
+	var spremarks = '';
+   
+      //Check if file exists
+
+      fs.readFile('./data/static/lastKOT.txt', 'utf8', function readFileCallback(err, data){
+       if (err){
+           showToast('System Error: Unable to read order related data. Please contact Accelerate Support.', '#e74c3c');
+       } else{
+          var num = parseInt(data) + 1;
+          var kot = 'KOT' + num;
+          var today = new Date();
+          var time;
+          var dd = today.getDate();
+          var mm = today.getMonth()+1; //January is 0!
+          var yyyy = today.getFullYear();
+          var hour = today.getHours();
+          var mins = today.getMinutes();
+
+          if(dd<10) {
+              dd = '0'+dd;
+          } 
+
+          if(mm<10) {
+              mm = '0'+mm;
+          } 
+
+          if(hour<10) {
+              hour = '0'+hour;
+          } 
+
+          if(mins<10) {
+              mins = '0'+mins;
+          }
+
+          today = dd + '-' + mm + '-' + yyyy;
+          time = hour + '' + mins;
+
+          var obj = {}; 
+          obj.KOTNumber = kot;
+          obj.table = customerInfo.mappedAddress;
+          obj.customerName = customerInfo.name;
+          obj.customerMobile = customerInfo.mobile; 
+          obj.stewardName = 'STEWARD NAME';
+          obj.stewardCode = 'STEWARD CODE';
+          obj.orderStatus = 1;
+          obj.date = today;
+          obj.timePunch = time;
+          obj.timeKOT = "";
+          obj.timeBill = "";
+          obj.timeSettle = "";
+          obj.cart = cart_products;
+          obj.specialRemarks = 'SPECIAL COMMENTS';
+          obj.extras = otherCharges,
+          obj.discount = {}
+
+          console.log(obj)
+          
+          
+
+          var json = JSON.stringify(obj); //convert it back to json
+          var file = './data/KOT/'+kot+'.json';
+          fs.writeFile(file, json, 'utf8', (err) => {
+              if(err)
+                 showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
+              else
+              	 showToast('#'+kot+' generated Successfully', '#27ae60');
+           });
+
+
+          fs.writeFile("./data/static/lastKOT.txt", num, 'utf8', (err) => {
+              if(err)
+                 showToast('System Error: Unable to modify order related data. Please contact Accelerate Support.', '#e74c3c');
+           });
+       }
+       });
 }

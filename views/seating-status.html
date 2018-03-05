@@ -1,5 +1,8 @@
  <template class="task-template">
-    <div id="fullSeatingRenderArea"></div>
+    <div id="fullSeatingRenderArea" style="margin-bottom: 90px"></div>
+    <div class="confirmationConsentArea" id="confirmationRenderArea">
+
+    </div>
 
      
 
@@ -40,7 +43,28 @@
          </div>
       </div>
 
+    <!-- Modal -->
+      <div id="billPreviewModal" class="modal">
+         <div class="modal-dialog" style="top: 10%">
+            <div class="modal-header cartTitleRow">
+              <h1 style="font-size: 24px; margin: 0; text-align: center;" id="billPreviewContentTitle">KOT ...</h1>
+            </div>
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-body" id="billPreviewContent" style="height: 540px; overflow: scroll; padding: 10px 10px 5px 10px">
 
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button class="btn btn-success tableOptionsButton" onclick="confirmBillGeneration()">Confirm</button>
+                        <button style="margin: 0" class="btn btn-default tableOptionsButton" onclick="hideBillPreviewModal()">Close</button>
+                    </div>
+                </div>
+               </div>
+            </div>
+         </div>
+      </div>
 
 
 </template>

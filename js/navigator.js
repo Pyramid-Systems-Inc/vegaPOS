@@ -12,7 +12,6 @@ let $ = require('jquery');
 function fetchInitFunctions(pageReference){
 	switch (pageReference){
 		case 'new-order':{
-			renderCart();
 			renderMenu();
 			renderCustomerInfo();
 			break;
@@ -89,4 +88,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('seating-status', 'New Order');
+renderPage('new-order', 'New Order');

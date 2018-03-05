@@ -429,6 +429,12 @@ html, body {
   cursor: pointer;
 }
 
+.tableTileOther{
+  width: 140px; text-align: center; display: inline-block; max-width: 32%; 
+  height: 80px; margin: 3px; padding: 2px; background: #bdc3c7 !important;
+  cursor: not-allowed;
+}
+
 
 .tableTitle{
 	display: block; color: #FFF; font-weight: 600; font-size: 24px;
@@ -450,14 +456,45 @@ html, body {
   display: block; color: #82612e
 }
 
+.tableTileRed.selected{
+  background: #2980b9 !important;
+}
+
+.tableTileRed.selectedExtra{
+  background: #3498db !important;
+}
+
+.confirmationConsentArea{
+    background: none;
+    display: none;
+    padding: 15px;
+    width: 100%;
+    height: 80px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+.billOptionWindowFrame{
+  margin-bottom: 5px;
+  border: 2px solid #1abc9c;
+  padding: 5px 5px 0 5px;
+}
+
+.billOptionWindowFrame .tableOptionsActionButton{
+  background: green;
+}
+
+
 .clearButton{
-background: none;     color: #d2d6de;
+  background: none;     
+  color: #d2d6de;
 }
 
 .clearButton:hover, .clearButton:active, .clearButton:focus{
 	background: none;
 	box-shadow: none;
-	 outline: none !important;
+  outline: none !important;
 }
 
 .clearButton:focus{
