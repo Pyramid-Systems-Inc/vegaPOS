@@ -342,6 +342,19 @@ function renderCustomerInfo(){
 	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
 	var billingModesInfo = {};
 
+
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+
+
+
 		if(fs.existsSync('./data/static/billingmodes.json')) {
 	      fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
@@ -380,36 +393,74 @@ function renderCustomerInfo(){
 						n++;
 					}
 					
+
+					var selectMappedAddressButton = '';
+					var tempModeType = customerInfo.modeType;
+					
+					if(customerInfo.mode == ""){ //Mode not set
+						tempModeType = billingModesInfo[0].type; //First value in modes list - temporarily by default
+					}
+
+					//Ask for MappedAddress value
+						if(tempModeType == 'PARCEL'){ //ask for address
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-danger" style=" width: 100%; text-overflow: ellipsis; overflow: hidden;" onclick="pickAddressForNewOrder()">Set Address</tag>';
+							customerInfo.mappedAddress = 'Sayujyam Trippanachi Post';
+							if(customerInfo.mappedAddress){
+								selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-default" onclick="pickAddressForNewOrder(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							}
+						}
+						else if(tempModeType == 'DINE'){ //ask for table
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Table No.</label><tag class="btn btn-danger" style="width: 100%; text-overflow: ellipsis; overflow: hidden;" onclick="pickTableForNewOrder()">Select Table</tag>';
+							
+							if(customerInfo.mappedAddress){
+								selectMappedAddressButton = '<label class="cartCustomerLabel">Table No.</label><tag class="btn btn-default" onclick="pickTableForNewOrder(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							}
+						}					
+						else if(tempModeType == 'TOKEN'){ //assign token
+							customerInfo.mappedAddress = 1001;
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Token No.</label><tag class="btn btn-default" onclick="setTokenManually(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+						}			
+
+			
+
 					document.getElementById("orderCustomerInfo").innerHTML = '<div class="row" style="padding: 0 15px"> '+
-			                                 '<div class="col-xs-9" style="padding: 0; padding-right: 2px">'+
+			                                 '<div class="col-xs-8" style="padding: 0; padding-right: 2px">'+
 			                                    '<div class="form-group" style="margin-bottom:5px;">'+
 			                                       '<div class="input-group" style="width:100%;">'+
+			                                       		 '<label class="cartCustomerLabel">Order Type</label>'+
 			                                             '<select name="group" onchange="changeCustomerInfo(\'mode\')" id="customer_form_data_mode" class="form-control input-tip select2">'+modeOptions+'</select>'+
 			                                       '</div>'+
 			                                       '<div style="clear:both;"></div>'+
 			                                    '</div>'+
 			                                ' </div>'+
-			                                 '<div class="col-xs-3" style="padding: 0; padding-left: 2px">'+
-			                                    '<div class="form-group" style="margin-bottom:5px;">'+
-			                                       '<input type="text" value="'+customerInfo.mappedAddress+'" onchange="changeCustomerInfo(\'mappedAddress\')" id="customer_form_data_mappedAddress" class="form-control kb-text" placeholder="Table" />'+
-			                                    '</div>'+
+			                                 '<div class="col-xs-4" style="padding: 0; padding-left: 2px">'+selectMappedAddressButton+
 			                                 '</div> '+                       
 			                           '</div>'+
 			                           '<div class="row" style="padding: 0 15px">'+
 			                                 '<div class="col-xs-6" style="padding: 0; padding-right: 2px">'+
 			                                    '<div class="form-group" style="margin-bottom:5px;">'+
-			                                       '<input type="text" onchange="changeCustomerInfo(\'name\')" value="'+customerInfo.name+'" id="customer_form_data_name" class="form-control kb-text" placeholder="Name" />'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'name\')" value="'+customerInfo.name+'" id="customer_form_data_name" class="form-control kb-text" placeholder="Guest Name" />'+
 			                                    '</div>'+
 			                                 '</div>'+
 			                                 '<div class="col-xs-6" style="padding: 0; padding-left: 2px">'+
 			                                   ' <div class="form-group" style="margin-bottom:5px;">'+
-			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Mobile" />'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Guest Mobile" />'+
 			                                    '</div>'+
 			                                 '</div>   '+                     
 			                           '</div>';	
 
 
 			        document.getElementById("customer_form_data_mode").value = customerInfo.mode;
+
+			        /*First dropdown item as default*/ /*TWEAK*/
+			        if(customerInfo.mode == ""){
+			        	$("#customer_form_data_mode").val($("#customer_form_data_mode option:first").val());
+			        	customerInfo.modeType = billingModesInfo[0].type;
+			        	customerInfo.mode = billingModesInfo[0].name;
+
+			        	window.localStorage.customerData = JSON.stringify(customerInfo);
+			        }
+
 			        renderCart();
 				}
 		}
@@ -425,7 +476,9 @@ function renderCustomerInfo(){
 function changeCustomerInfo(type){
 	var value = document.getElementById("customer_form_data_"+type).value;
 	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
-	
+	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
+
+
 	if(jQuery.isEmptyObject(customerInfo)){
 		customerInfo.name = "";
 		customerInfo.mobile = "";
@@ -444,14 +497,29 @@ function changeCustomerInfo(type){
 				customerInfo.mobile = value;
 				break;
 			}	
-			case "mappedAddress":{
-				customerInfo.mappedAddress = value;
-				break;
-			}	
 			case "mode":{
 				customerInfo.mode = value;
+
+				//Set mode type
+				var n = 0;
+				while(billing_modes[n]){
+					if(billing_modes[n].name == value){
+
+						//reset address if type changed
+						if(customerInfo.modeType != billing_modes[n].type){
+							customerInfo.mappedAddress = "";
+						}
+
+						customerInfo.modeType = billing_modes[n].type;
+						break;
+					}
+					n++;
+				}
+
+				window.localStorage.customerData = JSON.stringify(customerInfo);
 				renderCart();
-				break;
+				renderCustomerInfo();
+				return '';
 			}
 			case "reference":{
 				customerInfo.reference = value;
@@ -460,6 +528,29 @@ function changeCustomerInfo(type){
 		}
 
 	window.localStorage.customerData = JSON.stringify(customerInfo);
+	
+
+	console.log('customer info changed')
+}
+
+function setCustomerInfoTable(tableID){
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+	customerInfo.mappedAddress = tableID;
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+
+	pickTableForNewOrderHide();
+	renderCustomerInfo();
 }
 
 
@@ -902,4 +993,171 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
            });
        }
        });
+}
+
+
+function getTableLiveStatus(tableID){
+	/*returns table occupancy data*/
+	if(!window.localStorage.tableMappingData){
+		return '';
+	}
+
+	var tableMapData = JSON.parse(window.localStorage.tableMappingData);
+
+	var n = 0;
+	while(tableMapData[n]){
+		if(tableMapData[n].table == tableID){
+			return tableMapData[n];
+		}
+		n++;
+	}
+
+	return '';
+}
+
+function pickTableForNewOrder(currentTableID){
+
+	  if(fs.existsSync('./data/static/tables.json')) {
+        fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var tables = JSON.parse(data);
+              tables.sort(); //alphabetical sorting 
+
+
+		    if(fs.existsSync('./data/static/tablesections.json')) {
+		        fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
+		      if (err){
+		          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+		      } else {
+
+		          if(data == ''){ data = '[]'; }
+
+		              var tableSections = JSON.parse(data);
+		              tableSections.sort(); //alphabetical sorting 
+
+		              
+
+		            if(0){
+
+		            	
+		              
+		            }
+		            else{
+		              var renderSectionArea = '';
+
+		              var n = 0;
+		              while(tableSections[n]){
+		        
+		              	var renderTableArea = ''
+		              	for(var i = 0; i<tables.length; i++){
+		              		if(tables[i].type == tableSections[n]){
+
+		              			var tableOccupancyData = getTableLiveStatus(tables[i].name);
+
+		              			if(tableOccupancyData){ /*Occuppied*/
+									if(tableOccupancyData.status == 1 || tableOccupancyData.status == 2){
+		              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
+															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+															            '<tag class="tableInfo">Occuppied</tag>'+
+															        	'</tag>';	
+									}									
+									else if(tableOccupancyData.status == 5){
+										if(currentTableID != '' && currentTableID == tables[i].name){
+			              				renderTableArea = renderTableArea + '<tag class="tableTileBlue" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
+																            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
+																            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
+																        	'</tag>';	
+										}	
+										else{
+			              				renderTableArea = renderTableArea + '<tag class="tableReserved" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
+																            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
+																            '<tag class="tableInfo">Reserved</tag>'+
+																        	'</tag>';	
+										}
+
+									}									
+									else{
+		              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
+															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+															            '<tag class="tableInfo">Occuppied</tag>'+
+															        	'</tag>';											
+									}
+
+
+		              			}
+		              			else{
+
+		              				if(currentTableID != '' && currentTableID == tables[i].name){
+		              					renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileBlue">'+
+															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+															            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
+															        	'</tag>';
+									}	
+									else{
+										renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileGreen">'+
+															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+															            '<tag class="tableInfo">Free</tag>'+
+															        	'</tag>';
+									}							        	              				
+		              			}
+
+		              		}
+		              	}
+
+		              	renderSectionArea = renderSectionArea + '<div class="row" style="margin-top: 25px">'+
+												   '<h1 class="seatingPlanHead">'+tableSections[n]+'</h1>'+
+												   '<div class="col-lg-12" style="text-align: center;">'+renderTableArea+
+												    '</div>'+
+												'</div>'
+
+		              	n++;
+		              }
+		              
+		              document.getElementById("pickTableForNewOrderModalContent").innerHTML = renderSectionArea;		            	
+		              document.getElementById("pickTableForNewOrderModal").style.display = 'block';	
+		            }
+		    }
+		    });
+		      } else {
+		        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+		      } 
+
+    }
+    });
+      } else {
+        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+      } 
+
+}
+
+
+function pickTableForNewOrderHide(){
+	document.getElementById("pickTableForNewOrderModalContent").innerHTML = '';
+	document.getElementById("pickTableForNewOrderModal").style.display = 'none';
+}
+
+
+/*Set Delivery address*/
+function pickAddressForNewOrder(currentAddress){
+	document.getElementById("pickAddressForNewOrderModal").style.display = 'block';
+}
+
+function saveNewDeliveryAddress(){
+	
+}
+
+function pickAddressForNewOrderHide(){
+	document.getElementById("pickAddressForNewOrderModalContent").innerHTML = '';
+	document.getElementById("pickAddressForNewOrderModal").style.display = 'none';
 }

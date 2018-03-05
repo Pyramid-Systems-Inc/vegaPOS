@@ -155,4 +155,45 @@
          </div>
       </div>
    </div>
+
+
+   <!-- Modal -->
+   <div id="pickTableForNewOrderModal" class="modal">
+      <div class="modal-dialog" style="top: 10%; width: 80%">
+         <!-- Modal content-->
+         <div class="modal-content">
+            <div class="modal-header">
+               <button type="button" onclick="pickTableForNewOrderHide()" style="float: right;" class="btn clearButton">X</button>
+               <h4 class="modal-title">Choose a Table</h4>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow: scroll;" id="pickTableForNewOrderModalContent">
+            </div>
+            <div class="modal-footer" style="padding: 0">
+               <button type="button" class="btn btn-default" onclick="pickTableForNewOrderHide()" style="width: 100%; border: none; border-radius: 0; height: 50px;">Cancel</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+
+   <!-- Modal -->
+   <div id="pickAddressForNewOrderModal" class="modal">
+      <div class="modal-dialog" style="top: 20%">
+         <!-- Modal content-->
+         <div class="modal-content">
+            <div class="modal-header">
+               <button type="button" onclick="pickTableForNewOrderHide()" style="float: right;" class="btn clearButton">X</button>
+               <h4 class="modal-title">Delivery Address</h4>
+            </div>
+            <div class="modal-body" style="max-height: 420px; overflow: scroll;" id="pickAddressForNewOrderModalContent">
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-default" onclick="pickAddressForNewOrderHide()" style="float: left">Cancel</button>
+               <button type="button" class="btn btn-success" onclick="saveNewDeliveryAddress()" style="float: right">Set Address</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+
 </template>

@@ -11,7 +11,7 @@ Table Status
 function openFreeSeatOptions(tableID){
 	document.getElementById("freeSeatOptionsModalContent").innerHTML = '<h1 class="tableOptionsHeader">Table <b>'+tableID+'</b></h1>'+
                   '<button class="btn btn-success tableOptionsButton" onclick="punchNewOrder(\''+tableID+'\')">Punch New Order</button>'+ 
-                  '<button class="btn btn-success tableOptionsButton" onclick="addToReserveList(\''+tableID+'\')">Reserve this Table</button>'+  
+                  '<button class="btn btn-success tableOptionsButton" onclick="addToReserveListConsent(\''+tableID+'\')">Reserve this Table</button>'+  
                   '<button class="btn btn-default tableOptionsButton" onclick="hideFreeSeatOptions()">Close</button>';
 	document.getElementById("freeSeatOptionsModal").style.display ='block';
 }
@@ -455,7 +455,24 @@ function punchNewOrder(tableID){
 
 }
 
+function addToReserveListConsent(tableID){
+	document.getElementById("addToReservedConsentModal").style.display = 'block';
+	document.getElementById("addToReserveListConsentButton").innerHTML = '<button type="button" onclick="addToReserveList(\''+tableID+'\')" class="btn btn-success">Proceed and Reserve</button>';
+	document.getElementById("addToReserveListConsentTitle").innerHTML = "Reserve Table #"+tableID;
+	document.getElementById("reserve_table_in_the_name_of").value = '';
+}
+
+function addToReserveListConsentClose(){
+	document.getElementById("addToReservedConsentModal").style.display = 'none';
+}
+
+
 function addToReserveList(tableID){
+
+		addToReserveListConsentClose();
+		var comments = document.getElementById("reserve_table_in_the_name_of").value;
+
+
 		if(fs.existsSync('./data/static/tablemapping.json')) {
 	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
@@ -473,7 +490,7 @@ function addToReserveList(tableID){
 	          			return '';
 	          		}
 
-	          		tableMapping[i].assigned = "";
+	          		tableMapping[i].assigned = comments;
 	          		tableMapping[i].KOT = "";
 	          		tableMapping[i].status = 5;
 	          		tableMapping[i].lastUpdate = "";
@@ -485,7 +502,7 @@ function addToReserveList(tableID){
 	          }
 
 	          if(!isUpdated){
-	          	tableMapping.push({ "table": tableID, "assigned": "", "KOT": "", "status": 5, "lastUpdate": "12:00 pm" });
+	          	tableMapping.push({ "table": tableID, "assigned": comments, "KOT": "", "status": 5, "lastUpdate": "12:00 pm" });
 		      }
 
 		       var newjson = JSON.stringify(tableMapping);
@@ -722,7 +739,7 @@ function renderCurrentPlan(mode, currentTableID){
 									else if(tableOccupancyData.status == 5){
 		              				renderTableArea = renderTableArea + '<tag class="tableTileOther">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
 															            '<tag class="tableInfo">Reserved</tag>'+
 															        	'</tag>';	
 									}																									
@@ -793,7 +810,7 @@ function renderCurrentPlan(mode, currentTableID){
 									else if(tableOccupancyData.status == 5){
 		              				renderTableArea = renderTableArea + '<tag onclick="openReservedSeatOptions(\''+tables[i].name+'\')" class="tableReserved">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
 															            '<tag class="tableInfo">Reserved</tag>'+
 															        	'</tag>';	
 									}									
