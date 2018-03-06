@@ -1935,26 +1935,95 @@ ol ol {
 /*Search in Menu page*/
 .menuSuggestionSubMenu{
     font-size: 12px;
-    background: #3c8dbc;
+    background: #596a7d;
     padding: 3px 6px 3px 6px;
     text-transform: uppercase;
     color: #FFF;
     font-weight: 600;
     width: 100%;
-  /*  margin-top: 5px; */
+    margin: 0;
 }
 
-.ui-menu .ui-menu-item:hover, .ui-menu .ui-menu-item:active, .ui-menu .ui-menu-item:focus{
-    background: #d9edf7 !important;
-    outline: none !important;
-}
-
+.ui-menu .ui-menu-item:hover, 
+.ui-menu .ui-menu-item:active, 
+.ui-menu .ui-menu-item:focus,
 .ui-menu .ui-menu-item.selected{
-    background: #d9edf7 !important;
-    outline: none !important;  
+    background: #dff0d8 !important;
+    outline: none !important;
 }
 
 .searchResultsHolder{
   position: absolute;
 }
+
+/*.skin-blue .menuSuggestionSubMenu,
+.skin-blue-light .menuSuggestionSubMenu{
+  background: #3c8dbc;
+}*/
+
+.skin-blue .ui-menu .ui-menu-item:hover, 
+.skin-blue .ui-menu .ui-menu-item:active, 
+.skin-blue .ui-menu .ui-menu-item:focus,
+.skin-blue .ui-menu .ui-menu-item.selected,
+.skin-blue-light .ui-menu .ui-menu-item:hover, 
+.skin-blue-light .ui-menu .ui-menu-item:active, 
+.skin-blue-light .ui-menu .ui-menu-item:focus,
+.skin-blue-light .ui-menu .ui-menu-item.selected{
+    background: #d9edf7 !important;
+    outline: none !important;
+}
+
+/*.skin-red .menuSuggestionSubMenu,
+.skin-red-light .menuSuggestionSubMenu{
+  background: #3c8dbc;
+}*/
+
+.skin-red .ui-menu .ui-menu-item:hover, 
+.skin-red .ui-menu .ui-menu-item:active, 
+.skin-red .ui-menu .ui-menu-item:focus,
+.skin-red .ui-menu .ui-menu-item.selected,
+.skin-red-light .ui-menu .ui-menu-item:hover, 
+.skin-red-light .ui-menu .ui-menu-item:active, 
+.skin-red-light .ui-menu .ui-menu-item:focus,
+.skin-red-light .ui-menu .ui-menu-item.selected{
+    background: #f2dede !important;
+    outline: none !important;
+}
+
+/*.skin-purple .menuSuggestionSubMenu,
+.skin-purple-light .menuSuggestionSubMenu{
+  background: #605ca8;
+}*/
+
+.skin-purple .ui-menu .ui-menu-item:hover, 
+.skin-purple .ui-menu .ui-menu-item:active, 
+.skin-purple .ui-menu .ui-menu-item:focus,
+.skin-purple .ui-menu .ui-menu-item.selected,
+.skin-purple-light .ui-menu .ui-menu-item:hover, 
+.skin-purple-light .ui-menu .ui-menu-item:active, 
+.skin-purple-light .ui-menu .ui-menu-item:focus,
+.skin-purple-light .ui-menu .ui-menu-item.selected{
+    background: #e3dcf5 !important;
+    outline: none !important;
+}
+
+/*.skin-yellow .menuSuggestionSubMenu,
+.skin-yellow-light .menuSuggestionSubMenu{
+  background: #f39c12;
+}
+*/
+.skin-yellow .ui-menu .ui-menu-item:hover, 
+.skin-yellow .ui-menu .ui-menu-item:active, 
+.skin-yellow .ui-menu .ui-menu-item:focus,
+.skin-yellow .ui-menu .ui-menu-item.selected,
+.skin-yellow-light .ui-menu .ui-menu-item:hover, 
+.skin-yellow-light .ui-menu .ui-menu-item:active, 
+.skin-yellow-light .ui-menu .ui-menu-item:focus,
+.skin-yellow-light .ui-menu .ui-menu-item.selected{
+    background: #fcf8e3 !important;
+    outline: none !important;
+}
+
+
+
 

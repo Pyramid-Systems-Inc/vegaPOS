@@ -231,4 +231,33 @@
       </div>
    </div>
 
+
+
+      <!-- Modal -->
+   <div id="setTokenOptionsModal" class="modal">
+      <div class="modal-dialog" style="top: 20%">
+         <!-- Modal content-->
+         <div class="modal-content">
+            <div class="modal-body" style="max-height: 420px; overflow: scroll;">
+                     <div class="row">
+                        <div class="col-lg-12">
+                                 <div class="form-group">
+                                    <label style="margin: 0 0 10px 0; font-size: 21px; font-weight: 300;">Token Counter</label>
+                                    <input type="text" value="" class="form-control tip" id="next_token_value_set" style="border: none; border-bottom: 1px solid; font-size: 36px; letter-spacing: 5px; height: 60px; font-weight: bold; padding: 10px 3px;" required="required" />
+                                 </div>                                 
+                        </div>
+                     </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-default" onclick="setTokenManuallyHide()" style="float: left">Cancel</button>
+               <button type="button" class="btn btn-primary" onclick="restartTokenManuallySave()" style="float: left">Restart from 1</button>
+               <button type="button" class="btn btn-success" onclick="setTokenManuallySave()" style="float: right">Set Token</button>
+
+            </div>
+         </div>
+      </div>
+   </div>
+
+
+
 </template>

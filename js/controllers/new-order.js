@@ -429,8 +429,12 @@ function renderCustomerInfo(){
 							}
 						}					
 						else if(tempModeType == 'TOKEN'){ //assign token
-							customerInfo.mappedAddress = 1001;
-							selectMappedAddressButton = '<label class="cartCustomerLabel">Token No.</label><tag class="btn btn-default" onclick="setTokenManually(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							var tempToken = window.localStorage.lastPrintedToken;
+							if(!tempToken || tempToken == ''){
+								tempToken = 1;
+							}
+							customerInfo.mappedAddress = tempToken;
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Token No.</label><tag class="btn btn-default" onclick="setTokenManually()" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
 						}			
 
 			
@@ -469,9 +473,9 @@ function renderCustomerInfo(){
 			        	$("#customer_form_data_mode").val($("#customer_form_data_mode option:first").val());
 			        	customerInfo.modeType = billingModesInfo[0].type;
 			        	customerInfo.mode = billingModesInfo[0].name;
-
-			        	window.localStorage.customerData = JSON.stringify(customerInfo);
 			        }
+
+			        window.localStorage.customerData = JSON.stringify(customerInfo);
 
 			        renderCart();
 				}
@@ -968,7 +972,18 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
               	if(orderMetaInfo.modeType == 'DINE'){
               		addToTableMapping(obj.table, kot, obj.customerName);
               	}
-              	
+              	else if(orderMetaInfo.modeType == 'TOKEN'){
+              		/*Increment Token Counter*/
+              		var tempToken = window.localStorage.lastPrintedToken;
+              		if(!tempToken || tempToken == ''){
+              			tempToken = 1;
+              		}
+              		window.localStorage.lastPrintedToken = parseInt(tempToken) + 1;
+              		clearAllMetaData();
+              		renderCustomerInfo();
+              		renderCart();
+              		$("#add_item_by_search").focus();
+              	}
               }
               	 
            });
@@ -980,6 +995,19 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
            });
        }
        });
+}
+
+function clearAllMetaData(){
+	//to remove cart info, customer info
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+
+	customerInfo.name = "";
+	customerInfo.mobile ="";
+	customerInfo.mappedAddress = "";
+	customerInfo.reference = "";
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+	window.localStorage.zaitoon_cart = '';
 }
 
 function addToTableMapping(tableID, kotID, assignedTo){
@@ -1248,6 +1276,87 @@ function pickAddressForNewOrderHide(){
 	document.getElementById("pickAddressForNewOrderModal").style.display = 'none';
 }
 
+
+/*Set Token No.*/
+function setTokenManually(){
+	var lastToken = window.localStorage.lastPrintedToken;
+
+	if(!lastToken || lastToken == ''){
+		lastToken = 1;
+	}
+
+	document.getElementById("next_token_value_set").value = lastToken;
+	document.getElementById("setTokenOptionsModal").style.display = 'block';
+}
+
+function setTokenManuallyHide(){
+	document.getElementById("setTokenOptionsModal").style.display = 'none';
+}
+
+function setTokenManuallySave(){
+	var lastToken = window.localStorage.lastPrintedToken;
+
+	if(!lastToken || lastToken == ''){
+		lastToken = 1;
+	}
+
+	var token = document.getElementById("next_token_value_set").value;
+
+	if(token == ''){
+		token = 1;
+	}
+	else if(lastToken == token){
+		//do nothing
+	}
+	else{
+		//save new token
+		window.localStorage.lastPrintedToken = token;
+	}
+
+
+
+
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+	customerInfo.mappedAddress = token;
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+
+	setTokenManuallyHide();
+	renderCustomerInfo();
+}
+
+function restartTokenManuallySave(){
+	window.localStorage.lastPrintedToken = 1;
+
+
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+	customerInfo.mappedAddress = 1;
+
+	setTokenManuallyHide();
+	renderCustomerInfo();
+}
+
+
 /*Add item-wise comments*/
 function addCommentToItem(itemCode, variant){
 
@@ -1280,6 +1389,7 @@ function addCommentToItem(itemCode, variant){
 	hideItemWiseCommentModal();
 	renderCart();
 
+	$("#add_item_by_search").focus();
 }
 
 function openItemWiseCommentModal(itemCode, variant){
@@ -1355,9 +1465,21 @@ function openItemWiseCommentModal(itemCode, variant){
 	    document.getElementById("itemWiseCommentsModal").style.display = 'block';
 	    document.getElementById("itemWiseCommentsModalTitle").innerHTML = "Comments for <b>"+itemTitle+"</b>"+variantTitle;
 	    document.getElementById("itemWiseCommentsModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="hideItemWiseCommentModal()" style="float: left">Cancel</button>'+
-               									'<button type="button" class="btn btn-success" onclick="addCommentToItem(\''+itemCode+'\', \''+variant+'\')" style="float: right">Save Comment</button>';
+               									'<button id="itemWiseCommentsModalActions_SAVE" type="button" class="btn btn-success" onclick="addCommentToItem(\''+itemCode+'\', \''+variant+'\')" style="float: right">Save Comment</button>';
 
         $("#add_item_wise_comment").focus();
+
+        var duplicateClick = false;
+        $('#add_item_wise_comment').keyup(function(e) {
+			if (e.which === 13) {
+				if(duplicateClick){
+					$('#itemWiseCommentsModalActions_SAVE').click();
+				}
+				else{
+					duplicateClick = true;
+				}
+			}
+        });
 }
 
 function addFromSuggestions(suggestion){
@@ -1465,7 +1587,7 @@ function initMenuSuggestion(){
 					    }
 
 					    var regex = new RegExp(searchField, "i");
-					    var renderContent = '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" style="display: block; top: 0; left: 0; width: 100%; position: relative; max-height: 420px !important; overflow: scroll">';
+					    var renderContent = '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" style="display: block; top: 0; left: 0; min-width: 320px; position: relative; max-height: 420px !important; overflow: scroll">';
 					    var count = 0;
 					    var tabIndex = 1;
 					    var itemsList = '';
