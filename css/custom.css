@@ -1915,3 +1915,122 @@ ol ol {
     text-transform: uppercase;
     color: #bdbdbd;
 }
+
+
+.deliveryAddressWithRows {
+    background-attachment: local;
+    background-image:
+        linear-gradient(to right, white 10px, transparent 10px),
+        linear-gradient(to left, white 10px, transparent 10px),
+        repeating-linear-gradient(white, white 30px, #ccc 30px, #ccc 31px, white 31px);
+    line-height: 31px;
+    padding: 8px 10px;
+    border: none;
+    resize: none;
+}
+
+
+
+
+/*Search in Menu page*/
+
+.tt-dropdown-menu,
+.gist {
+  text-align: left;
+}
+
+.ng-invalid {
+  border-color: red !important; /* just for visual */
+}
+
+.typeahead,
+.tt-query,
+.tt-hint {
+  width: 100%;
+  height: 30px;
+  font-size: 14px;
+  outline: none;
+}
+
+.typeahead {
+  width: 100%
+  background-color: #fff;
+  border:none;
+  border-radius: 0px;
+  border-bottom: 1px solid #95a5a6;
+}
+
+.typeahead:focus {
+  border-radius: 0px;
+  border-bottom: 2px solid #27ae60;
+}
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-menu {
+  width: 100%;
+  margin: 12px 0;
+  padding: 8px;
+  background-color: #fff;
+  max-height:150px;
+  overflow-y:auto;
+  border:1px solid #27AE60;
+  color: #27AE60;
+
+}
+
+.tt-menu::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #F5F5F5;
+}
+
+.tt-menu::-webkit-scrollbar
+{
+  width: 6px;
+  background-color: #F5F5F5;
+}
+
+.tt-menu::-webkit-scrollbar-thumb
+{
+  background-color: rgba(37,36,36, 0.5);
+}
+
+
+.tt-suggestion {
+  width: 100%;
+  padding: 3px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid #F3F3F3;
+  line-height: 18px;
+  font-weight: 200;
+}
+
+.tt-suggestion:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #27AE60;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+
+.tt-error {
+  border: none;
+  text-align: center;
+}

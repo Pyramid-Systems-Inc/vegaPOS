@@ -244,7 +244,7 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
 			variantName = ' ('+cart_products[i].variant+')';
 		}
 
-		temp = '<tr class="success"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-success"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
+		temp = '<tr class="success"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-success" onclick="openItemWiseCommentModal(\''+cart_products[i].code+'\', \''+( cart_products[i].isCustom? cart_products[i].variant : '')+'\')"><span class="sname">'+cart_products[i].name+variantName+((cart_products[i].hasOwnProperty('comments') && cart_products[i].comments != '') ? '<i class="fa fa-comment-o" style="float: right"></i>' : '')+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
 		i++
 	}
 	
@@ -404,7 +404,7 @@ function renderCustomerInfo(){
 					//Ask for MappedAddress value
 						if(tempModeType == 'PARCEL'){ //ask for address
 							selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-danger" style=" width: 100%; text-overflow: ellipsis; overflow: hidden;" onclick="pickAddressForNewOrder()">Set Address</tag>';
-							customerInfo.mappedAddress = 'Sayujyam Trippanachi Post';
+							
 							if(customerInfo.mappedAddress){
 								selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-default" onclick="pickAddressForNewOrder(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
 							}
@@ -746,6 +746,11 @@ function renderMenu(subtype){
 
 {
 	"KOTNumber": "KOT1001",
+	"orderDetails": {
+		"mode": "Dine In",
+		"modeType": "DINE",
+		"reference": ""
+	},
 	"table": "T3",
 	"customerName": "Abhijith",
 	"customerMobile": "9043960876",
@@ -919,6 +924,11 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
 	var stewName = '';
 	var stewCode = '9884169765';
 	var spremarks = '';
+
+	var orderMetaInfo = {};
+	orderMetaInfo.mode = customerInfo.mode;
+	orderMetaInfo.modeType = customerInfo.modeType;
+	orderMetaInfo.reference = customerInfo.reference;
    
       //Check if file exists
 
@@ -957,6 +967,7 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
 
           var obj = {}; 
           obj.KOTNumber = kot;
+          obj.orderDetails = orderMetaInfo;
           obj.table = customerInfo.mappedAddress;
           obj.customerName = customerInfo.name;
           obj.customerMobile = customerInfo.mobile; 
@@ -973,17 +984,20 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
           obj.extras = otherCharges,
           obj.discount = {}
 
-          console.log(obj)
-          
-          
-
           var json = JSON.stringify(obj); //convert it back to json
           var file = './data/KOT/'+kot+'.json';
           fs.writeFile(file, json, 'utf8', (err) => {
-              if(err)
-                 showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
-              else
-              	 showToast('#'+kot+' generated Successfully', '#27ae60');
+              if(err){
+				showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
+              }
+              else{
+              	showToast('#'+kot+' generated Successfully', '#27ae60');
+              	if(orderMetaInfo.modeType == 'DINE'){
+              		addToTableMapping(obj.table, kot, obj.customerName);
+              	}
+              	
+              }
+              	 
            });
 
 
@@ -993,6 +1007,69 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
            });
        }
        });
+}
+
+function addToTableMapping(tableID, kotID, assignedTo){
+
+
+          var today = new Date();
+          var hour = today.getHours();
+          var mins = today.getMinutes();
+
+          if(hour<10) {
+              hour = '0'+hour;
+          } 
+
+          if(mins<10) {
+              mins = '0'+mins;
+          }
+
+		if(fs.existsSync('./data/static/tablemapping.json')) {
+	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to map KOT and Table. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+	    	if(data == ''){ data = '[]'; }
+	          var tableMapping = JSON.parse(data); 
+
+	          var isUpdated = false;
+
+	          for(var i=0; i<tableMapping.length; i++){
+	          	if(tableMapping[i].table == tableID){
+
+	          		isUpdated = true;
+
+	          		if(tableMapping[i].status != 0 && tableMapping[i].status != 5){
+						showToast('Warning: Table #'+tableID+' was not free. But Order is punched.', '#e67e22');
+	          		}
+	          		else{
+	          			tableMapping[i].status = 1;
+	          			tableMapping[i].assigned = assignedTo;
+	          			tableMapping[i].KOT = kotID;
+	          			tableMapping[i].lastUpdate = hour+''+mins;
+	          		}
+
+	          	}
+	          }
+
+	          if(!isUpdated){
+	          	tableMapping.push({ "table": tableID, "assigned": assignedTo, "KOT": kotID, "status": 1, "lastUpdate": hour+''+mins });
+		      }
+
+		       var newjson = JSON.stringify(tableMapping);
+		       fs.writeFile('./data/static/tablemapping.json', newjson, 'utf8', (err) => {
+		         if(err){
+		            showToast('System Error: Unable to map KOT and Table. Please contact Accelerate Support.', '#e74c3c');
+		           }
+		       }); 
+
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to map KOT and Table. Please contact Accelerate Support.', '#e74c3c');
+	    }
+
+
 }
 
 
@@ -1017,128 +1094,147 @@ function getTableLiveStatus(tableID){
 
 function pickTableForNewOrder(currentTableID){
 
-	  if(fs.existsSync('./data/static/tables.json')) {
-        fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
-      if (err){
-          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-      } else {
-
-          if(data == ''){ data = '[]'; }
-
-              var tables = JSON.parse(data);
-              tables.sort(); //alphabetical sorting 
-
-
-		    if(fs.existsSync('./data/static/tablesections.json')) {
-		        fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
+			//PRELOAD TABLE MAPPING
+		    if(fs.existsSync('./data/static/tablemapping.json')) {
+		        fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
 		      if (err){
-		          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
 		      } else {
 
-		          if(data == ''){ data = '[]'; }
+		          	if(data == ''){ data = '[]'; }
 
-		              var tableSections = JSON.parse(data);
-		              tableSections.sort(); //alphabetical sorting 
+		              var tableMapping = JSON.parse(data);
+		              tableMapping.sort(); //alphabetical sorting 
+		              window.localStorage.tableMappingData = JSON.stringify(tableMapping);
 
-		              
+		              //PRELOAD TABLES
+		    
+						  if(fs.existsSync('./data/static/tables.json')) {
+					        fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
+					      if (err){
+					          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+					      } else {
 
-		            if(0){
+					          if(data == ''){ data = '[]'; }
 
-		            	
-		              
-		            }
-		            else{
-		              var renderSectionArea = '';
-
-		              var n = 0;
-		              while(tableSections[n]){
-		        
-		              	var renderTableArea = ''
-		              	for(var i = 0; i<tables.length; i++){
-		              		if(tables[i].type == tableSections[n]){
-
-		              			var tableOccupancyData = getTableLiveStatus(tables[i].name);
-
-		              			if(tableOccupancyData){ /*Occuppied*/
-									if(tableOccupancyData.status == 1 || tableOccupancyData.status == 2){
-		              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
-															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
-															            '<tag class="tableInfo">Occuppied</tag>'+
-															        	'</tag>';	
-									}									
-									else if(tableOccupancyData.status == 5){
-										if(currentTableID != '' && currentTableID == tables[i].name){
-			              				renderTableArea = renderTableArea + '<tag class="tableTileBlue" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
-																            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-																            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
-																            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
-																        	'</tag>';	
-										}	
-										else{
-			              				renderTableArea = renderTableArea + '<tag class="tableReserved" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
-																            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-																            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
-																            '<tag class="tableInfo">Reserved</tag>'+
-																        	'</tag>';	
-										}
-
-									}									
-									else{
-		              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
-															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
-															            '<tag class="tableInfo">Occuppied</tag>'+
-															        	'</tag>';											
-									}
+					              var tables = JSON.parse(data);
+					              tables.sort(); //alphabetical sorting 
 
 
-		              			}
-		              			else{
+					             //PRELOAD TABLE SECTIONS
+							    if(fs.existsSync('./data/static/tablesections.json')) {
+							        fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
+							      if (err){
+							          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+							      } else {
 
-		              				if(currentTableID != '' && currentTableID == tables[i].name){
-		              					renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileBlue">'+
-															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
-															            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
-															        	'</tag>';
-									}	
-									else{
-										renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileGreen">'+
-															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
-															            '<tag class="tableInfo">Free</tag>'+
-															        	'</tag>';
-									}							        	              				
-		              			}
+							          if(data == ''){ data = '[]'; }
 
-		              		}
-		              	}
+							              var tableSections = JSON.parse(data);
+							              tableSections.sort(); //alphabetical sorting 
 
-		              	renderSectionArea = renderSectionArea + '<div class="row" style="margin-top: 25px">'+
-												   '<h1 class="seatingPlanHead">'+tableSections[n]+'</h1>'+
-												   '<div class="col-lg-12" style="text-align: center;">'+renderTableArea+
-												    '</div>'+
-												'</div>'
+							              
 
-		              	n++;
-		              }
-		              
-		              document.getElementById("pickTableForNewOrderModalContent").innerHTML = renderSectionArea;		            	
-		              document.getElementById("pickTableForNewOrderModal").style.display = 'block';	
-		            }
+							            if(0){
+
+							            	
+							              
+							            }
+							            else{
+							              var renderSectionArea = '';
+
+							              var n = 0;
+							              while(tableSections[n]){
+							        
+							              	var renderTableArea = ''
+							              	for(var i = 0; i<tables.length; i++){
+							              		if(tables[i].type == tableSections[n]){
+
+							              			var tableOccupancyData = getTableLiveStatus(tables[i].name);
+
+							              			if(tableOccupancyData){ /*Occuppied*/
+														if(tableOccupancyData.status == 1 || tableOccupancyData.status == 2){
+							              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo">Occuppied</tag>'+
+																				        	'</tag>';	
+														}									
+														else if(tableOccupancyData.status == 5){
+															if(currentTableID != '' && currentTableID == tables[i].name){
+								              				renderTableArea = renderTableArea + '<tag class="tableTileBlue" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
+																					            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																					            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
+																					            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
+																					        	'</tag>';	
+															}	
+															else{
+								              				renderTableArea = renderTableArea + '<tag class="tableReserved" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
+																					            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																					            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
+																					            '<tag class="tableInfo">Reserved</tag>'+
+																					        	'</tag>';	
+															}
+
+														}									
+														else{
+							              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo">Occuppied</tag>'+
+																				        	'</tag>';											
+														}
+
+
+							              			}
+							              			else{
+
+							              				if(currentTableID != '' && currentTableID == tables[i].name){
+							              					renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileBlue">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
+																				        	'</tag>';
+														}	
+														else{
+															renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileGreen">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo">Free</tag>'+
+																				        	'</tag>';
+														}							        	              				
+							              			}
+
+							              		}
+							              	}
+
+							              	renderSectionArea = renderSectionArea + '<div class="row" style="margin-top: 25px">'+
+																	   '<h1 class="seatingPlanHead">'+tableSections[n]+'</h1>'+
+																	   '<div class="col-lg-12" style="text-align: center;">'+renderTableArea+
+																	    '</div>'+
+																	'</div>'
+
+							              	n++;
+							              }
+							              
+							              document.getElementById("pickTableForNewOrderModalContent").innerHTML = renderSectionArea;		            	
+							              document.getElementById("pickTableForNewOrderModal").style.display = 'block';	
+							            }
+							    }
+							    });
+							      } else {
+							        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+							      } 
+
+					    }
+					    });
+					      } else {
+					        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+					      } 
+
+
 		    }
 		    });
-		      } else {
-		        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-		      } 
-
-    }
-    });
-      } else {
-        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-      } 
-
+		     }
 }
 
 
@@ -1151,13 +1247,214 @@ function pickTableForNewOrderHide(){
 /*Set Delivery address*/
 function pickAddressForNewOrder(currentAddress){
 	document.getElementById("pickAddressForNewOrderModal").style.display = 'block';
+
+	if(currentAddress){
+		currentAddress = currentAddress.replace(/, /g, '\n');
+		document.getElementById("delivery_address_parcel").value = currentAddress;
+	}
 }
 
 function saveNewDeliveryAddress(){
+	var address = document.getElementById("delivery_address_parcel").value;
+	address = address.replace(/\n/g, ', ');
+	address = address.replace(/, ,/g, ','); /*TWEAK*/
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
 	
+	if(address != ''){
+		customerInfo.mappedAddress = address;
+		window.localStorage.customerData = JSON.stringify(customerInfo);
+		pickAddressForNewOrderHide();
+		renderCustomerInfo();
+	}
+	else{
+		showToast('Warning: Delivery Address is empty', '#e67e22');                                 
+	}
 }
 
 function pickAddressForNewOrderHide(){
-	document.getElementById("pickAddressForNewOrderModalContent").innerHTML = '';
 	document.getElementById("pickAddressForNewOrderModal").style.display = 'none';
+}
+
+/*Add item-wise comments*/
+function addCommentToItem(itemCode, variant){
+
+	var text = document.getElementById("add_item_wise_comment").value;
+	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+
+	if(variant){
+		var n = 0;
+		while(cart_products[n]){
+			if(cart_products[n].code == itemCode && cart_products[n].variant == variant){
+				cart_products[n].comments = text;
+				break;
+			}
+			n++;
+		}	
+	}
+	else{
+		var n = 0;
+		while(cart_products[n]){
+			if(cart_products[n].code == itemCode){
+				cart_products[n].comments = text;
+				break;
+			}
+			n++;
+		}			
+	}
+
+	window.localStorage.zaitoon_cart = JSON.stringify(cart_products);
+	showToast('Comment saved successfully', '#27ae60');
+	hideItemWiseCommentModal();
+	renderCart();
+
+}
+
+function openItemWiseCommentModal(itemCode, variant){
+
+		var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+		var commentsAdded = false; 
+		var variantTitle = '';
+		var itemTitle = '';
+
+		if(variant != ''){
+			var n = 0;
+			while(cart_products[n]){
+				if(cart_products[n].code == itemCode && cart_products[n].variant == variant){
+					itemTitle = cart_products[n].name;
+					if(cart_products[n].hasOwnProperty('comments')){
+						document.getElementById("add_item_wise_comment").value = cart_products[n].comments;
+					}
+					else{
+						document.getElementById("add_item_wise_comment").value = "";
+					}
+					
+					break;
+				}
+				n++;
+			}	
+
+			variantTitle = ' ('+variant+')'; /*TWEAK*/
+		}
+		else{
+			var n = 0;
+			while(cart_products[n]){
+				if(cart_products[n].code == itemCode){
+
+					itemTitle = cart_products[n].name;
+					if(cart_products[n].hasOwnProperty('comments')){
+						document.getElementById("add_item_wise_comment").value = cart_products[n].comments;
+					}
+					else{
+						document.getElementById("add_item_wise_comment").value = "";
+					}
+					
+					break;
+				}
+				n++;
+			}			
+		}
+
+		if(fs.existsSync('./data/static/savedcomments.json')) {
+	      fs.readFile('./data/static/savedcomments.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	var modes = JSON.parse(data);
+	          	modes.sort(); //alphabetical sorting 
+	          	var modesTag = '';
+
+				for (var i=0; i<modes.length; i++){
+					modesTag = modesTag + '<button type="button" style="margin-right: 5px" class="btn btn-outline" onclick="addFromSuggestions(\''+modes[i]+'\')">'+modes[i]+'</button>';
+        		}
+
+				if(!modesTag)
+					document.getElementById("savedCommentsSuggestions").innerHTML = '';
+				else
+					document.getElementById("savedCommentsSuggestions").innerHTML = modesTag;
+		}
+		});
+	    }
+
+
+	    document.getElementById("itemWiseCommentsModal").style.display = 'block';
+	    document.getElementById("itemWiseCommentsModalTitle").innerHTML = "Comments for <b>"+itemTitle+"</b>"+variantTitle;
+	    document.getElementById("itemWiseCommentsModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="hideItemWiseCommentModal()" style="float: left">Cancel</button>'+
+               									'<button type="button" class="btn btn-success" onclick="addCommentToItem(\''+itemCode+'\', \''+variant+'\')" style="float: right">Save Comment</button>';
+}
+
+function addFromSuggestions(suggestion){
+	document.getElementById("add_item_wise_comment").value = suggestion;
+}
+
+function hideItemWiseCommentModal(){
+	document.getElementById("itemWiseCommentsModal").style.display = 'none';
+}
+
+
+/*Auto Suggetion - MENU*/
+
+function test(){
+
+        var city = "Chennai";
+      
+
+      var areaSuggestions = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+          url: 'https://www.zaitoon.online/services/searchareas.php?city='+city+'&key=%QUERY',
+          wildcard: '%QUERY'
+        }
+      });
+
+
+      $('#remote .typeahead').typeahead({hint: true, highlight: true, minLength: 2}, {
+        name: 'area',
+        display: 'value',
+        limit: 10,
+        source: areaSuggestions,
+	templates: {
+		empty: function(context){
+		 	$(".tt-dataset").text('No locations found');
+		}
+	}        
+      });
+  
+
+
+      //On location set...
+      $('#remote .typeahead').on('typeahead:selected', function(e, item) {
+        if(localStorage.getItem("location")){
+
+          $('#setLocation').modal('hide');
+
+          var temp = JSON.parse(localStorage.getItem('location')) || [];
+          temp.location = item.value;
+          temp.locationCode = item.name;
+          localStorage.setItem("location", JSON.stringify(temp));
+
+          $.get("https://www.zaitoon.online/services/fetchoutlets.php?locationCode="+temp.locationCode, function(data, status){
+          console.log('old is called')
+              var temp = JSON.parse(data);
+              console.log(temp)
+              if(temp.isServed){
+                localStorage.setItem("outletInfo", JSON.stringify(temp.response));
+                localStorage.setItem("isDeliveryAvailable", true);
+              }
+              else{
+              	localStorage.setItem("outletInfo", JSON.stringify(temp.response));
+                localStorage.setItem("isDeliveryAvailable", false);
+              }
+
+              window.location = "index.html";
+          });
+
+        }
+
+
+      })
+
 }

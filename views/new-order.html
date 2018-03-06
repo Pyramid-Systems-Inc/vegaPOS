@@ -1,5 +1,10 @@
 <template class="task-template">
 
+                <div id="remote" style="width:100%" >
+                  <input class="typeahead" style="width:100%" type="text" placeholder="Enter your area name">
+                </div>
+
+                
    <div class="row">
       <div class="col-sm-4">
 
@@ -181,11 +186,19 @@
       <div class="modal-dialog" style="top: 20%">
          <!-- Modal content-->
          <div class="modal-content">
-            <div class="modal-header">
-               <button type="button" onclick="pickTableForNewOrderHide()" style="float: right;" class="btn clearButton">X</button>
-               <h4 class="modal-title">Delivery Address</h4>
-            </div>
+
             <div class="modal-body" style="max-height: 420px; overflow: scroll;" id="pickAddressForNewOrderModalContent">
+                  <h1 style="margin: 10px 0; font-size: 21px; font-weight: 400; padding-left: 10px">Delivery Address</h1>
+
+                     <div class="row">
+                        <div class="col-lg-12">
+                           <div class="form-group">
+                              <textarea value="" placeholder="Enter Delivery Address" class="form-control tip deliveryAddressWithRows" id="delivery_address_parcel" rows="4" required="required" /></textarea>
+                           </div>
+                        </div>
+                     </div>
+
+
             </div>
             <div class="modal-footer">
                <button type="button" class="btn btn-default" onclick="pickAddressForNewOrderHide()" style="float: left">Cancel</button>
@@ -195,5 +208,35 @@
       </div>
    </div>
 
+
+
+
+   <!-- Modal -->
+   <div id="itemWiseCommentsModal" class="modal">
+      <div class="modal-dialog" style="top: 20%">
+         <!-- Modal content-->
+         <div class="modal-content">
+            <div class="modal-body" style="max-height: 420px; overflow: scroll;" id="pickAddressForNewOrderModalContent">
+
+                     <div class="row">
+                        <div class="col-lg-12">
+                                 <div class="form-group">
+                                    <label style="margin: 0 0 10px 0; font-size: 21px; font-weight: 300;" id="itemWiseCommentsModalTitle"></label>
+                                    <input type="text" value="" class="form-control tip" id="add_item_wise_comment" style="border: none; border-bottom: 1px solid; font-size: 18px; padding: 6px 0px;" placeholder="Add any Comment" required="required" />
+                                 </div>                                 
+                        </div>
+                     </div>
+
+                     <p style="margin: 0; font-size: 14px; font-weight: 400; margin-bottom: 5px; color: #969696;">Suggestions:</p>
+                     <div id="savedCommentsSuggestions"></div>
+
+
+            </div>
+            <div class="modal-footer" id="itemWiseCommentsModalActions">
+
+            </div>
+         </div>
+      </div>
+   </div>
 
 </template>

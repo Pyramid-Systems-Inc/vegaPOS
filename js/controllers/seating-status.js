@@ -716,14 +716,14 @@ function renderCurrentPlan(mode, currentTableID){
 										if(tables[i].name == currentTableID){
 											renderTableArea = renderTableArea + '<tag class="tableTileRed selected">'+
 																	            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-																	            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+																	            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 																	            '<tag class="tableInfo" style="color: #fff"><i class="fa fa-check"></i></tag>'+
 																	        	'</tag>';	
 										}
 										else{
 				              				renderTableArea = renderTableArea + '<tag id="holdMain_'+tables[i].name+'" onclick="addToHoldList(\''+tables[i].name+'\')" class="tableTileRed">'+
 																	            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-																	            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+																	            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 																	            '<tag class="tableInfo" id="hold_'+tables[i].name+'" style="color: #fff">Order Punched '+getTimeLapsed(tableOccupancyData.lastUpdate)+' ago</tag>'+
 																	        	'</tag>';												
 										}
@@ -732,7 +732,7 @@ function renderCurrentPlan(mode, currentTableID){
 									else if(tableOccupancyData.status == 2){
 		              				renderTableArea = renderTableArea + '<tag class="tableTileOther">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 															            '<tag class="tableInfo">Billed '+getTimeLapsed(tableOccupancyData.lastUpdate)+' ago</tag>'+
 															        	'</tag>';	
 									}	
@@ -746,7 +746,7 @@ function renderCurrentPlan(mode, currentTableID){
 									else{
 		              				renderTableArea = renderTableArea + '<tag class="tableTileOther">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 															            '<tag class="tableInfo">Last updated '+getTimeLapsed(tableOccupancyData.lastUpdate)+' ago</tag>'+
 															        	'</tag>';											
 									}
@@ -796,14 +796,14 @@ function renderCurrentPlan(mode, currentTableID){
 									if(tableOccupancyData.status == 1){
 		              				renderTableArea = renderTableArea + '<tag onclick="openOccuppiedSeatOptions(\''+encodeURI(JSON.stringify(tableOccupancyData))+'\')" class="tableTileRed">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 															            '<tag class="tableInfo">Order Punched '+getTimeLapsed(tableOccupancyData.lastUpdate)+' ago</tag>'+
 															        	'</tag>';	
 									}
 									else if(tableOccupancyData.status == 2){
 		              				renderTableArea = renderTableArea + '<tag onclick="openOccuppiedSeatOptions(\''+encodeURI(JSON.stringify(tableOccupancyData))+'\')" class="tableTileYellow">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 															            '<tag class="tableInfo">Billed '+getTimeLapsed(tableOccupancyData.lastUpdate)+' ago</tag>'+
 															        	'</tag>';	
 									}
@@ -817,7 +817,7 @@ function renderCurrentPlan(mode, currentTableID){
 									else{
 		              				renderTableArea = renderTableArea + '<tag onclick="openOccuppiedSeatOptions(\''+encodeURI(JSON.stringify(tableOccupancyData))+'\')" class="tableTileRed">'+
 															            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
-															            '<tag class="tableCapacity">'+tableOccupancyData.assigned+'</tag>'+
+															            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
 															            '<tag class="tableInfo">Last updated '+getTimeLapsed(tableOccupancyData.lastUpdate)+' ago</tag>'+
 															        	'</tag>';											
 									}
