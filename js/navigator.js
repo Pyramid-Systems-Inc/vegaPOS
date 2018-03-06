@@ -14,7 +14,8 @@ function fetchInitFunctions(pageReference){
 		case 'new-order':{
 			renderMenu();
 			renderCustomerInfo();
-			test();
+			initMenuSuggestion();
+			initOrderPunch();
 			break;
 		}
 		case 'live-orders':{

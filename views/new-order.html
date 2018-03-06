@@ -1,10 +1,5 @@
 <template class="task-template">
-
-                <div id="remote" style="width:100%" >
-                  <input class="typeahead" style="width:100%" type="text" placeholder="Enter your area name">
-                </div>
-
-                
+        
    <div class="row">
       <div class="col-sm-4">
 
@@ -18,19 +13,16 @@
                         <hr style="margin-top: 0">
 
                         <h2 class="posCartSubHead">Customer Details</h2>
+                        <div style="padding: 0 6px" id="orderCustomerInfo"></div>
 
-                        <div style="padding: 0 6px" id="orderCustomerInfo">
-
-                        </div>
-
-
-                        
                         <h2 class="posCartSubHead" style="margin-top: 20px">Order Cart</h2>
 
-
-
                      <div class="form-group" style="margin-bottom:5px; margin-right: 6px; margin-left: 6px">
-                        <input type="text" name="code" id="add_item" class="form-control" placeholder="Search product by code or name, you can scan barcode too" />
+                        <input type="text" name="code" id="add_item_by_search" class="form-control ui-autocomplete-input" placeholder="Search item by name or short code"/>
+
+                        <div id="searchResultsRenderArea" class="searchResultsHolder">
+
+                        </div>
                      </div>
                   </div>
                

@@ -31,7 +31,7 @@ function saveToCart(productToAdd){
 		window.localStorage.zaitoon_cart = JSON.stringify(cart_products)
 }
 
-function additemtocart(encodedItem){
+function additemtocart(encodedItem, optionalSource){
 
 	var productToAdd = JSON.parse(decodeURI(encodedItem));
 	
@@ -41,7 +41,7 @@ function additemtocart(encodedItem){
 		var i = 0;
 		var optionList = '';
 		while(productToAdd.customOptions[i]){
-			optionList = optionList + '<li onclick="addCustomToCart(\''+productToAdd.name+'\', \''+productToAdd.code+'\', \''+productToAdd.customOptions[i].customPrice+'\', \''+productToAdd.customOptions[i].customName+'\')">'+
+			optionList = optionList + '<li onclick="addCustomToCart(\''+productToAdd.name+'\', \''+productToAdd.code+'\', \''+productToAdd.customOptions[i].customPrice+'\', \''+productToAdd.customOptions[i].customName+'\', \'SUGGESTION\')">'+
 										'<a>'+productToAdd.customOptions[i].customName+' <tag style="float: right"><i class="fa fa-inr"></i> '+productToAdd.customOptions[i].customPrice+'</tag></a>'+
 									  '</li>';
 			i++;
@@ -53,10 +53,17 @@ function additemtocart(encodedItem){
 	else if(!productToAdd.isCustom){
 		saveToCart(productToAdd)
 		renderCart()
+
+		if(optionalSource == 'SUGGESTION'){
+			$('#searchResultsRenderArea').html('');
+			document.getElementById("add_item_by_search").value = '';
+		}
 	}	
+
+	$("#add_item_by_search").focus();
 }
 
-function addCustomToCart(name, code, price, variant){
+function addCustomToCart(name, code, price, variant, optionalSource){
 
 		var productToAdd = {};
 		productToAdd.name = name;
@@ -68,6 +75,13 @@ function addCustomToCart(name, code, price, variant){
 		saveToCart(productToAdd)
 		document.getElementById("customiseItemModal").style.display ='none'
 		renderCart()
+
+		if(optionalSource == 'SUGGESTION'){
+			$('#searchResultsRenderArea').html('');
+			document.getElementById("add_item_by_search").value = '';
+		}
+
+		$("#add_item_by_search").focus();		
 }
 
 function hideCustomiseItem(){
@@ -173,7 +187,6 @@ function renderCart(){
 		n++;
 	}
 
-
 		if(fs.existsSync('./data/static/billingparameters.json')) {
 	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
@@ -193,8 +206,7 @@ function renderCart(){
 	          		m = 0;
 	          		while(params[m]){	  
 	          			if(selectedModeExtrasList[n] == params[m].name)        			
-	          				cartExtrasList.push(params[m])
-	          			
+	          				cartExtrasList.push(params[m]);
 	          			m++;
 	          		}
 	          		n++;
@@ -696,46 +708,7 @@ function renderMenu(subtype){
 	    } else {
 	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    }	
-
 	
-
-	/*
-	else{
-		if(fs.existsSync('./data/static/mastermenu.json')) {
-	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        console.log(err);
-	    } else {
-	          var mastermenu = JSON.parse(data); 
-
-	          var wholeMenu = "";
-	          var subMenu = ""
-	          var itemsInSubMenu = "";
-
-	         
-				for (var i=0; i<mastermenu.length; i++){
-
-					subMenu = '<div class="items"><h1>'+mastermenu[i].category+'</h1>';
-
-					itemsInSubMenu = '';
-					for(var j=0; j<mastermenu[i].items.length; j++){
-						var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
-						itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
-			
-					}
-
-					subMenu = subMenu + itemsInSubMenu +'</div>';
-					wholeMenu = wholeMenu + subMenu;
-				}
-				
-				document.getElementById("item-list").innerHTML = wholeMenu;
-		}
-		});
-	    } else {
-	      console.log("File Doesn\'t Exist.")
-	    }	
-	}
-	*/
 }
 
 
@@ -1383,6 +1356,8 @@ function openItemWiseCommentModal(itemCode, variant){
 	    document.getElementById("itemWiseCommentsModalTitle").innerHTML = "Comments for <b>"+itemTitle+"</b>"+variantTitle;
 	    document.getElementById("itemWiseCommentsModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="hideItemWiseCommentModal()" style="float: left">Cancel</button>'+
                									'<button type="button" class="btn btn-success" onclick="addCommentToItem(\''+itemCode+'\', \''+variant+'\')" style="float: right">Save Comment</button>';
+
+        $("#add_item_wise_comment").focus();
 }
 
 function addFromSuggestions(suggestion){
@@ -1394,67 +1369,146 @@ function hideItemWiseCommentModal(){
 }
 
 
+
+
+function initOrderPunch(){
+		//Focus on to "Add item"
+		$("#add_item_by_search").focus();
+
+		/*Remove suggestions if focus out*/ /*TWEAK*/
+		$("#add_item_by_search").focusout(function(){
+			setTimeout(function(){ 
+				$('#searchResultsRenderArea').html('');
+			}, 300);	 /*delay added for the focusout to understand if modal is opened*/
+		});
+}
+
+
+
 /*Auto Suggetion - MENU*/
+function initMenuSuggestion(){
 
-function test(){
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	    	return '';
+	        
+	    } else {
+	          	
+	          	var mastermenu = JSON.parse(data);
 
-        var city = "Chennai";
-      
+				    /*Select on Arrow Up/Down */
+					var li = $('#searchResultsRenderArea li');
 
-      var areaSuggestions = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-          url: 'https://www.zaitoon.online/services/searchareas.php?city='+city+'&key=%QUERY',
-          wildcard: '%QUERY'
-        }
-      });
+					var liSelected = undefined;
+
+				$('#add_item_by_search').keyup(function(e) {
 
 
-      $('#remote .typeahead').typeahead({hint: true, highlight: true, minLength: 2}, {
-        name: 'area',
-        display: 'value',
-        limit: 10,
-        source: areaSuggestions,
-	templates: {
-		empty: function(context){
-		 	$(".tt-dataset").text('No locations found');
+
+				    if (e.which === 40 || e.which === 38) {
+				        /*
+				        	Skip Search if the Up-Arrow or Down-Arrow
+							is pressed inside the Search Input
+				        */ 
+
+
+					    if(e.which === 40){ 
+					        if(liSelected){
+					            liSelected.removeClass('selected');
+					            next = liSelected.next();
+					            if(next.length > 0){
+					                liSelected = next.addClass('selected');
+					            }else{
+					                liSelected = li.eq(0).addClass('selected');
+					            }
+					        }else{
+					            liSelected = li.eq(0).addClass('selected');
+					        }
+					    }else if(e.which === 38){
+					        if(liSelected){
+					            liSelected.removeClass('selected');
+					            next = liSelected.prev();
+					            if(next.length > 0){
+					                liSelected = next.addClass('selected');
+					            }else{
+					                liSelected = li.last().addClass('selected');
+					            }
+					        }else{
+					            liSelected = li.last().addClass('selected');
+					        }
+					    }
+
+
+				    }
+				    else if (e.which === 13) {
+				        /*
+				        	Add Item if the Enter Key
+							is pressed inside the Search Input
+				        */ 
+
+				        $("#searchResultsRenderArea li").each(function(){
+					        if($(this).hasClass("selected")){
+					        	$(this).click();
+					        }
+					    });
+
+				    }
+				    else{
+
+				    	liSelected = undefined
+
+					    var searchField = $(this).val();
+					    if (searchField === '') {
+					        $('#searchResultsRenderArea').html('');
+					        return;
+					    }
+
+					    var regex = new RegExp(searchField, "i");
+					    var renderContent = '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" style="display: block; top: 0; left: 0; width: 100%; position: relative; max-height: 420px !important; overflow: scroll">';
+					    var count = 0;
+					    var tabIndex = 1;
+					    var itemsList = '';
+
+					    $.each(mastermenu, function(key_1, subMenu) {
+					    	
+					    	itemsList = '';
+					    	count = 0;
+					    	$.each(subMenu.items, function(key_2, items) {
+
+						        if ((items.name.search(regex) != -1)) {
+						        	tabIndex = -1;
+						  			itemsList += '<li class="ui-menu-item" onclick="additemtocart(\''+encodeURI(JSON.stringify(items))+'\', \'SUGGESTION\')" tabindex="'+tabIndex+'">'+items.name+' (<i class="fa fa-inr"></i>'+items.price+')</li>'
+						            count++;
+						            tabIndex++;
+						        }
+						           		
+
+					    	 });
+
+					    	if(count > 0){
+					    		renderContent += '<label class="menuSuggestionSubMenu">'+subMenu.category+'</label>'+itemsList;
+					    	}
+
+					    });
+
+					    renderContent += '</ul>';
+
+					    $('#searchResultsRenderArea').html(renderContent);
+
+					    //Refresh dropdown list
+					    li = $('#searchResultsRenderArea li');
+					}
+
+				});
+
+
+
+
 		}
-	}        
-      });
-  
-
-
-      //On location set...
-      $('#remote .typeahead').on('typeahead:selected', function(e, item) {
-        if(localStorage.getItem("location")){
-
-          $('#setLocation').modal('hide');
-
-          var temp = JSON.parse(localStorage.getItem('location')) || [];
-          temp.location = item.value;
-          temp.locationCode = item.name;
-          localStorage.setItem("location", JSON.stringify(temp));
-
-          $.get("https://www.zaitoon.online/services/fetchoutlets.php?locationCode="+temp.locationCode, function(data, status){
-          console.log('old is called')
-              var temp = JSON.parse(data);
-              console.log(temp)
-              if(temp.isServed){
-                localStorage.setItem("outletInfo", JSON.stringify(temp.response));
-                localStorage.setItem("isDeliveryAvailable", true);
-              }
-              else{
-              	localStorage.setItem("outletInfo", JSON.stringify(temp.response));
-                localStorage.setItem("isDeliveryAvailable", false);
-              }
-
-              window.location = "index.html";
-          });
-
-        }
-
-
-      })
+		});
+	    } else {
+	      return '';
+	    }		
 
 }

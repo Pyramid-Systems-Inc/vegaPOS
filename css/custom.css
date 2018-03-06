@@ -1933,104 +1933,28 @@ ol ol {
 
 
 /*Search in Menu page*/
-
-.tt-dropdown-menu,
-.gist {
-  text-align: left;
+.menuSuggestionSubMenu{
+    font-size: 12px;
+    background: #3c8dbc;
+    padding: 3px 6px 3px 6px;
+    text-transform: uppercase;
+    color: #FFF;
+    font-weight: 600;
+    width: 100%;
+  /*  margin-top: 5px; */
 }
 
-.ng-invalid {
-  border-color: red !important; /* just for visual */
+.ui-menu .ui-menu-item:hover, .ui-menu .ui-menu-item:active, .ui-menu .ui-menu-item:focus{
+    background: #d9edf7 !important;
+    outline: none !important;
 }
 
-.typeahead,
-.tt-query,
-.tt-hint {
-  width: 100%;
-  height: 30px;
-  font-size: 14px;
-  outline: none;
+.ui-menu .ui-menu-item.selected{
+    background: #d9edf7 !important;
+    outline: none !important;  
 }
 
-.typeahead {
-  width: 100%
-  background-color: #fff;
-  border:none;
-  border-radius: 0px;
-  border-bottom: 1px solid #95a5a6;
+.searchResultsHolder{
+  position: absolute;
 }
 
-.typeahead:focus {
-  border-radius: 0px;
-  border-bottom: 2px solid #27ae60;
-}
-
-.tt-query {
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.tt-hint {
-  color: #999
-}
-
-.tt-menu {
-  width: 100%;
-  margin: 12px 0;
-  padding: 8px;
-  background-color: #fff;
-  max-height:150px;
-  overflow-y:auto;
-  border:1px solid #27AE60;
-  color: #27AE60;
-
-}
-
-.tt-menu::-webkit-scrollbar-track
-{
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  background-color: #F5F5F5;
-}
-
-.tt-menu::-webkit-scrollbar
-{
-  width: 6px;
-  background-color: #F5F5F5;
-}
-
-.tt-menu::-webkit-scrollbar-thumb
-{
-  background-color: rgba(37,36,36, 0.5);
-}
-
-
-.tt-suggestion {
-  width: 100%;
-  padding: 3px 20px;
-  font-size: 14px;
-  border-bottom: 1px solid #F3F3F3;
-  line-height: 18px;
-  font-weight: 200;
-}
-
-.tt-suggestion:hover {
-  cursor: pointer;
-  color: #fff;
-  background-color: #27AE60;
-}
-
-.tt-suggestion.tt-cursor {
-  color: #fff;
-  background-color: #0097cf;
-
-}
-
-.tt-suggestion p {
-  margin: 0;
-}
-
-.tt-error {
-  border: none;
-  text-align: center;
-}
