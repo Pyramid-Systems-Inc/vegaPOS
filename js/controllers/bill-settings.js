@@ -79,6 +79,19 @@ function hideNewPaymentMode(){
 }
 
 
+function openNewDiscountType(){
+  document.getElementById("newDiscountTypeArea").style.display = "block";
+  document.getElementById("openNewDiscountButton").style.display = "none";
+}
+
+function hideNewDiscountType(){
+  
+  document.getElementById("newDiscountTypeArea").style.display = "none";
+  document.getElementById("openNewDiscountButton").style.display = "block";
+
+}
+
+
 
 function openBillSettings(id){
 	
@@ -104,6 +117,10 @@ function openBillSettings(id){
 			fetchAllPaymentModes();
 			break;
 		}		
+    case "discountTypes":{
+      fetchAllDiscountTypes();
+      break;
+    }
 	}
 }
 
@@ -304,6 +321,174 @@ function deleteParameter(name) {
 
    cancelSettingsDeleteConfirmation()
 
+}
+
+
+
+/*Discount Types*/
+
+function fetchAllDiscountTypes(){
+
+    if(fs.existsSync('./data/static/discounttypes.json')) {
+        fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var modes = JSON.parse(data);
+              modes.sort(); //alphabetical sorting 
+              var modesTag = '';
+
+        for (var i=0; i<modes.length; i++){
+          modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+modes[i].name+'</td> <td>'+(modes[i].maxDiscountUnit == 'PERCENTAGE'? (modes[i].maxDiscountValue+'%'): ('<i class="fa fa-inr"></i> '+modes[i].maxDiscountValue))+'</td> <td onclick="deleteDiscountTypeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
+        }
+
+        if(!modesTag)
+          document.getElementById("discountTypesTable").innerHTML = '<p style="color: #bdc3c7">No discount types added yet.</p>';
+        else
+          document.getElementById("discountTypesTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Type Name</th> <th style="text-align: left">Max Discount</th> <th style="text-align: left"></th> </tr> </thead>'+
+                                  '<tbody>'+modesTag+'</tbody>';
+    }
+    });
+      } else {
+        showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+      } 
+}
+
+
+
+
+/* add new discount type */
+function addDiscountType() {  
+
+  var paramObj = {};
+  paramObj.name = document.getElementById("add_new_discount_name").value;
+  paramObj.maxDiscountUnit = document.getElementById("add_new_discount_unit").value;
+  paramObj.maxDiscountValue = document.getElementById("add_new_discount_maxValue").value;
+
+  paramObj.maxDiscountValue = parseFloat(paramObj.maxDiscountValue);
+
+  if(paramObj.name == ''){
+    showToast('Warning: Please set a name', '#e67e22');
+    return '';
+  }
+
+
+  if((paramObj.name).toUpperCase() == 'COUPON' || (paramObj.name).toUpperCase() == 'VOUCHER'){
+    showToast('Warning: Reserved Keyword. Please set different a name', '#e67e22');
+    return '';
+  }
+
+      //Check if file exists
+      if(fs.existsSync('./data/static/discounttypes.json')) {
+         fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){
+       if (err){
+           showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+       } else {
+         if(data==""){
+            var obj = []
+            obj.push(paramObj); //add some data
+            var json = JSON.stringify(obj);
+            fs.writeFile('./data/static/discounttypes.json', json, 'utf8', (err) => {
+                if(err){
+                  showToast('System Error: Unable to save Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+              }
+              else{
+
+                fetchAllDiscountTypes(); //refresh the list
+                hideNewDiscountType();
+
+              }
+            });
+         }
+         else{
+             var flag=0;
+             if(data == ''){ data = '[]'; }
+             var obj = [];
+             obj = JSON.parse(data);
+             for (var i=0; i<obj.length; i++) {
+               if (obj[i].name == paramObj.name){
+                  flag=1;
+                  break;
+               }
+             }
+             if(flag==1){
+               showToast('Warning: Discount type name already exists. Please choose a different name', '#e67e22');
+             }
+             else{
+                obj.push(paramObj);
+                var json = JSON.stringify(obj);
+                fs.writeFile('./data/static/discounttypes.json', json, 'utf8', (err) => {
+                     if(err){
+                        showToast('System Error: Unable to save Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+                    }
+                else{
+                      fetchAllDiscountTypes(); //refresh the list
+                      hideNewDiscountType();
+                    
+                  }
+                  });  
+
+             }
+                 
+         }
+          
+   }});
+      } else {
+         obj.push(paramObj);
+         fs.writeFile('./data/static/discounttypes.json', obj, 'utf8', (err) => {
+            if(err){
+               showToast('System Error: Unable to save Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+           }
+           else{
+                fetchAllDiscountTypes(); //refresh the list
+                hideNewDiscountType();           
+           }
+         });
+      }
+  
+}
+
+
+function deleteDiscountTypeConfirm(name){
+  openSettingsDeleteConfirmation(name, 'deleteDiscountType');
+}
+
+
+/* delete a discount type */
+function deleteDiscountType(name) {  
+
+   //Check if file exists
+   if(fs.existsSync('./data/static/discounttypes.json')) {
+       fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){
+       if (err){
+           showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+       } else {
+        if(data == ''){ data = '[]'; }
+       var obj = JSON.parse(data); //now it an object
+       for (var i=0; i<obj.length; i++) {  
+         if (obj[i].name == name){
+            obj.splice(i,1);
+            break;
+         }
+       }
+       var newjson = JSON.stringify(obj);
+       fs.writeFile('./data/static/discounttypes.json', newjson, 'utf8', (err) => {
+         if(err)
+            showToast('System Error: Unable to make changes in Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+        
+          /* on successful delete */
+          fetchAllDiscountTypes();
+       }); 
+      }});
+   } else {
+      showToast('System Error: Unable to modify Discount Types data. Please contact Accelerate Support.', '#e74c3c');
+   }
+
+
+   cancelSettingsDeleteConfirmation()
 }
 
 

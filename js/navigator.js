@@ -12,9 +12,10 @@ let $ = require('jquery');
 function fetchInitFunctions(pageReference){
 	switch (pageReference){
 		case 'new-order':{
-			renderCart();
 			renderMenu();
 			renderCustomerInfo();
+			initMenuSuggestion();
+			initOrderPunch();
 			break;
 		}
 		case 'live-orders':{

@@ -395,7 +395,7 @@ html, body {
 
 .tableTileGreen{
 	width: 140px; text-align: center; display: inline-block; max-width: 32%; 
-	height: 80px; margin: 3px; padding: 2px; background: #2ecc71;
+	height: 80px; margin: 3px; padding: 5px; background: #2ecc71;
   cursor: pointer;
 }
 
@@ -405,7 +405,7 @@ html, body {
 
 .tableTileRed{
 	width: 140px; text-align: center; display: inline-block; max-width: 32%; 
-	height: 80px; margin: 3px; padding: 2px;  background: #e74c3c;
+	height: 80px; margin: 3px; padding: 5px;  background: #e74c3c;
   cursor: pointer;
 }
 
@@ -413,9 +413,16 @@ html, body {
   background: #c0392b;
 }
 
+
+.tableTileRedDisable{
+  width: 140px; text-align: center; display: inline-block; max-width: 32%; 
+  height: 80px; margin: 3px; padding: 5px;  background: #e74c3c;
+  cursor: not-allowed;
+}
+
 .tableTileYellow{
   width: 140px; text-align: center; display: inline-block; max-width: 32%; 
-  height: 80px; margin: 3px; padding: 2px; background: #f39c12;
+  height: 80px; margin: 3px; padding: 5px; background: #f39c12;
   cursor: pointer;
 }
 
@@ -425,17 +432,42 @@ html, body {
 
 .tableReserved{
   width: 140px; text-align: center; display: inline-block; max-width: 32%; 
-  height: 80px; margin: 3px; padding: 2px; background: #7fbb99 !important;
+  height: 80px; margin: 3px; padding: 5px; background: #7fbb99 !important;
   cursor: pointer;
 }
 
+.tableTileOther{
+  width: 140px; text-align: center; display: inline-block; max-width: 32%; 
+  height: 80px; margin: 3px; padding: 5px; background: #bdc3c7 !important;
+  cursor: not-allowed;
+}
+
+
+.tableTileBlue{
+ 
+    width: 140px; text-align: center; display: inline-block; max-width: 32%; 
+  height: 80px; margin: 3px; padding: 5px;  background: #3498db !important;
+  cursor: pointer;
+}
 
 .tableTitle{
 	display: block; color: #FFF; font-weight: 600; font-size: 24px;
+      text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .tableCapacity{
-	display: block; color: #ecf0f5
+	display: block; color: #ecf0f5;
+      text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.tableInfo{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .tableTileGreen .tableInfo{
@@ -450,14 +482,45 @@ html, body {
   display: block; color: #82612e
 }
 
+.tableTileRed.selected{
+  background: #2980b9 !important;
+}
+
+.tableTileRed.selectedExtra{
+  background: #3498db !important;
+}
+
+.confirmationConsentArea{
+    background: none;
+    display: none;
+    height: 100px;
+    width: 100%;
+    position: fixed;
+    padding-right: 150px;
+    bottom: 0;
+    margin-left: -15px;
+}
+
+.billOptionWindowFrame{
+  margin-bottom: 5px;
+  border: 2px solid #1abc9c;
+  padding: 5px 5px 0 5px;
+}
+
+.billOptionWindowFrame .tableOptionsActionButton{
+  background: green;
+}
+
+
 .clearButton{
-background: none;     color: #d2d6de;
+  background: none;     
+  color: #d2d6de;
 }
 
 .clearButton:hover, .clearButton:active, .clearButton:focus{
 	background: none;
 	box-shadow: none;
-	 outline: none !important;
+  outline: none !important;
 }
 
 .clearButton:focus{
@@ -1855,3 +1918,245 @@ ol ol {
     font-weight: 400;
     text-align: center;
 }
+
+
+.cartCustomerLabel{
+      margin-bottom: 3px;
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: #bdbdbd;
+}
+
+
+.deliveryAddressWithRows {
+    background-attachment: local;
+    background-image:
+        linear-gradient(to right, white 10px, transparent 10px),
+        linear-gradient(to left, white 10px, transparent 10px),
+        repeating-linear-gradient(white, white 30px, #ccc 30px, #ccc 31px, white 31px);
+    line-height: 31px;
+    padding: 8px 10px;
+    border: none;
+    resize: none;
+}
+
+
+
+
+/*Search in Menu page*/
+.menuSuggestionSubMenu{
+    font-size: 12px;
+    background: #596a7d;
+    padding: 3px 6px 3px 6px;
+    text-transform: uppercase;
+    color: #FFF;
+    font-weight: 600;
+    width: 100%;
+    margin: 0;
+}
+
+.ui-menu .ui-menu-item:hover, 
+.ui-menu .ui-menu-item:active, 
+.ui-menu .ui-menu-item:focus,
+.ui-menu .ui-menu-item.selected{
+    background: #dff0d8 !important;
+    outline: none !important;
+}
+
+.searchResultsHolder{
+  position: absolute;
+}
+
+/*.skin-blue .menuSuggestionSubMenu,
+.skin-blue-light .menuSuggestionSubMenu{
+  background: #3c8dbc;
+}*/
+
+.skin-blue .ui-menu .ui-menu-item:hover, 
+.skin-blue .ui-menu .ui-menu-item:active, 
+.skin-blue .ui-menu .ui-menu-item:focus,
+.skin-blue .ui-menu .ui-menu-item.selected,
+.skin-blue-light .ui-menu .ui-menu-item:hover, 
+.skin-blue-light .ui-menu .ui-menu-item:active, 
+.skin-blue-light .ui-menu .ui-menu-item:focus,
+.skin-blue-light .ui-menu .ui-menu-item.selected{
+    background: #d9edf7 !important;
+    outline: none !important;
+}
+
+/*.skin-red .menuSuggestionSubMenu,
+.skin-red-light .menuSuggestionSubMenu{
+  background: #3c8dbc;
+}*/
+
+.skin-red .ui-menu .ui-menu-item:hover, 
+.skin-red .ui-menu .ui-menu-item:active, 
+.skin-red .ui-menu .ui-menu-item:focus,
+.skin-red .ui-menu .ui-menu-item.selected,
+.skin-red-light .ui-menu .ui-menu-item:hover, 
+.skin-red-light .ui-menu .ui-menu-item:active, 
+.skin-red-light .ui-menu .ui-menu-item:focus,
+.skin-red-light .ui-menu .ui-menu-item.selected{
+    background: #f2dede !important;
+    outline: none !important;
+}
+
+/*.skin-purple .menuSuggestionSubMenu,
+.skin-purple-light .menuSuggestionSubMenu{
+  background: #605ca8;
+}*/
+
+.skin-purple .ui-menu .ui-menu-item:hover, 
+.skin-purple .ui-menu .ui-menu-item:active, 
+.skin-purple .ui-menu .ui-menu-item:focus,
+.skin-purple .ui-menu .ui-menu-item.selected,
+.skin-purple-light .ui-menu .ui-menu-item:hover, 
+.skin-purple-light .ui-menu .ui-menu-item:active, 
+.skin-purple-light .ui-menu .ui-menu-item:focus,
+.skin-purple-light .ui-menu .ui-menu-item.selected{
+    background: #e3dcf5 !important;
+    outline: none !important;
+}
+
+/*.skin-yellow .menuSuggestionSubMenu,
+.skin-yellow-light .menuSuggestionSubMenu{
+  background: #f39c12;
+}
+*/
+.skin-yellow .ui-menu .ui-menu-item:hover, 
+.skin-yellow .ui-menu .ui-menu-item:active, 
+.skin-yellow .ui-menu .ui-menu-item:focus,
+.skin-yellow .ui-menu .ui-menu-item.selected,
+.skin-yellow-light .ui-menu .ui-menu-item:hover, 
+.skin-yellow-light .ui-menu .ui-menu-item:active, 
+.skin-yellow-light .ui-menu .ui-menu-item:focus,
+.skin-yellow-light .ui-menu .ui-menu-item.selected{
+    background: #fcf8e3 !important;
+    outline: none !important;
+}
+
+
+.serverStatus{
+  color: #2aea45
+}
+
+.skin-red .serverStatus, .skin-red-light .serverStatus{
+  color: #248431
+}
+
+.skin-yellow .serverStatus, .skin-yellow-light .serverStatus{
+  color: #2e9c3e
+}
+
+.serverStatusRed{
+  color: #b94034
+}
+
+.skin-blue .serverStatusRed, .skin-blue-light .serverStatusRed{
+  color: #a5382d
+}
+
+.skin-purple .serverStatusRed, .skin-purple-light .serverStatusRed{
+  color: #e25244
+}
+
+.skin-red .serverStatusRed, .skin-red-light .serverStatusRed{
+  color: #8e190e
+}
+
+.skin-yellow .serverStatusRed, .skin-yellow-light .serverStatusRed{
+  color: #d24132
+}
+
+
+/*Login*/
+/* Main */
+
+  #main {
+    position: relative;
+    max-width: 27em;
+    min-width: 27em;
+    padding: 4.5em 3em 3em 3em ;
+    background: #ffffff;
+    border-radius: 4px;
+    cursor: default;
+    opacity: 0.95;
+    text-align: center;
+    -moz-transform-origin: 50% 50%;
+    -webkit-transform-origin: 50% 50%;
+    -ms-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -moz-transform: rotateX(0deg);
+    -webkit-transform: rotateX(0deg);
+    -ms-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+    -moz-transition: opacity 1s ease, -moz-transform 1s ease;
+    -webkit-transition: opacity 1s ease, -webkit-transform 1s ease;
+    -ms-transition: opacity 1s ease, -ms-transform 1s ease;
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+    #main .avatar {
+      position: relative;
+      display: block;
+      margin-bottom: 1.5em;
+    }
+
+      #main .avatar img {
+        display: block;
+        margin: 0 auto;
+        border-radius: 100%;
+        box-shadow: 0 0 0 1.5em #ffffff;
+        border: none;
+      }
+
+      #main .avatar:before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: -3em;
+        width: calc(100% + 6em);
+        height: 1px;
+        z-index: -1;
+        background: #c8cccf;
+      }
+
+    @media screen and (max-width: 480px) {
+
+      #main {
+        min-width: 0;
+        width: 100%;
+        padding: 4em 2em 2.5em 2em ;
+      }
+
+        #main .avatar:before {
+          left: -2em;
+          width: calc(100% + 4em);
+        }
+
+    }
+
+    body.is-loading #main {
+      opacity: 0;
+      -moz-transform: rotateX(15deg);
+      -webkit-transform: rotateX(15deg);
+      -ms-transform: rotateX(15deg);
+      transform: rotateX(15deg);
+    }
+
+.loginWindowInput{
+  border: none; border-bottom: 1px solid #f3f3f3; 
+  text-align: center; font-size: 16px; height: 40px;  
+  font-weight: 300; text-transform: uppercase;
+}
+
+.loginWindowButton{
+     width: 100%;
+    height: 40px;
+    border-radius: 0;
+    font-size: 16px;
+    margin-bottom: 5px; 
+}
+

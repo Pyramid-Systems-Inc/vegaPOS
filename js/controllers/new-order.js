@@ -31,7 +31,7 @@ function saveToCart(productToAdd){
 		window.localStorage.zaitoon_cart = JSON.stringify(cart_products)
 }
 
-function additemtocart(encodedItem){
+function additemtocart(encodedItem, optionalSource){
 
 	var productToAdd = JSON.parse(decodeURI(encodedItem));
 	
@@ -41,7 +41,7 @@ function additemtocart(encodedItem){
 		var i = 0;
 		var optionList = '';
 		while(productToAdd.customOptions[i]){
-			optionList = optionList + '<li onclick="addCustomToCart(\''+productToAdd.name+'\', \''+productToAdd.code+'\', \''+productToAdd.customOptions[i].customPrice+'\', \''+productToAdd.customOptions[i].customName+'\')">'+
+			optionList = optionList + '<li onclick="addCustomToCart(\''+productToAdd.name+'\', \''+productToAdd.code+'\', \''+productToAdd.customOptions[i].customPrice+'\', \''+productToAdd.customOptions[i].customName+'\', \'SUGGESTION\')">'+
 										'<a>'+productToAdd.customOptions[i].customName+' <tag style="float: right"><i class="fa fa-inr"></i> '+productToAdd.customOptions[i].customPrice+'</tag></a>'+
 									  '</li>';
 			i++;
@@ -53,10 +53,17 @@ function additemtocart(encodedItem){
 	else if(!productToAdd.isCustom){
 		saveToCart(productToAdd)
 		renderCart()
+
+		if(optionalSource == 'SUGGESTION'){
+			$('#searchResultsRenderArea').html('');
+			document.getElementById("add_item_by_search").value = '';
+		}
 	}	
+
+	$("#add_item_by_search").focus();
 }
 
-function addCustomToCart(name, code, price, variant){
+function addCustomToCart(name, code, price, variant, optionalSource){
 
 		var productToAdd = {};
 		productToAdd.name = name;
@@ -68,6 +75,13 @@ function addCustomToCart(name, code, price, variant){
 		saveToCart(productToAdd)
 		document.getElementById("customiseItemModal").style.display ='none'
 		renderCart()
+
+		if(optionalSource == 'SUGGESTION'){
+			$('#searchResultsRenderArea').html('');
+			document.getElementById("add_item_by_search").value = '';
+		}
+
+		$("#add_item_by_search").focus();		
 }
 
 function hideCustomiseItem(){
@@ -75,10 +89,9 @@ function hideCustomiseItem(){
 }
 
 function deleteItem(item, isCustom, variant){
+
 	var itemCode = JSON.parse(decodeURI(item))
 	var cart_products = JSON.parse(window.localStorage.zaitoon_cart)
-
-
 
 		if(isCustom == 'true'){
 
@@ -126,6 +139,10 @@ function changeqty(item, isCustom, variant){
 
 							if(cart_products[i].code == itemCode && cart_products[i].variant == variant){
 								var temp = document.getElementById("qty"+cart_products[i].code+cart_products[i].variant).value;
+								if(temp == '' || isNaN(temp) || temp == 0){
+									temp = 1;
+									break;
+								}
 								cart_products[i].qty = parseInt(temp);
 								break;
 							}
@@ -140,7 +157,12 @@ function changeqty(item, isCustom, variant){
 					while(i < cart_products.length){
 
 						if(cart_products[i].code == itemCode){
-							cart_products[i].qty = parseInt(document.getElementById("qty"+cart_products[i].code+cart_products[i].variant).value);
+							temp = document.getElementById("qty"+cart_products[i].code+cart_products[i].variant).value;
+								if(temp == '' || isNaN(temp) || temp == 0){
+									temp = 1;
+									break;
+								}
+							cart_products[i].qty = parseInt(temp);
 							break;
 						}
 				        i++;
@@ -155,10 +177,67 @@ function changeqty(item, isCustom, variant){
 }
 
 function renderCart(){
+
 	//Render Cart Items based on local storage
-	//Calculate Tax
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+
+	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
 	
+	var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
+	var selectedBillingModeInfo = '';
+	
+	var n = 0;
+	while(billing_modes[n]){
+		if(billing_modes[n].name == selectedBillingModeName){
+			selectedBillingModeInfo = billing_modes[n];
+			break;
+		}
+		n++;
+	}
+
+		if(fs.existsSync('./data/static/billingparameters.json')) {
+	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	var params = JSON.parse(data);
+
+	          	var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
+	          	var cartExtrasList = [];
+
+	          	var n = 0;
+	          	var m = 0;
+	          	while(selectedModeExtrasList[n]){
+	          		m = 0;
+	          		while(params[m]){	  
+	          			if(selectedModeExtrasList[n] == params[m].name)        			
+	          				cartExtrasList.push(params[m]);
+	          			m++;
+	          		}
+	          		n++;
+	          	}
+
+	          	renderCartAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)	          	
+
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+	    }	
+
+}
+
+function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selectedModeExtras){
+
+	/*
+		cart_products - cart of items 
+		selectedBillingModeInfo - info relating to the particular mode like minBillAmount, isDiscountable? etc.
+		selectedModeExtras - extras of taxes to be calculated		
+	*/
+
 	if(cart_products.length < 1){
 		document.getElementById("cartTitleHead").innerHTML = '';
 		document.getElementById("summaryDisplay").innerHTML = '';
@@ -168,10 +247,12 @@ function renderCart(){
 		return 0;
 	}
 
-	var i = 0
+	var i = 0;
 	var temp = '';
-	var totqty = 0 
-	var tot = 0
+	var totqty = 0;
+	var tot = 0;
+	var grandPayableSum = 0;
+
 	var variantName = '';
 	while(i < cart_products.length){
 		variantName = '';
@@ -183,13 +264,64 @@ function renderCart(){
 			variantName = ' ('+cart_products[i].variant+')';
 		}
 
-		temp = '<tr class="success"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-success"><span class="sname">'+cart_products[i].name+variantName+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
+		temp = '<tr class="success"><td class="text-center"><i class="fa fa-trash-o tip pointer posdel" title="Remove" onclick="deleteItem(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></i></td><td><button type="button" class="btn btn-block btn-xs edit btn-success" onclick="openItemWiseCommentModal(\''+cart_products[i].code+'\', \''+( cart_products[i].isCustom? cart_products[i].variant : '')+'\')"><span class="sname">'+cart_products[i].name+variantName+((cart_products[i].hasOwnProperty('comments') && cart_products[i].comments != '') ? '<i class="fa fa-comment-o" style="float: right"></i>' : '')+'</span></button></td><td class="text-right"> <span class="text-right sprice"><i class="fa fa-inr"></i>'+cart_products[i].price+'</span></td><td><input class="form-control input-qty kb-pad text-center rquantity" id="qty'+cart_products[i].code+cart_products[i].variant+'" name="quantity[]" type="text" value="'+cart_products[i].qty+'" data-item="2" onchange="changeqty(\''+itemrem+'\', \''+cart_products[i].isCustom+'\', \''+cart_products[i].variant+'\')"></td><td class="text-right"><span class="text-right ssubtotal"><i class="fa fa-rupee"></i>'+cart_products[i].price*cart_products[i].qty+'</span></td></tr>' + temp
 		i++
 	}
 	
 	document.getElementById("cartTitleHead").innerHTML = '<tr class="success cartTitleRow"> <th class="satu cartTitleRow" onclick="clearCartConsent()"><i class="fa fa-trash-o"></i></th><th class="cartTitleRow">Item</th> <th class="cartTitleRow">Price</th> <th class="cartTitleRow" >Qty</th> <th class="cartTitleRow">Subtotal</th>  </tr>';
 	document.getElementById("cartDetails").innerHTML = temp;
 	
+
+	/*Calculate Taxes and Other Charges*/ 
+
+          var otherChargesSum = 0;        
+          var otherCharges = '';
+          var otherChargerRenderCount = 1;
+          var k = 0;
+
+          otherCharges = '<tr class="info"><td width="25%" class="cartSummaryRow">Discount</td><td class="text-right cartSummaryRow" style="padding-right:10px;">0</td>';
+          /*discount applied after kot generation only*/
+
+          if(selectedModeExtras.length > 0){
+
+          	for(k = 0; k < selectedModeExtras.length; k++){
+          		if(k%2 == 1){
+          			otherCharges = otherCharges + '</tr><tr class="info">';
+          		}
+
+          		var tempExtraTotal = 0;
+          		if(selectedModeExtras[k].value != 0){
+          			if(selectedModeExtras[k].unit == 'PERCENTAGE'){
+          				tempExtraTotal = selectedModeExtras[k].value * tot/100;
+          			}
+          			else if(selectedModeExtras[k].unit == 'FIXED'){
+          				tempExtraTotal = selectedModeExtras[k].value;
+          			}
+          		}
+
+          		tempExtraTotal = Math.round(tempExtraTotal * 100) / 100;
+
+          		otherCharges = otherCharges + '<td width="25%" class="cartSummaryRow">'+selectedModeExtras[k].name+' ('+(selectedModeExtras[k].unit == 'PERCENTAGE'? selectedModeExtras[k].value + '%': '<i class="fa fa-inr"></i>'+selectedModeExtras[k].value)+')</td><td class="text-right cartSummaryRow"><i class="fa fa-inr"></i>'+tempExtraTotal+'</td>';
+          		otherChargesSum = otherChargesSum + tempExtraTotal;
+          		
+          	}
+          }
+
+
+          otherChargerRenderCount = otherChargerRenderCount + k;
+
+          if(otherChargerRenderCount%2 == 1){
+          	otherCharges = otherCharges + '<td class="cartSummaryRow"></td><td class="cartSummaryRow"></td></tr>';
+          }
+          else{
+          	otherCharges = otherCharges + '</tr>';
+          }
+
+
+          grandPayableSum = tot + otherChargesSum;
+
+          grandPayableSum = Math.round(grandPayableSum * 100) / 100
+
 
 	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin: 0">'+
                         '   <tbody>'+
@@ -198,22 +330,15 @@ function renderCart(){
                         '        <td class="text-right cartSummaryRow" style="padding-right:10px;"><span id="count">'+totqty+'</span></td>'+
                         '         <td width="25%" class="cartSummaryRow">Total</td>'+
                         '         <td class="text-right cartSummaryRow" colspan="2"><span id="total"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
-                        '      </tr>'+
-                        '      <tr class="info">'+
-                        '         <td width="25%" class="cartSummaryRow"><a href="#" id="add_discount">Discount</a></td>'+
-                        '         <td class="text-right cartSummaryRow " style="padding-right:10px;"><span id="ds_con">0</span></td>'+
-                        '         <td width="25%" class="cartSummaryRow"><a href="#" id="add_tax">Order Tax</a></td>'+
-                        '         <td class="text-right cartSummaryRow"><span id="ts_con">0</span></td>'+
-                        '      </tr>'+
+                        '      </tr>'+otherCharges+
                         '      <tr class="success cartSumRow">'+
                         '         <td colspan="2" class="cartSumRow" style="font-weight: 400 !important; font-size: 16px;">'+
                         '            Total Payable'+
                         '         </td>'+
-                        '         <td class="text-right cartSumRow" colspan="2" ><span id="total-payable"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
+                        '         <td class="text-right cartSumRow" colspan="2" ><span id="total-payable"><i class="fa fa-inr"></i>'+grandPayableSum+'</span></td>'+
                         '      </tr>'+
                         '   </tbody>'+
                         '</table>';
-
 }
 
 /*Clear cart*/
@@ -237,16 +362,32 @@ function renderCustomerInfo(){
 	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
 	var billingModesInfo = {};
 
+
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+
+
+
 		if(fs.existsSync('./data/static/billingmodes.json')) {
 	      fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
 	        showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+	    	renderCart();
 	    } else {
 
 	    		if(data == ''){ data = '[]'; }
 
 	          	billingModesInfo = JSON.parse(data);
 	          	billingModesInfo.sort(); //alphabetical sorting 
+
+	          	window.localStorage.billingModesData = data; /*For cart rendering purpose*/
 	          	
 				/*Billing modes not set or not rendering*/
 				if(jQuery.isEmptyObject(billingModesInfo)){
@@ -272,42 +413,86 @@ function renderCustomerInfo(){
 						n++;
 					}
 					
+
+					var selectMappedAddressButton = '';
+					var tempModeType = customerInfo.modeType;
+					
+					if(customerInfo.mode == ""){ //Mode not set
+						tempModeType = billingModesInfo[0].type; //First value in modes list - temporarily by default
+					}
+
+					//Ask for MappedAddress value
+						if(tempModeType == 'PARCEL'){ //ask for address
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-danger" style=" width: 100%; text-overflow: ellipsis; overflow: hidden;" onclick="pickAddressForNewOrder()">Set Address</tag>';
+							
+							if(customerInfo.mappedAddress){
+								selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-default" onclick="pickAddressForNewOrder(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							}
+						}
+						else if(tempModeType == 'DINE'){ //ask for table
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Table No.</label><tag class="btn btn-danger" style="width: 100%; text-overflow: ellipsis; overflow: hidden;" onclick="pickTableForNewOrder()">Select Table</tag>';
+							
+							if(customerInfo.mappedAddress){
+								selectMappedAddressButton = '<label class="cartCustomerLabel">Table No.</label><tag class="btn btn-default" onclick="pickTableForNewOrder(\''+customerInfo.mappedAddress+'\')" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							}
+						}					
+						else if(tempModeType == 'TOKEN'){ //assign token
+							var tempToken = window.localStorage.lastPrintedToken;
+							if(!tempToken || tempToken == ''){
+								tempToken = 1;
+							}
+							customerInfo.mappedAddress = tempToken;
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Token No.</label><tag class="btn btn-default" onclick="setTokenManually()" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+						}			
+
+			
+
 					document.getElementById("orderCustomerInfo").innerHTML = '<div class="row" style="padding: 0 15px"> '+
-			                                 '<div class="col-xs-9" style="padding: 0; padding-right: 2px">'+
+			                                 '<div class="col-xs-8" style="padding: 0; padding-right: 2px">'+
 			                                    '<div class="form-group" style="margin-bottom:5px;">'+
 			                                       '<div class="input-group" style="width:100%;">'+
+			                                       		 '<label class="cartCustomerLabel">Order Type</label>'+
 			                                             '<select name="group" onchange="changeCustomerInfo(\'mode\')" id="customer_form_data_mode" class="form-control input-tip select2">'+modeOptions+'</select>'+
 			                                       '</div>'+
 			                                       '<div style="clear:both;"></div>'+
 			                                    '</div>'+
 			                                ' </div>'+
-			                                 '<div class="col-xs-3" style="padding: 0; padding-left: 2px">'+
-			                                    '<div class="form-group" style="margin-bottom:5px;">'+
-			                                       '<input type="text" value="'+customerInfo.mappedAddress+'" onchange="changeCustomerInfo(\'mappedAddress\')" id="customer_form_data_mappedAddress" class="form-control kb-text" placeholder="Table" />'+
-			                                    '</div>'+
+			                                 '<div class="col-xs-4" style="padding: 0; padding-left: 2px">'+selectMappedAddressButton+
 			                                 '</div> '+                       
 			                           '</div>'+
 			                           '<div class="row" style="padding: 0 15px">'+
 			                                 '<div class="col-xs-6" style="padding: 0; padding-right: 2px">'+
 			                                    '<div class="form-group" style="margin-bottom:5px;">'+
-			                                       '<input type="text" onchange="changeCustomerInfo(\'name\')" value="'+customerInfo.name+'" id="customer_form_data_name" class="form-control kb-text" placeholder="Name" />'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'name\')" value="'+customerInfo.name+'" id="customer_form_data_name" class="form-control kb-text" placeholder="Guest Name" />'+
 			                                    '</div>'+
 			                                 '</div>'+
 			                                 '<div class="col-xs-6" style="padding: 0; padding-left: 2px">'+
 			                                   ' <div class="form-group" style="margin-bottom:5px;">'+
-			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Mobile" />'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Guest Mobile" />'+
 			                                    '</div>'+
 			                                 '</div>   '+                     
 			                           '</div>';	
 
 
 			        document.getElementById("customer_form_data_mode").value = customerInfo.mode;
+
+			        /*First dropdown item as default*/ /*TWEAK*/
+			        if(customerInfo.mode == ""){
+			        	$("#customer_form_data_mode").val($("#customer_form_data_mode option:first").val());
+			        	customerInfo.modeType = billingModesInfo[0].type;
+			        	customerInfo.mode = billingModesInfo[0].name;
+			        }
+
+			        window.localStorage.customerData = JSON.stringify(customerInfo);
+
+			        renderCart();
 				}
 		}
 		});
 	    }
 	    else{
 	    	showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+	    	renderCart();
 	    }	
 
 }
@@ -315,7 +500,9 @@ function renderCustomerInfo(){
 function changeCustomerInfo(type){
 	var value = document.getElementById("customer_form_data_"+type).value;
 	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
-	
+	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
+
+
 	if(jQuery.isEmptyObject(customerInfo)){
 		customerInfo.name = "";
 		customerInfo.mobile = "";
@@ -334,14 +521,29 @@ function changeCustomerInfo(type){
 				customerInfo.mobile = value;
 				break;
 			}	
-			case "mappedAddress":{
-				customerInfo.mappedAddress = value;
-				break;
-			}	
 			case "mode":{
 				customerInfo.mode = value;
+
+				//Set mode type
+				var n = 0;
+				while(billing_modes[n]){
+					if(billing_modes[n].name == value){
+
+						//reset address if type changed
+						if(customerInfo.modeType != billing_modes[n].type){
+							customerInfo.mappedAddress = "";
+						}
+
+						customerInfo.modeType = billing_modes[n].type;
+						break;
+					}
+					n++;
+				}
+
+				window.localStorage.customerData = JSON.stringify(customerInfo);
 				renderCart();
-				break;
+				renderCustomerInfo();
+				return '';
 			}
 			case "reference":{
 				customerInfo.reference = value;
@@ -350,6 +552,29 @@ function changeCustomerInfo(type){
 		}
 
 	window.localStorage.customerData = JSON.stringify(customerInfo);
+	
+
+	console.log('customer info changed')
+}
+
+function setCustomerInfoTable(tableID){
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+	customerInfo.mappedAddress = tableID;
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+
+	pickTableForNewOrderHide();
+	renderCustomerInfo();
 }
 
 
@@ -495,44 +720,925 @@ function renderMenu(subtype){
 	    } else {
 	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
 	    }	
-
 	
+}
 
-	/*
-	else{
-		if(fs.existsSync('./data/static/mastermenu.json')) {
-	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
+
+
+
+/* Sample KOT */
+/*
+
+{
+	"KOTNumber": "KOT1001",
+	"orderDetails": {
+		"mode": "Dine In",
+		"modeType": "DINE",
+		"reference": ""
+	},
+	"table": "T3",
+	"customerName": "Abhijith",
+	"customerMobile": "9043960876",
+	"stewardName": "Maneesh",
+	"stewardCode": "9848010922",
+	"orderStatus": 1,
+	"date": "24-01-2018",
+	"timePunch": "2217",
+	"timeKOT": "2219",
+	"timeBill": "",
+	"timeSettle": "",
+	"cart": [{
+		"name": "Chicken Shawarma",
+		"code": "1086",
+		"qty": 1,
+		"isCustom": true,
+		"variant": "Paratha Roll",
+		"price": "75",
+		"comments": ""
+	}, {
+		"code": "1081",
+		"name": "Boneless BBQ Fish",
+		"qty": 1,
+		"isCustom": false,
+		"price": "220",
+		"comments": "Make it less spicy"
+	}],
+	"extras": [{
+		"name": "GST",
+		"value": 5,
+		"unit": "PERCENTAGE",
+		"amount": 15
+	}, {
+		"name": "Service Charge",
+		"value": 45,
+		"unit": "FIXED",
+		"amount": 45
+	}],
+	"discount": {
+		"amount": 35.4,
+		"type": "Staffs Guest",
+		"unit": "PERCENTAGE",
+		"value": "12"
+	},
+	"specialRemarks": "Allergic to Tomato"
+}
+
+*/
+
+function generateKOT(){
+
+	//Render Cart Items based on local storage
+	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+	if(cart_products.length == 0){
+		showToast('Empty Cart! Add items and try again', '#e74c3c');
+		return '';
+	}
+
+	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
+	
+	var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
+	var selectedBillingModeInfo = '';
+	
+	var n = 0;
+	while(billing_modes[n]){
+		if(billing_modes[n].name == selectedBillingModeName){
+			selectedBillingModeInfo = billing_modes[n];
+			break;
+		}
+		n++;
+	}
+
+
+		if(fs.existsSync('./data/static/billingparameters.json')) {
+	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
 	    if (err){
-	        console.log(err);
+	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
 	    } else {
-	          var mastermenu = JSON.parse(data); 
 
-	          var wholeMenu = "";
-	          var subMenu = ""
-	          var itemsInSubMenu = "";
+	    		if(data == ''){ data = '[]'; }
 
-	         
-				for (var i=0; i<mastermenu.length; i++){
+	          	var params = JSON.parse(data);
 
-					subMenu = '<div class="items"><h1>'+mastermenu[i].category+'</h1>';
+	          	var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
+	          	var cartExtrasList = [];
 
-					itemsInSubMenu = '';
-					for(var j=0; j<mastermenu[i].items.length; j++){
-						var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
-						itemsInSubMenu = itemsInSubMenu + '<button onclick="additemtocart(\''+temp+'\')" type="button" id="p1" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><img src="https://spos.tecdiary.com/uploads/thumbs/213c9e007090ca3fc93889817ada3115.png" alt="Minion Banana" style="width: 100px; height: 100px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
-			
-					}
+	          	var n = 0;
+	          	var m = 0;
+	          	while(selectedModeExtrasList[n]){
+	          		m = 0;
+	          		while(params[m]){	  
+	          			if(selectedModeExtrasList[n] == params[m].name)        			
+	          				cartExtrasList.push(params[m])
+	          			
+	          			m++;
+	          		}
+	          		n++;
+	          	}
 
-					subMenu = subMenu + itemsInSubMenu +'</div>';
-					wholeMenu = wholeMenu + subMenu;
-				}
-				
-				document.getElementById("item-list").innerHTML = wholeMenu;
+	          	generateKOTAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)	          	
+
 		}
 		});
 	    } else {
-	      console.log("File Doesn\'t Exist.")
+	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
 	    }	
+}
+
+function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selectedModeExtras){
+	/*Process Figures*/
+	var subTotal = 0;
+
+	var n = 0;
+	while(cart_products[n]){
+		subTotal = subTotal + cart_products[n].qty * cart_products[n].price;
+		n++;
 	}
+
+		  /*Calculate Taxes and Other Charges*/ 
+          var otherCharges = [];        
+          var k = 0;
+
+          if(selectedModeExtras.length > 0){
+          	for(k = 0; k < selectedModeExtras.length; k++){
+
+          		var tempExtraTotal = 0;
+          		if(selectedModeExtras[k].value != 0){
+          			if(selectedModeExtras[k].unit == 'PERCENTAGE'){
+          				tempExtraTotal = selectedModeExtras[k].value * subTotal/100;
+          			}
+          			else if(selectedModeExtras[k].unit == 'FIXED'){
+          				tempExtraTotal = selectedModeExtras[k].value;
+          			}
+          		}
+
+          		tempExtraTotal = Math.round(tempExtraTotal * 100) / 100;
+
+          		otherCharges.push({
+			 		"name": selectedModeExtras[k].name,
+					"value": selectedModeExtras[k].value,
+					"unit": selectedModeExtras[k].unit,
+					"amount": tempExtraTotal
+          		})
+          	}
+          }
+
+
+    //Get customer info.
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		showToast('Customer Details missing', '#e74c3c');
+		return '';
+	}
+
+	if(customerInfo.mappedAddress == ''){
+		showToast('Table Number or Address missing', '#e74c3c');
+		return '';
+	}
+
+	/* customerInfo.json
+		{
+			"name": "Anas Jafry",
+			"mobile": "9884179675",
+			"mode": "VIP Guest",
+			"mappedAddress": "T3",
+			"reference": "Ref. to any other API (say booking number)"
+		}
 	*/
+
+	var stewName = '';
+	var stewCode = '9884169765';
+	var spremarks = '';
+
+	var orderMetaInfo = {};
+	orderMetaInfo.mode = customerInfo.mode;
+	orderMetaInfo.modeType = customerInfo.modeType;
+	orderMetaInfo.reference = customerInfo.reference;
+   
+      //Check if file exists
+
+      fs.readFile('./data/static/lastKOT.txt', 'utf8', function readFileCallback(err, data){
+       if (err){
+           showToast('System Error: Unable to read order related data. Please contact Accelerate Support.', '#e74c3c');
+       } else{
+          var num = parseInt(data) + 1;
+          var kot = 'KOT' + num;
+          var today = new Date();
+          var time;
+          var dd = today.getDate();
+          var mm = today.getMonth()+1; //January is 0!
+          var yyyy = today.getFullYear();
+          var hour = today.getHours();
+          var mins = today.getMinutes();
+
+          if(dd<10) {
+              dd = '0'+dd;
+          } 
+
+          if(mm<10) {
+              mm = '0'+mm;
+          } 
+
+          if(hour<10) {
+              hour = '0'+hour;
+          } 
+
+          if(mins<10) {
+              mins = '0'+mins;
+          }
+
+          today = dd + '-' + mm + '-' + yyyy;
+          time = hour + '' + mins;
+
+          var obj = {}; 
+          obj.KOTNumber = kot;
+          obj.orderDetails = orderMetaInfo;
+          obj.table = customerInfo.mappedAddress;
+          obj.customerName = customerInfo.name;
+          obj.customerMobile = customerInfo.mobile; 
+          obj.stewardName = 'STEWARD NAME';
+          obj.stewardCode = 'STEWARD CODE';
+          obj.orderStatus = 1;
+          obj.date = today;
+          obj.timePunch = time;
+          obj.timeKOT = "";
+          obj.timeBill = "";
+          obj.timeSettle = "";
+          obj.cart = cart_products;
+          obj.specialRemarks = 'SPECIAL COMMENTS';
+          obj.extras = otherCharges,
+          obj.discount = {}
+
+          var json = JSON.stringify(obj); //convert it back to json
+          var file = './data/KOT/'+kot+'.json';
+          fs.writeFile(file, json, 'utf8', (err) => {
+              if(err){
+				showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
+              }
+              else{
+              	showToast('#'+kot+' generated Successfully', '#27ae60');
+              	if(orderMetaInfo.modeType == 'DINE'){
+              		addToTableMapping(obj.table, kot, obj.customerName);
+              	}
+              	else if(orderMetaInfo.modeType == 'TOKEN'){
+              		/*Increment Token Counter*/
+              		var tempToken = window.localStorage.lastPrintedToken;
+              		if(!tempToken || tempToken == ''){
+              			tempToken = 1;
+              		}
+              		window.localStorage.lastPrintedToken = parseInt(tempToken) + 1;
+              		clearAllMetaData();
+              		renderCustomerInfo();
+              		renderCart();
+              		$("#add_item_by_search").focus();
+              	}
+              }
+              	 
+           });
+
+
+          fs.writeFile("./data/static/lastKOT.txt", num, 'utf8', (err) => {
+              if(err)
+                 showToast('System Error: Unable to modify order related data. Please contact Accelerate Support.', '#e74c3c');
+           });
+       }
+       });
+}
+
+function clearAllMetaData(){
+	//to remove cart info, customer info
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+
+	customerInfo.name = "";
+	customerInfo.mobile ="";
+	customerInfo.mappedAddress = "";
+	customerInfo.reference = "";
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+	window.localStorage.zaitoon_cart = '';
+}
+
+function addToTableMapping(tableID, kotID, assignedTo){
+
+
+          var today = new Date();
+          var hour = today.getHours();
+          var mins = today.getMinutes();
+
+          if(hour<10) {
+              hour = '0'+hour;
+          } 
+
+          if(mins<10) {
+              mins = '0'+mins;
+          }
+
+		if(fs.existsSync('./data/static/tablemapping.json')) {
+	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        showToast('System Error: Unable to map KOT and Table. Please contact Accelerate Support.', '#e74c3c');
+	    } else {
+	    	if(data == ''){ data = '[]'; }
+	          var tableMapping = JSON.parse(data); 
+
+	          var isUpdated = false;
+
+	          for(var i=0; i<tableMapping.length; i++){
+	          	if(tableMapping[i].table == tableID){
+
+	          		isUpdated = true;
+
+	          		if(tableMapping[i].status != 0 && tableMapping[i].status != 5){
+						showToast('Warning: Table #'+tableID+' was not free. But Order is punched.', '#e67e22');
+	          		}
+	          		else{
+	          			tableMapping[i].status = 1;
+	          			tableMapping[i].assigned = assignedTo;
+	          			tableMapping[i].KOT = kotID;
+	          			tableMapping[i].lastUpdate = hour+''+mins;
+	          		}
+
+	          	}
+	          }
+
+	          if(!isUpdated){
+	          	tableMapping.push({ "table": tableID, "assigned": assignedTo, "KOT": kotID, "status": 1, "lastUpdate": hour+''+mins });
+		      }
+
+		       var newjson = JSON.stringify(tableMapping);
+		       fs.writeFile('./data/static/tablemapping.json', newjson, 'utf8', (err) => {
+		         if(err){
+		            showToast('System Error: Unable to map KOT and Table. Please contact Accelerate Support.', '#e74c3c');
+		           }
+		       }); 
+
+		}
+		});
+	    } else {
+	      showToast('System Error: Unable to map KOT and Table. Please contact Accelerate Support.', '#e74c3c');
+	    }
+
+
+}
+
+
+function getTableLiveStatus(tableID){
+	/*returns table occupancy data*/
+	if(!window.localStorage.tableMappingData){
+		return '';
+	}
+
+	var tableMapData = JSON.parse(window.localStorage.tableMappingData);
+
+	var n = 0;
+	while(tableMapData[n]){
+		if(tableMapData[n].table == tableID){
+			return tableMapData[n];
+		}
+		n++;
+	}
+
+	return '';
+}
+
+function pickTableForNewOrder(currentTableID){
+
+			//PRELOAD TABLE MAPPING
+		    if(fs.existsSync('./data/static/tablemapping.json')) {
+		        fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
+		      if (err){
+		      } else {
+
+		          	if(data == ''){ data = '[]'; }
+
+		              var tableMapping = JSON.parse(data);
+		              tableMapping.sort(); //alphabetical sorting 
+		              window.localStorage.tableMappingData = JSON.stringify(tableMapping);
+
+		              //PRELOAD TABLES
+		    
+						  if(fs.existsSync('./data/static/tables.json')) {
+					        fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
+					      if (err){
+					          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+					      } else {
+
+					          if(data == ''){ data = '[]'; }
+
+					              var tables = JSON.parse(data);
+					              tables.sort(); //alphabetical sorting 
+
+
+					             //PRELOAD TABLE SECTIONS
+							    if(fs.existsSync('./data/static/tablesections.json')) {
+							        fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
+							      if (err){
+							          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+							      } else {
+
+							          if(data == ''){ data = '[]'; }
+
+							              var tableSections = JSON.parse(data);
+							              tableSections.sort(); //alphabetical sorting 
+
+							              
+
+							            if(0){
+
+							            	
+							              
+							            }
+							            else{
+							              var renderSectionArea = '';
+
+							              var n = 0;
+							              while(tableSections[n]){
+							        
+							              	var renderTableArea = ''
+							              	for(var i = 0; i<tables.length; i++){
+							              		if(tables[i].type == tableSections[n]){
+
+							              			var tableOccupancyData = getTableLiveStatus(tables[i].name);
+
+							              			if(tableOccupancyData){ /*Occuppied*/
+														if(tableOccupancyData.status == 1 || tableOccupancyData.status == 2){
+							              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo">Occuppied</tag>'+
+																				        	'</tag>';	
+														}									
+														else if(tableOccupancyData.status == 5){
+															if(currentTableID != '' && currentTableID == tables[i].name){
+								              				renderTableArea = renderTableArea + '<tag class="tableTileBlue" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
+																					            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																					            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
+																					            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
+																					        	'</tag>';	
+															}	
+															else{
+								              				renderTableArea = renderTableArea + '<tag class="tableReserved" onclick="setCustomerInfoTable(\''+tables[i].name+'\')">'+
+																					            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																					            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ""? "For "+tableOccupancyData.assigned : "-")+'</tag>'+
+																					            '<tag class="tableInfo">Reserved</tag>'+
+																					        	'</tag>';	
+															}
+
+														}									
+														else{
+							              				renderTableArea = renderTableArea + '<tag class="tableTileRedDisable">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo">Occuppied</tag>'+
+																				        	'</tag>';											
+														}
+
+
+							              			}
+							              			else{
+
+							              				if(currentTableID != '' && currentTableID == tables[i].name){
+							              					renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileBlue">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo" style="color: #FFF"><i class="fa fa-check"></i></tag>'+
+																				        	'</tag>';
+														}	
+														else{
+															renderTableArea = renderTableArea + '<tag onclick="setCustomerInfoTable(\''+tables[i].name+'\')" class="tableTileGreen">'+
+																				            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
+																				            '<tag class="tableCapacity">'+tables[i].capacity+' Seater</tag>'+
+																				            '<tag class="tableInfo">Free</tag>'+
+																				        	'</tag>';
+														}							        	              				
+							              			}
+
+							              		}
+							              	}
+
+							              	renderSectionArea = renderSectionArea + '<div class="row" style="margin-top: 25px">'+
+																	   '<h1 class="seatingPlanHead">'+tableSections[n]+'</h1>'+
+																	   '<div class="col-lg-12" style="text-align: center;">'+renderTableArea+
+																	    '</div>'+
+																	'</div>'
+
+							              	n++;
+							              }
+							              
+							              document.getElementById("pickTableForNewOrderModalContent").innerHTML = renderSectionArea;		            	
+							              document.getElementById("pickTableForNewOrderModal").style.display = 'block';	
+							            }
+							    }
+							    });
+							      } else {
+							        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+							      } 
+
+					    }
+					    });
+					      } else {
+					        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
+					      } 
+
+
+		    }
+		    });
+		     }
+}
+
+
+function pickTableForNewOrderHide(){
+	document.getElementById("pickTableForNewOrderModalContent").innerHTML = '';
+	document.getElementById("pickTableForNewOrderModal").style.display = 'none';
+}
+
+
+/*Set Delivery address*/
+function pickAddressForNewOrder(currentAddress){
+	document.getElementById("pickAddressForNewOrderModal").style.display = 'block';
+
+	if(currentAddress){
+		currentAddress = currentAddress.replace(/, /g, '\n');
+		document.getElementById("delivery_address_parcel").value = currentAddress;
+	}
+}
+
+function saveNewDeliveryAddress(){
+	var address = document.getElementById("delivery_address_parcel").value;
+	address = address.replace(/\n/g, ', ');
+	address = address.replace(/, ,/g, ','); /*TWEAK*/
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(address != ''){
+		customerInfo.mappedAddress = address;
+		window.localStorage.customerData = JSON.stringify(customerInfo);
+		pickAddressForNewOrderHide();
+		renderCustomerInfo();
+	}
+	else{
+		showToast('Warning: Delivery Address is empty', '#e67e22');                                 
+	}
+}
+
+function pickAddressForNewOrderHide(){
+	document.getElementById("pickAddressForNewOrderModal").style.display = 'none';
+}
+
+
+/*Set Token No.*/
+function setTokenManually(){
+	var lastToken = window.localStorage.lastPrintedToken;
+
+	if(!lastToken || lastToken == ''){
+		lastToken = 1;
+	}
+
+	document.getElementById("next_token_value_set").value = lastToken;
+	document.getElementById("setTokenOptionsModal").style.display = 'block';
+}
+
+function setTokenManuallyHide(){
+	document.getElementById("setTokenOptionsModal").style.display = 'none';
+}
+
+function setTokenManuallySave(){
+	var lastToken = window.localStorage.lastPrintedToken;
+
+	if(!lastToken || lastToken == ''){
+		lastToken = 1;
+	}
+
+	var token = document.getElementById("next_token_value_set").value;
+
+	if(token == ''){
+		token = 1;
+	}
+	else if(lastToken == token){
+		//do nothing
+	}
+	else{
+		//save new token
+		window.localStorage.lastPrintedToken = token;
+	}
+
+
+
+
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+	customerInfo.mappedAddress = token;
+
+	window.localStorage.customerData = JSON.stringify(customerInfo);
+
+	setTokenManuallyHide();
+	renderCustomerInfo();
+}
+
+function restartTokenManuallySave(){
+	window.localStorage.lastPrintedToken = 1;
+
+
+	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	
+	if(jQuery.isEmptyObject(customerInfo)){
+		customerInfo.name = "";
+		customerInfo.mobile = "";
+		customerInfo.mode = "";
+		customerInfo.modeType = "";
+		customerInfo.mappedAddress = "";
+		customerInfo.reference = "";
+	}
+
+	customerInfo.mappedAddress = 1;
+
+	setTokenManuallyHide();
+	renderCustomerInfo();
+}
+
+
+/*Add item-wise comments*/
+function addCommentToItem(itemCode, variant){
+
+	var text = document.getElementById("add_item_wise_comment").value;
+	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+
+	if(variant){
+		var n = 0;
+		while(cart_products[n]){
+			if(cart_products[n].code == itemCode && cart_products[n].variant == variant){
+				cart_products[n].comments = text;
+				break;
+			}
+			n++;
+		}	
+	}
+	else{
+		var n = 0;
+		while(cart_products[n]){
+			if(cart_products[n].code == itemCode){
+				cart_products[n].comments = text;
+				break;
+			}
+			n++;
+		}			
+	}
+
+	window.localStorage.zaitoon_cart = JSON.stringify(cart_products);
+	showToast('Comment saved successfully', '#27ae60');
+	hideItemWiseCommentModal();
+	renderCart();
+
+	$("#add_item_by_search").focus();
+}
+
+function openItemWiseCommentModal(itemCode, variant){
+
+		var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+		var commentsAdded = false; 
+		var variantTitle = '';
+		var itemTitle = '';
+
+		if(variant != ''){
+			var n = 0;
+			while(cart_products[n]){
+				if(cart_products[n].code == itemCode && cart_products[n].variant == variant){
+					itemTitle = cart_products[n].name;
+					if(cart_products[n].hasOwnProperty('comments')){
+						document.getElementById("add_item_wise_comment").value = cart_products[n].comments;
+					}
+					else{
+						document.getElementById("add_item_wise_comment").value = "";
+					}
+					
+					break;
+				}
+				n++;
+			}	
+
+			variantTitle = ' ('+variant+')'; /*TWEAK*/
+		}
+		else{
+			var n = 0;
+			while(cart_products[n]){
+				if(cart_products[n].code == itemCode){
+
+					itemTitle = cart_products[n].name;
+					if(cart_products[n].hasOwnProperty('comments')){
+						document.getElementById("add_item_wise_comment").value = cart_products[n].comments;
+					}
+					else{
+						document.getElementById("add_item_wise_comment").value = "";
+					}
+					
+					break;
+				}
+				n++;
+			}			
+		}
+
+		if(fs.existsSync('./data/static/savedcomments.json')) {
+	      fs.readFile('./data/static/savedcomments.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	        
+	    } else {
+
+	    		if(data == ''){ data = '[]'; }
+
+	          	var modes = JSON.parse(data);
+	          	modes.sort(); //alphabetical sorting 
+	          	var modesTag = '';
+
+				for (var i=0; i<modes.length; i++){
+					modesTag = modesTag + '<button type="button" style="margin-right: 5px" class="btn btn-outline" onclick="addFromSuggestions(\''+modes[i]+'\')">'+modes[i]+'</button>';
+        		}
+
+				if(!modesTag)
+					document.getElementById("savedCommentsSuggestions").innerHTML = '';
+				else
+					document.getElementById("savedCommentsSuggestions").innerHTML = modesTag;
+		}
+		});
+	    }
+
+
+	    document.getElementById("itemWiseCommentsModal").style.display = 'block';
+	    document.getElementById("itemWiseCommentsModalTitle").innerHTML = "Comments for <b>"+itemTitle+"</b>"+variantTitle;
+	    document.getElementById("itemWiseCommentsModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="hideItemWiseCommentModal()" style="float: left">Cancel</button>'+
+               									'<button id="itemWiseCommentsModalActions_SAVE" type="button" class="btn btn-success" onclick="addCommentToItem(\''+itemCode+'\', \''+variant+'\')" style="float: right">Save Comment</button>';
+
+        $("#add_item_wise_comment").focus();
+
+        var duplicateClick = false;
+        $('#add_item_wise_comment').keyup(function(e) {
+			if (e.which === 13) {
+				if(duplicateClick){
+					$('#itemWiseCommentsModalActions_SAVE').click();
+				}
+				else{
+					duplicateClick = true;
+				}
+			}
+        });
+}
+
+function addFromSuggestions(suggestion){
+	document.getElementById("add_item_wise_comment").value = suggestion;
+}
+
+function hideItemWiseCommentModal(){
+	document.getElementById("itemWiseCommentsModal").style.display = 'none';
+}
+
+
+
+
+function initOrderPunch(){
+		//Focus on to "Add item"
+		$("#add_item_by_search").focus();
+
+		/*Remove suggestions if focus out*/ /*TWEAK*/
+		$("#add_item_by_search").focusout(function(){
+			setTimeout(function(){ 
+				$('#searchResultsRenderArea').html('');
+			}, 300);	 /*delay added for the focusout to understand if modal is opened*/
+		});
+}
+
+
+
+/*Auto Suggetion - MENU*/
+function initMenuSuggestion(){
+
+		if(fs.existsSync('./data/static/mastermenu.json')) {
+	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	    	return '';
+	        
+	    } else {
+	          	
+	          	var mastermenu = JSON.parse(data);
+
+				    /*Select on Arrow Up/Down */
+					var li = $('#searchResultsRenderArea li');
+
+					var liSelected = undefined;
+
+				$('#add_item_by_search').keyup(function(e) {
+
+
+
+				    if (e.which === 40 || e.which === 38) {
+				        /*
+				        	Skip Search if the Up-Arrow or Down-Arrow
+							is pressed inside the Search Input
+				        */ 
+
+
+					    if(e.which === 40){ 
+					        if(liSelected){
+					            liSelected.removeClass('selected');
+					            next = liSelected.next();
+					            if(next.length > 0){
+					                liSelected = next.addClass('selected');
+					            }else{
+					                liSelected = li.eq(0).addClass('selected');
+					            }
+					        }else{
+					            liSelected = li.eq(0).addClass('selected');
+					        }
+					    }else if(e.which === 38){
+					        if(liSelected){
+					            liSelected.removeClass('selected');
+					            next = liSelected.prev();
+					            if(next.length > 0){
+					                liSelected = next.addClass('selected');
+					            }else{
+					                liSelected = li.last().addClass('selected');
+					            }
+					        }else{
+					            liSelected = li.last().addClass('selected');
+					        }
+					    }
+
+
+				    }
+				    else if (e.which === 13) {
+				        /*
+				        	Add Item if the Enter Key
+							is pressed inside the Search Input
+				        */ 
+
+				        $("#searchResultsRenderArea li").each(function(){
+					        if($(this).hasClass("selected")){
+					        	$(this).click();
+					        }
+					    });
+
+				    }
+				    else{
+
+				    	liSelected = undefined
+
+					    var searchField = $(this).val();
+					    if (searchField === '') {
+					        $('#searchResultsRenderArea').html('');
+					        return;
+					    }
+
+					    var regex = new RegExp(searchField, "i");
+					    var renderContent = '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" style="display: block; top: 0; left: 0; min-width: 320px; position: relative; max-height: 420px !important; overflow: scroll">';
+					    var count = 0;
+					    var tabIndex = 1;
+					    var itemsList = '';
+
+					    $.each(mastermenu, function(key_1, subMenu) {
+					    	
+					    	itemsList = '';
+					    	count = 0;
+					    	$.each(subMenu.items, function(key_2, items) {
+
+						        if ((items.name.search(regex) != -1)) {
+						        	tabIndex = -1;
+						  			itemsList += '<li class="ui-menu-item" onclick="additemtocart(\''+encodeURI(JSON.stringify(items))+'\', \'SUGGESTION\')" tabindex="'+tabIndex+'">'+items.name+' (<i class="fa fa-inr"></i>'+items.price+')</li>'
+						            count++;
+						            tabIndex++;
+						        }
+						           		
+
+					    	 });
+
+					    	if(count > 0){
+					    		renderContent += '<label class="menuSuggestionSubMenu">'+subMenu.category+'</label>'+itemsList;
+					    	}
+
+					    });
+
+					    renderContent += '</ul>';
+
+					    $('#searchResultsRenderArea').html(renderContent);
+
+					    //Refresh dropdown list
+					    li = $('#searchResultsRenderArea li');
+					}
+
+				});
+
+
+
+
+		}
+		});
+	    } else {
+	      return '';
+	    }		
+
 }
