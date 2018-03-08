@@ -38,24 +38,39 @@ function doLogin(){
 
 	$.ajax({
 		type: 'POST',
-		url: 'https://www.zaitoon.online/services/adminlogin.php',
+		url: 'https://www.zaitoon.online/services/posserverlogin.php',
 		data: JSON.stringify(data),
 		contentType: "application/json",
 		dataType: 'json',
-		success: function(data) {
-			if(data.status){
-				window.localStorage.loggedInAdmin = data.response;
-				showToast('Succesfully logged in to '+data.branch, '#27ae60');
+	    timeout: 10000,
+	    success: function(data) {
+	      if(data.status){
+
+	        var userInfo = {};
+	        userInfo.name = data.user;
+	        userInfo.mobile = data.mobile;
+	        userInfo.branch = data.branch;
+	        userInfo.branchCode = data.branchCode;
+
+	        window.localStorage.loggedInAdminData = JSON.stringify(userInfo);
+
+	        window.localStorage.loggedInAdmin = data.response;
+	        showToast('Succesfully logged in to '+data.branch, '#27ae60');
+				
 				hideLoginModal();
 				renderDefaults();
 				renderServerConnectionStatus(); 
-			}
-			else
-			{
-				showToast(data.error, '#e74c3c');
-			}
+	      }
+	      else
+	      {
+	        showToast(data.error, '#e74c3c');
+	      }
 
-		}
+	    },
+	    error: function(data){
+	      showToast('Server not responding. Check your connection.', '#e74c3c');
+	    }
+
 	});		
 
 }

@@ -30,7 +30,27 @@
 </head>
 
 <body class="skin-green sidebar-mini pos sidebar-collapse" id="mainAppBody">
-    <div class="wrapper rtl rtl-inv">
+
+    <!-- LOADER -->
+    <!--<div id="preloader"></div> -->
+
+
+    <!-- SCREEN INACTIVITY -->
+    <div id="inactivity" style="display: none">
+        <div class="track">
+          <div class="albumArt left">
+            <img src="https://zaitoon.online/login/images/avatar.jpg" style="width: inherit; border-radius: 5px">
+        </div>
+          <div class="trackInfo left">
+            <h4 style="color: #FFF; font-size: 32px; margin-left: 10px; font-family: 'Roboto';">Zaitoon <b>IIT Madras</b></h4>
+            <p style="margin: 0; margin-left: 10px; font-size: 20px; color: #e4e4e4;">Logged in as <b>Sahadudheen</b></p>
+            <p style="margin: 0; margin-left: 10px; font-size: 14px; color: #e4e4e4;">Active <tag id="inactivityTimeLapsed">0 s</tag> ago</p>
+          </div>
+        </div>
+    </div> 
+
+
+        <div class="wrapper rtl rtl-inv">
         <header class="main-header">
             <a href="#" class="logo" onclick="activateSidebar()">
             <span class="logo-mini"><i class="fa fa-bars"></i></span>
@@ -107,6 +127,7 @@
         </aside>
 
         <div class="content-wrapper">
+
             <section class="content" id="appRenderArea">
 
             </section>

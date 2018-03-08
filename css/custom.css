@@ -2160,3 +2160,78 @@ ol ol {
     margin-bottom: 5px; 
 }
 
+/*preloader*/
+#preloader { 
+  position: fixed; left: 0; top: 0; 
+  z-index: 100001; width: 100%; height: 100%; 
+  overflow: visible; 
+  background: rgba(255, 0, 0, 0) url('https://zaitoon.online/assets/images/common/ripple.svg') no-repeat center center; 
+}
+
+/*inactivity screen*/
+#inactivity{
+   position: fixed; left: 0; top: 0; 
+  z-index: 100001; width: 100%; height: 100%; 
+  overflow: visible; 
+    background-image: url("https://zaitoon.online/login/images/pattern.jpg");
+    background-repeat: repeat;
+}
+
+
+.track {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    animation: trackAnimate 160s infinite;
+}
+
+.left {
+  float:left;
+}
+
+.albumArt {
+  background-color: #FFF;
+  height: 120px;
+  width: 120px;
+  margin-right:10px;
+  border-radius: 5px; 
+}
+
+
+@keyframes trackAnimate {
+  0% {
+     transform: translate(-100%, -100%);
+  }
+  10% {
+     transform: translate(100%, 100%);
+  }
+  20% {
+     transform: translate(-100%, 100%);
+  }
+  30% {
+     transform: translate(100%, -100%);
+  }
+  40% {
+     transform: translate(-100%, -100%);
+  }
+  50% {
+     transform: translate(100%, 100%);
+  }
+  60% {
+     transform: translate(100%, -100%);
+  }
+  70% {
+     transform: translate(-100%, 100%);
+  }
+  80% {
+     transform: translate(-100%, -100%);
+  }
+  90% {
+     transform: translate(100%, -100%);
+  }
+  100% {
+     transform: translate(100%, 100%);
+  }
+}
+
+

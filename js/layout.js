@@ -364,3 +364,38 @@ function getCurrentTime() {
 
 getCurrentTime();
 
+
+/*Track Inactivity*/
+var IDLE_TIMEOUT = 3; //seconds
+var idleSecondsCounter = 0;
+
+document.onclick = function() {
+    idleSecondsCounter = 0;
+};
+
+document.onmousemove = function() {
+    idleSecondsCounter = 0;
+};
+
+document.onkeypress = function() {
+    idleSecondsCounter = 0;
+};
+
+window.setInterval(CheckIdleTime, 1000);
+
+function CheckIdleTime() {
+    idleSecondsCounter++;
+    document.getElementById("inactivity").style.display = 'none';
+
+    if (idleSecondsCounter >= IDLE_TIMEOUT) {
+        document.getElementById("inactivityTimeLapsed").innerHTML = convertTimeLapsed(idleSecondsCounter);
+        document.getElementById("inactivity").style.display = 'block';
+    }
+}
+
+
+function convertTimeLapsed(seconds){
+  return seconds+'s';
+}
+
+
