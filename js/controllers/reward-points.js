@@ -59,6 +59,7 @@ function doLogin(){
 				
 				hideLoginModal();
 				renderDefaults();
+				initScreenSaver(); //Screensaver changes
 				renderServerConnectionStatus(); 
 	      }
 	      else

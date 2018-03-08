@@ -242,7 +242,7 @@ function checkLogin(){
   if(loggedInAdminInfo.name == '' || loggedInAdminInfo.branch == ''){ //Not logged in
     document.getElementById("loginModalHomeContent").innerHTML = '<section id="main" style="padding: 35px 44px 20px 44px">'+
                                    '<header>'+
-                                      '<span class="avatar"><img src="data/photos/logos/brand-square.jpg" alt=""></span>'+
+                                      '<span class="avatar"><img src="data/photos/brand/brand-square.jpg" alt=""></span>'+
                                       '<h1 style="font-size: 21px; font-family: \'Roboto\'; color: #3e5b6b;">Login to Cloud Server</h1>'+
                                    '</header>'+
                                    '<form style="margin: 0">'+
@@ -261,7 +261,7 @@ function checkLogin(){
 
     document.getElementById("loginModalHomeContent").innerHTML = '<section id="main" style="padding: 35px 44px 20px 44px">'+
                                    '<header>'+
-                                      '<span class="avatar"><img src="data/photos/logos/brand-square.jpg" alt=""></span>'+
+                                      '<span class="avatar"><img src="data/photos/brand/brand-square.jpg" alt=""></span>'+
                                       '<h1 style="font-size: 24px; margin-bottom: 0; color: #3e5b6b; font-family: \'Roboto\';">'+loggedInAdminInfo.branch+'</h1>'+
                                       '<p style="font-size: 14px; color: #72767d;">Logged In as <b>'+loggedInAdminInfo.name+'</b></p>'+
                                    '</header>'+
@@ -275,7 +275,78 @@ function checkLogin(){
   }
 }
 
-function doHomeLogin(optionalCallback){
+/*Recovery Login*/
+function recoveryLogin(){
+
+    showToast('Login to the Server and Prove your identity. We will reset your Screen Lock Code!', '#8e44ad')
+
+    document.getElementById("loginModalHomeContent").innerHTML = '<section id="main" style="padding: 35px 44px 20px 44px">'+
+                                   '<header>'+
+                                      '<span class="avatar"><img src="data/photos/brand/brand-square.jpg" alt=""></span>'+
+                                      '<h1 style="font-size: 21px; font-family: \'Roboto\'; color: #3e5b6b;">Login to the Server</h1>'+
+                                   '</header>'+
+                                   '<form style="margin: 0">'+
+                                    '<div class="row" style="margin: 15px 0">'+
+                                        '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Username" type="text" id="loginHome_server_username" value="" class="form-control loginWindowInput"> </div> </div>'+
+                                        '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Password" type="password" id="loginHome_server_password" value="" class="form-control loginWindowInput"> </div> </div>'+                     
+                                    '</div>'+
+                                    '<button type="button" onclick="performRecovryLogin()" class="btn btn-success loginWindowButton">Login</button>'+
+                                    '<button type="button" onclick="cancelLoginWindow()" class="btn btn-default loginWindowButton">Cancel</button>'+
+                                   '</form>'+
+                                '</section>';
+
+    document.getElementById("loginModalHome").style.display = 'block';
+}
+
+function performRecovryLogin(){
+
+  var username = document.getElementById("loginHome_server_username").value;
+  var password = document.getElementById("loginHome_server_password").value;
+
+  if(username == '' || password ==''){
+    showToast('Warning! Enter credentials correctly', '#e67e22');
+    return '';
+  }
+
+  var tempToken = '';
+  if(window.localStorage.loggedInAdmin && window.localStorage.loggedInAdmin != ''){
+    tempToken = window.localStorage.loggedInAdmin;
+  }
+
+  var data = {
+    "mobile": username,
+    "password": password,
+    "token": tempToken
+  }
+
+  $.ajax({
+    type: 'POST',
+    url: 'https://www.zaitoon.online/services/posserverrecoverylogin.php',
+    data: JSON.stringify(data),
+    contentType: "application/json",
+    dataType: 'json',
+    timeout: 10000,
+    success: function(data) {
+      if(data.status){
+        window.localStorage.appCustomSettings_InactivityToken = btoa('0000');
+        showToast('Screen Lock successfully reset to <b>0000</b>. Change it now.', '#27ae60');
+        initScreenSaver(); //Screensaver changes
+        cancelLoginWindow();
+      }
+      else
+      {
+        showToast(data.error, '#e74c3c');
+      }
+
+    },
+    error: function(data){
+      showToast('Server not responding. Check your connection.', '#e74c3c');
+    }
+
+  });  
+}
+
+function doHomeLogin(){
   var username = document.getElementById("loginHome_server_username").value;
   var password = document.getElementById("loginHome_server_password").value;
 
@@ -309,6 +380,7 @@ function doHomeLogin(optionalCallback){
 
         window.localStorage.loggedInAdmin = data.response;
         showToast('Succesfully logged in to '+data.branch, '#27ae60');
+        initScreenSaver(); //Screensaver changes
         cancelLoginWindow();
         renderServerConnectionStatus();
       }
@@ -330,6 +402,7 @@ function doHomeLogout(){
   window.localStorage.loggedInAdmin = '';
   window.localStorage.loggedInAdminData = '';
   showToast('You have been logged out from the Cloud Server', '#27ae60');
+  initScreenSaver(); //Screensaver changes
   cancelLoginWindow();
   renderServerConnectionStatus(); 
 }
@@ -366,7 +439,7 @@ getCurrentTime();
 
 
 /*Track Inactivity*/
-var IDLE_TIMEOUT = 3; //seconds
+var IDLE_TIMEOUT = 54000; //default time delay = 15mins
 var idleSecondsCounter = 0;
 
 document.onclick = function() {
@@ -381,21 +454,110 @@ document.onkeypress = function() {
     idleSecondsCounter = 0;
 };
 
-window.setInterval(CheckIdleTime, 1000);
 
-function CheckIdleTime() {
-    idleSecondsCounter++;
-    document.getElementById("inactivity").style.display = 'none';
+function initScreenSaver(){
+  console.log('Checking SAVER/LOCK:')
+  if(window.localStorage.appCustomSettings_InactivityEnabled && window.localStorage.appCustomSettings_InactivityEnabled != ''){
+    
+    if(window.localStorage.appCustomSettings_InactivityEnabled == 'LOCKSCREEN'){
+      //Lock Screen options
+          if(window.localStorage.appCustomSettings_InactivityScreenDelay && window.localStorage.appCustomSettings_InactivityScreenDelay != ''){
+            IDLE_TIMEOUT = window.localStorage.appCustomSettings_InactivityScreenDelay;
+          }
 
-    if (idleSecondsCounter >= IDLE_TIMEOUT) {
-        document.getElementById("inactivityTimeLapsed").innerHTML = convertTimeLapsed(idleSecondsCounter);
-        document.getElementById("inactivity").style.display = 'block';
+          window.setInterval(function() { CheckIdleTime('LOCKSCREEN'); }, 1000);      
+        
     }
+    else if(window.localStorage.appCustomSettings_InactivityEnabled == 'SCREENSAVER'){
+      //Screen Saver options
+          if(window.localStorage.appCustomSettings_InactivityScreenDelay && window.localStorage.appCustomSettings_InactivityScreenDelay != ''){
+            IDLE_TIMEOUT = window.localStorage.appCustomSettings_InactivityScreenDelay;
+          }
+
+          var loggedInAdminInfo = window.localStorage.loggedInAdminData ? JSON.parse(window.localStorage.loggedInAdminData): {};
+          if(loggedInAdminInfo.name && loggedInAdminInfo.name != ''){
+                document.getElementById("inactivityUserName").innerHTML = 'Logged in as <b>'+loggedInAdminInfo.name+'</b>';
+          }
+          if(loggedInAdminInfo.branch && loggedInAdminInfo.branch != ''){
+                document.getElementById("inactivityBranchName").innerHTML = '<b>'+loggedInAdminInfo.branch+'</b>';
+          }
+
+          window.setInterval(function() { CheckIdleTime('SCREENSAVER'); }, 1000);
+      
+    }
+
+  }
+}
+
+initScreenSaver();
+
+
+function CheckIdleTime(mode) {
+      idleSecondsCounter++;
+  
+      if(mode == 'SCREENSAVER'){
+        if (idleSecondsCounter >= IDLE_TIMEOUT) {
+          document.getElementById("inactivityTimeLapsed").innerHTML = convertTimeLapsed(idleSecondsCounter);
+          document.getElementById("inactivity").style.display = 'block';
+        }
+        else{
+          document.getElementById("inactivity").style.display = 'none';
+        }
+      }
+      else if(mode == 'LOCKSCREEN'){
+            if (idleSecondsCounter >= IDLE_TIMEOUT) {
+              document.getElementById("inactivityLock").style.display = 'block';
+            }
+      }
 }
 
 
 function convertTimeLapsed(seconds){
-  return seconds+'s';
+  if(seconds < 60){
+    return seconds+'s';
+  }
+  else if(seconds < 3600){
+    return parseInt(seconds/60)+'m '+(seconds%60)+'s';
+  }
+  else{
+    return parseInt(seconds/3600)+'h '+parseInt(parseInt(seconds%3600)/60)+'m '+((seconds%3600)%60)+'s';
+  }
 }
 
 
+/*Lock Screen*/
+$("#lockScreePasscode").keyup(function(){
+    if($(this).val().length == 4){
+      if(!validateScreenLockCode($(this).val()))//Wrong Passcode
+      {
+        $("#lockScreePasscode").css("background-color", "#fdb6c2");
+      }
+      else{
+        //Unlock Screen
+        $(this).val('');
+        document.getElementById("inactivityLock").style.display = 'none';
+      }
+    }
+    else{
+      $("#lockScreePasscode").css("background-color", "");
+    }
+    
+});
+
+
+function validateScreenLockCode(code){
+  var value = '';
+  if(window.localStorage.appCustomSettings_InactivityToken && window.localStorage.appCustomSettings_InactivityToken != ''){
+            value = atob(window.localStorage.appCustomSettings_InactivityToken);
+            if(value == code){ //Code matches
+              return true;
+            }
+            else{
+              return false;
+            }
+  }
+  else{
+    return false;
+  }  
+  
+}
