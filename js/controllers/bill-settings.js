@@ -375,6 +375,12 @@ function addDiscountType() {
     return '';
   }
 
+
+  if((paramObj.name).toUpperCase() == 'COUPON' || (paramObj.name).toUpperCase() == 'VOUCHER'){
+    showToast('Warning: Reserved Keyword. Please set different a name', '#e67e22');
+    return '';
+  }
+
       //Check if file exists
       if(fs.existsSync('./data/static/discounttypes.json')) {
          fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){

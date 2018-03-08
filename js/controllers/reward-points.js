@@ -48,6 +48,7 @@ function doLogin(){
 				showToast('Succesfully logged in to '+data.branch, '#27ae60');
 				hideLoginModal();
 				renderDefaults();
+				renderServerConnectionStatus(); 
 			}
 			else
 			{

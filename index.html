@@ -41,6 +41,7 @@
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li><a href="#"><i class="fa fa-clock-o"></i> <tag id="globalTimeDisplay"></tag></a></li>
+                        <li style="width: 165px !important; text-align: center" onclick="checkLogin()"><a href="#"><tag id="globalServerConnectionStatus">...</tag></a></li>
                         <li><a href="#" onclick="renderPage('live-orders', 'Live Orders')">Live Orders</a></li>
                         <li><a href="#" onclick="renderPage('sales-summary', 'Sales Summary')">Today's Sales</a></li>
                         <li class="dropdown user user-menu">
@@ -113,6 +114,25 @@
 
         <!-- INFO BAR - TOAST -->
         <div id="infobar"></div>   
+
+        
+        <!-- LOGIN MODAL -->
+        <div id="loginModalHome" class="modal">
+             <div class="modal-dialog" style="top: 20%; width: 27em !important;">
+                <!-- Modal content-->
+                <div class="modal-content" style="border-radius: 4px;" id="loginModalHomeContent">
+
+                </div>
+             </div>
+          </div>
+
+
+
+
+
+
+      
+
 
 
     </div>

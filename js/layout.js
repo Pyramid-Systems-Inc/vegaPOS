@@ -111,7 +111,232 @@ $(function () {
     jqKeyboard.init();
 });
 
+/* Server Connectivity */
+function pingServer(){
 
+      var admin_data = {
+        "token": window.localStorage.loggedInAdmin,
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: 'https://www.zaitoon.online/services/pospingserver.php',
+        data: JSON.stringify(admin_data),
+        contentType: "application/json",
+        dataType: 'json',
+        timeout: 2000,
+        success: function(data) {
+          if(data.status){
+            return true;
+          }
+          else
+          {
+            if(data.errorCode == 404){
+              window.localStorage.loggedInAdmin = "";
+              showToast(data.error, '#e74c3c');
+              return false;
+            }
+            return false;
+          }
+        },
+        error: function(data){
+          showToast('Failed to ping the Cloud Server. Please check your connection.', '#e74c3c');
+          return false;
+        }
+      });     
+}
+
+
+function renderServerConnectionStatus(){
+
+      var admin_data = {
+        "token": window.localStorage.loggedInAdmin,
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: 'https://www.zaitoon.online/services/pospingserver.php',
+        data: JSON.stringify(admin_data),
+        contentType: "application/json",
+        dataType: 'json',
+        timeout: 2000,
+        success: function(data) {
+          if(data.status){
+            document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatus"><i class="fa fa-circle"></i> Connected</tag>';
+          }
+          else
+          {
+            if(data.errorCode == 404){
+              window.localStorage.loggedInAdmin = "";
+              showToast(data.error, '#e74c3c');
+              document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatusRed"><i class="fa fa-circle"></i> Re-authenticate</tag>';
+            }
+            document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatusRed"><i class="fa fa-circle"></i> Re-authenticate</tag>';
+          }
+        },
+        error: function(data){
+          showToast('Failed to ping the Cloud Server. Please check your connection.', '#e74c3c');
+          document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatusRed"><i class="fa fa-exclamation-triangle"></i> Error in Connection</tag>';
+        }
+      });
+}
+
+
+
+function getServerConnectionStatus(){
+
+      var admin_data = {
+        "token": window.localStorage.loggedInAdmin,
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: 'https://www.zaitoon.online/services/pospingserver.php',
+        data: JSON.stringify(admin_data),
+        contentType: "application/json",
+        dataType: 'json',
+        timeout: 2000,
+        success: function(data) {
+          if(data.status){
+            document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatus"><i class="fa fa-circle"></i> Connected</tag>';
+          }
+          else
+          {
+            if(data.errorCode == 404){
+              window.localStorage.loggedInAdmin = "";
+              showToast(data.error, '#e74c3c');
+              document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatusRed"><i class="fa fa-circle"></i> Re-authenticate</tag>';
+            }
+            document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatusRed"><i class="fa fa-circle"></i> Re-authenticate</tag>';
+          }
+        },
+        error: function(data){
+          showToast('Failed to ping the Cloud Server. Please check your connection.', '#e74c3c');
+          document.getElementById('globalServerConnectionStatus').innerHTML = '<tag class="serverStatusRed"><i class="fa fa-exclamation-triangle"></i> Error in Connection</tag>';
+        }
+      });
+
+    //Repeat
+    var t = setTimeout(function() {
+      getServerConnectionStatus()
+    }, 300000);
+
+}
+
+getServerConnectionStatus();
+
+
+
+/*Check Login*/
+function checkLogin(){
+  var loggedInAdminInfo = window.localStorage.loggedInAdminData ? JSON.parse(window.localStorage.loggedInAdminData): {};
+  
+  if(jQuery.isEmptyObject(loggedInAdminInfo)){
+    loggedInAdminInfo.name = "";
+    loggedInAdminInfo.mobile = "";
+    loggedInAdminInfo.branch = "";
+    loggedInAdminInfo.branchCode = "";
+  }
+
+
+  if(loggedInAdminInfo.name == '' || loggedInAdminInfo.branch == ''){ //Not logged in
+    document.getElementById("loginModalHomeContent").innerHTML = '<section id="main" style="padding: 35px 44px 20px 44px">'+
+                                   '<header>'+
+                                      '<span class="avatar"><img src="data/photos/logos/brand-square.jpg" alt=""></span>'+
+                                      '<h1 style="font-size: 21px; font-family: \'Roboto\'; color: #3e5b6b;">Login to Cloud Server</h1>'+
+                                   '</header>'+
+                                   '<form style="margin: 0">'+
+                                    '<div class="row" style="margin: 15px 0">'+
+                                        '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Username" type="text" id="loginHome_server_username" value="" class="form-control loginWindowInput"> </div> </div>'+
+                                        '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Password" type="password" id="loginHome_server_password" value="" class="form-control loginWindowInput"> </div> </div>'+                     
+                                    '</div>'+
+                                    '<button type="button" onclick="doHomeLogin()" class="btn btn-success loginWindowButton">Login</button>'+
+                                    '<button type="button" onclick="cancelLoginWindow()" class="btn btn-default loginWindowButton">Cancel</button>'+
+                                   '</form>'+
+                                '</section>';
+
+    document.getElementById("loginModalHome").style.display = 'block';
+  }
+  else{ //logged in
+
+    document.getElementById("loginModalHomeContent").innerHTML = '<section id="main" style="padding: 35px 44px 20px 44px">'+
+                                   '<header>'+
+                                      '<span class="avatar"><img src="data/photos/logos/brand-square.jpg" alt=""></span>'+
+                                      '<h1 style="font-size: 24px; margin-bottom: 0; color: #3e5b6b; font-family: \'Roboto\';">'+loggedInAdminInfo.branch+'</h1>'+
+                                      '<p style="font-size: 14px; color: #72767d;">Logged In as <b>'+loggedInAdminInfo.name+'</b></p>'+
+                                   '</header>'+
+                                   '<form style="margin: 15px 0">'+
+                                    '<button type="button" onclick="doHomeLogout()" class="btn btn-danger loginWindowButton">Logout Now</button>'+
+                                    '<button type="button" onclick="cancelLoginWindow()" class="btn btn-default loginWindowButton">Cancel</button>'+
+                                   '</form>'+
+                                '</section>';
+
+    document.getElementById("loginModalHome").style.display = 'block';
+  }
+}
+
+function doHomeLogin(optionalCallback){
+  var username = document.getElementById("loginHome_server_username").value;
+  var password = document.getElementById("loginHome_server_password").value;
+
+  if(username == '' || password ==''){
+    showToast('Warning! Enter credentials correctly', '#e67e22');
+    return '';
+  }
+
+  var data = {
+    "mobile": username,
+    "password": password
+  }
+
+  $.ajax({
+    type: 'POST',
+    url: 'https://www.zaitoon.online/services/posserverlogin.php',
+    data: JSON.stringify(data),
+    contentType: "application/json",
+    dataType: 'json',
+    timeout: 10000,
+    success: function(data) {
+      if(data.status){
+
+        var userInfo = {};
+        userInfo.name = data.user;
+        userInfo.mobile = data.mobile;
+        userInfo.branch = data.branch;
+        userInfo.branchCode = data.branchCode;
+
+        window.localStorage.loggedInAdminData = JSON.stringify(userInfo);
+
+        window.localStorage.loggedInAdmin = data.response;
+        showToast('Succesfully logged in to '+data.branch, '#27ae60');
+        cancelLoginWindow();
+        renderServerConnectionStatus();
+      }
+      else
+      {
+        showToast(data.error, '#e74c3c');
+      }
+
+    },
+    error: function(data){
+      showToast('Server not responding. Check your connection.', '#e74c3c');
+    }
+
+  });   
+
+}
+
+function doHomeLogout(){
+  window.localStorage.loggedInAdmin = '';
+  window.localStorage.loggedInAdminData = '';
+  showToast('You have been logged out from the Cloud Server', '#27ae60');
+  cancelLoginWindow();
+  renderServerConnectionStatus(); 
+}
+
+function cancelLoginWindow(){
+  document.getElementById("loginModalHome").style.display = 'none';
+}
 
 /* Time Display */
 
@@ -132,7 +357,7 @@ function getCurrentTime() {
   m = checkTime(m);
   s = checkTime(s);
   document.getElementById('globalTimeDisplay').innerHTML = h + ":" + m + ":" + s;
-  t = setTimeout(function() {
+  var t = setTimeout(function() {
     getCurrentTime()
   }, 500);
 }

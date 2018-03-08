@@ -89,10 +89,9 @@ function hideCustomiseItem(){
 }
 
 function deleteItem(item, isCustom, variant){
+
 	var itemCode = JSON.parse(decodeURI(item))
 	var cart_products = JSON.parse(window.localStorage.zaitoon_cart)
-
-
 
 		if(isCustom == 'true'){
 
@@ -140,6 +139,10 @@ function changeqty(item, isCustom, variant){
 
 							if(cart_products[i].code == itemCode && cart_products[i].variant == variant){
 								var temp = document.getElementById("qty"+cart_products[i].code+cart_products[i].variant).value;
+								if(temp == '' || isNaN(temp) || temp == 0){
+									temp = 1;
+									break;
+								}
 								cart_products[i].qty = parseInt(temp);
 								break;
 							}
@@ -154,7 +157,12 @@ function changeqty(item, isCustom, variant){
 					while(i < cart_products.length){
 
 						if(cart_products[i].code == itemCode){
-							cart_products[i].qty = parseInt(document.getElementById("qty"+cart_products[i].code+cart_products[i].variant).value);
+							temp = document.getElementById("qty"+cart_products[i].code+cart_products[i].variant).value;
+								if(temp == '' || isNaN(temp) || temp == 0){
+									temp = 1;
+									break;
+								}
+							cart_products[i].qty = parseInt(temp);
 							break;
 						}
 				        i++;
