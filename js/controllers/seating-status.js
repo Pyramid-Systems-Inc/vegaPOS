@@ -43,7 +43,7 @@ function openOccuppiedSeatOptions(tableInfo){
 
 	if(tableData.status == 1){ /* Not Billed */
 		document.getElementById("occuppiedSeatOptionsModalContent").innerHTML = '<h1 class="tableOptionsHeader">Table <b>'+tableData.table+'</b></h1>'+
-                  '<button class="btn btn-success tableOptionsButton" onclick="editOrderKOT(\''+tableData.KOT+'\')">Edit KOT #'+tableData.KOT+'</button> '+
+                  '<button class="btn btn-success tableOptionsButton" onclick="editOrderKOT(\''+tableData.KOT+'\')">Edit Order #'+tableData.KOT+'</button> '+
                   '<button class="btn btn-success tableOptionsButton" onclick="generateBillFromKOT(\''+tableData.KOT+'\')">Generate Bill</button> '+
                   '<button class="btn btn-success tableOptionsButton" onclick="mergeDifferentBills(\''+tableData.table+'\')">Merge Orders and Generate Bill</button> '+
                   '<button class="btn btn-danger tableOptionsButton" onclick="cancelOrderKOT(\''+tableData.KOT+'\')">Cancel Order</button> '+ 
@@ -1126,6 +1126,7 @@ function renderCurrentPlan(mode, currentTableID){
 
 		              var renderSectionArea = '';
 		              
+		              var totalTablesToMerge = 0;
 
 		              var n = 0;
 		              while(tableSections[n]){
@@ -1140,6 +1141,9 @@ function renderCurrentPlan(mode, currentTableID){
 									if(tableOccupancyData.status == 1){
 
 										if(tables[i].name == currentTableID){
+
+											totalTablesToMerge++;
+
 											renderTableArea = renderTableArea + '<tag class="tableTileRed selected">'+
 																	            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
 																	            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
@@ -1147,6 +1151,9 @@ function renderCurrentPlan(mode, currentTableID){
 																	        	'</tag>';	
 										}
 										else{
+
+											totalTablesToMerge++;
+
 				              				renderTableArea = renderTableArea + '<tag id="holdMain_'+tables[i].name+'" onclick="addToHoldList(\''+tables[i].name+'\')" class="tableTileRed">'+
 																	            '<tag class="tableTitle">'+tables[i].name+'</tag>'+
 																	            '<tag class="tableCapacity">'+(tableOccupancyData.assigned != ''? tableOccupancyData.assigned: '-')+'</tag>'+
@@ -1199,6 +1206,13 @@ function renderCurrentPlan(mode, currentTableID){
 
 		              	n++;
 		              }
+
+		              if(totalTablesToMerge < 2){
+		              	showToast('Warning: Atleast two live orders need to perform Merge Operation', '#e67e22');
+		              	cancelBillMerge();
+		              	return '';
+		              }
+
 		              document.getElementById("fullSeatingRenderArea").innerHTML = renderSectionArea;
 
 		              document.getElementById("confirmationRenderArea").style.display = 'block';
