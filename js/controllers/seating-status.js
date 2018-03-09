@@ -10,8 +10,8 @@ Table Status
 /*Open/Close Options*/
 function openFreeSeatOptions(tableID){
 	document.getElementById("freeSeatOptionsModalContent").innerHTML = '<h1 class="tableOptionsHeader">Table <b>'+tableID+'</b></h1>'+
-                  '<button class="btn btn-success tableOptionsButton" onclick="punchNewOrder(\''+tableID+'\')">Punch New Order</button>'+ 
-                  '<button class="btn btn-success tableOptionsButton" onclick="addToReserveListConsent(\''+tableID+'\')">Reserve this Table</button>'+  
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="punchNewOrder(\''+tableID+'\')">Punch New Order</button>'+ 
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="addToReserveListConsent(\''+tableID+'\')">Reserve this Table</button>'+  
                   '<button class="btn btn-default tableOptionsButton" onclick="hideFreeSeatOptions()">Close</button>';
 	document.getElementById("freeSeatOptionsModal").style.display ='block';
 }
@@ -24,8 +24,8 @@ function hideFreeSeatOptions(){
 
 function openReservedSeatOptions(tableID){
 	document.getElementById("reservedSeatOptionsModalContent").innerHTML = '<h1 class="tableOptionsHeader">Reserved Table <b>'+tableID+'</b></h1>'+
-                  '<button class="btn btn-success tableOptionsButton" onclick="punchNewOrder(\''+tableID+'\')">Punch New Order</button>'+ 
-                  '<button class="btn btn-primary tableOptionsButton" onclick="removeFromReserveList(\''+tableID+'\')">Free this Table</button>'+  
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="punchNewOrder(\''+tableID+'\')">Punch New Order</button>'+ 
+                  '<button class="btn btn-primary tableOptionsButtonBig" onclick="removeFromReserveList(\''+tableID+'\')">Free this Table</button>'+  
                   '<button class="btn btn-default tableOptionsButton" onclick="hideReservedSeatOptions()">Close</button>';
 	document.getElementById("reservedSeatOptionsModal").style.display ='block';
 }
@@ -43,15 +43,15 @@ function openOccuppiedSeatOptions(tableInfo){
 
 	if(tableData.status == 1){ /* Not Billed */
 		document.getElementById("occuppiedSeatOptionsModalContent").innerHTML = '<h1 class="tableOptionsHeader">Table <b>'+tableData.table+'</b></h1>'+
-                  '<button class="btn btn-success tableOptionsButton" onclick="editOrderKOT(\''+tableData.KOT+'\')">Edit Order #'+tableData.KOT+'</button> '+
-                  '<button class="btn btn-success tableOptionsButton" onclick="generateBillFromKOT(\''+tableData.KOT+'\')">Generate Bill</button> '+
-                  '<button class="btn btn-success tableOptionsButton" onclick="mergeDifferentBills(\''+tableData.table+'\')">Merge Orders and Generate Bill</button> '+
-                  '<button class="btn btn-danger tableOptionsButton" onclick="cancelOrderKOT(\''+tableData.KOT+'\')">Cancel Order</button> '+ 
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="editOrderKOT(\''+tableData.KOT+'\')">Edit Order #'+tableData.KOT+'</button> '+
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="generateBillFromKOT(\''+tableData.KOT+'\')">Generate Bill</button> '+
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="mergeDifferentBills(\''+tableData.table+'\')">Merge Orders</button> '+
+                  '<button class="btn btn-danger tableOptionsButtonBig" onclick="cancelOrderKOT(\''+tableData.KOT+'\')">Cancel Order</button> '+ 
                   '<button class="btn btn-default tableOptionsButton" onclick="hideOccuppiedSeatOptions()">Close</button> ';
 	}
 	else if(tableData.status == 2){ /* Billed */
 		document.getElementById("occuppiedSeatOptionsModalContent").innerHTML = '<h1 class="tableOptionsHeader">Table <b>'+tableData.table+'</b></h1>'+
-                  '<button class="btn btn-success tableOptionsButton" onclick="settlePrintedBill(\''+tableData.KOT+'\')">Settle Bill</button> '+ 
+                  '<button class="btn btn-success tableOptionsButtonBig" onclick="settlePrintedBill(\''+tableData.KOT+'\')">Settle Bill</button> '+ 
                   '<button class="btn btn-default tableOptionsButton" onclick="hideOccuppiedSeatOptions()">Close</button> ';
 	}
 

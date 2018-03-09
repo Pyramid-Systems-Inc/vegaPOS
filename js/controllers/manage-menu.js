@@ -109,7 +109,7 @@ function markAvailability(code){
 					       var newjson = JSON.stringify(mastermenu);
 					       fs.writeFile('./data/static/mastermenu.json', newjson, 'utf8', (err) => {
 					         if(err){
-					            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
+					            showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
 					         }
 					         else{
 					         	return '';
