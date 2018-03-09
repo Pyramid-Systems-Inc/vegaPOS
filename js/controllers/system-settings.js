@@ -111,6 +111,12 @@ function renderSecurityOptions(){
           for (var i=0; i<params.length; i++){         
             if(params[i].name == "securityPasscodeProtection"){
               document.getElementById("securityPasscodeProtection").value = params[i].value;
+              if(document.getElementById("securityPasscodeProtection").value == 'YES'){
+                document.getElementById("passcodeActionsArea").style.display = 'table-row';
+              }
+              else{
+                document.getElementById("passcodeActionsArea").style.display = 'none';
+              }
             }                      
           }
 
