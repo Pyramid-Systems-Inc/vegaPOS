@@ -24,7 +24,7 @@
     <link rel="import" for="table-layout" href="views/table-layout.html">
     <link rel="import" for="bill-settings" href="views/bill-settings.html">
     <link rel="import" for="user-settings" href="views/user-settings.html">
-    <link rel="import" for="other-settings" href="views/other-settings.html">
+    <link rel="import" for="app-data" href="views/app-data.html">
     <link rel="import" for="system-settings" href="views/system-settings.html">
 
   
@@ -104,25 +104,29 @@
                     <li onclick="renderPage('live-orders', 'Live Orders')">
                      <a href="#"><i class="fa fa-retweet"></i> <span>Live Orders</span></a>
                   </li>
+                    <li onclick="renderPage('seating-status', 'Seating Status')">
+                        <a href="#"><i class="fa fa-th"></i> <span>Seating Status</span></a></li>                  
                     <li onclick="renderPage('online-orders', 'Online Orders')">
                      <a href="#"><i class="fa fa-globe"></i> <span>Online Orders</span></a></li>
-                    <li onclick="renderPage('settled-bills', 'Settled Bills')">
-                     <a href="#"><i class="fa fa-check"></i> <span>Settled Bills</span></a></li>
-                    <li onclick="renderPage('seating-status', 'Seating Status')">
-                        <a href="#"><i class="fa fa-th"></i> <span>Seating Status</span></a></li>
+
                     <li onclick="renderPage('reward-points', 'Reward Points')">
                         <a href="#"><i class="fa fa-gift"></i> <span>Reward Points</span></a></li>
-                    <li id="sidebarTools" class="treeview mm_products" onclick="activateSidebarElement('sidebarTools')">
+                    <li onclick="renderPage('settled-bills', 'Settled Bills')">
+                     <a href="#"><i class="fa fa-check"></i> <span>Settled Bills</span></a></li>
+
+                     <li id="sidebarTools" class="treeview mm_products" onclick="activateSidebarElement('sidebarTools')">
                         <a href="#">
                             <i class="fa fa-wrench"></i>
                             <span>Tools</span>
                             <i class="fa fa-angle-right pull-right"></i>
                             </a>
                         <ul class="treeview-menu">
-                            <li onclick="renderPage('sales-summary', 'Sales Summary')">
-                                <a href="#"><i class="fa fa-circle-o"></i> Sales Summary</a></li>
                             <li onclick="renderPage('manage-menu', 'Manage Menu')">
                                 <a href="#"><i class="fa fa-circle-o"></i> Manage Menu</a></li>
+
+                            <li onclick="renderPage('sales-summary', 'Sales Summary')">
+                                <a href="#"><i class="fa fa-circle-o"></i> Sales Summary</a></li>
+                            
                         </ul>
                     </li>
                     <li id="sidebarSettings" class="treeview mm_products" onclick="activateSidebarElement('sidebarSettings')">
@@ -132,16 +136,20 @@
                             <i class="fa fa-angle-right pull-right"></i>
                         </a>
                         <ul class="treeview-menu">
+                            <li onclick="renderPage('app-data', 'App Data')">
+                                <a href="#"><i class="fa fa-circle-o"></i> App Data</a></li>
+
+                            <li onclick="renderPage('bill-settings', 'Billing Settings')">
+                                <a href="#"><i class="fa fa-circle-o"></i> Billing Settings</a></li>                            
                             <li onclick="renderPage('table-layout', 'Table Layout')">
                                 <a href="#"><i class="fa fa-circle-o"></i> Table Layout</a></li>
-                            <li onclick="renderPage('bill-settings', 'Bill Settings')">
-                                <a href="#"><i class="fa fa-circle-o"></i> Bill Settings</a></li>
-                            <li onclick="renderPage('other-settings', 'Other Settings')">
-                                <a href="#"><i class="fa fa-circle-o"></i> Other Settings</a></li>
-                            <li onclick="renderPage('user-settings', 'User Settings')">
-                                <a href="#"><i class="fa fa-circle-o"></i> Users Settings</a></li>
+
                             <li onclick="renderPage('system-settings', 'System Settings')">
                                 <a href="#"><i class="fa fa-circle-o"></i> System Settings</a></li>
+
+
+                            <li onclick="renderPage('user-settings', 'Users Settings')">
+                                <a href="#"><i class="fa fa-circle-o"></i> Users Settings</a></li>                                
                         </ul>
                     </li>
                 </ul>
@@ -208,7 +216,7 @@
     <script type="text/javascript" src="js/controllers/table-layout.js"></script>
     <script type="text/javascript" src="js/controllers/bill-settings.js"></script>
     <script type="text/javascript" src="js/controllers/user-settings.js"></script>
-    <script type="text/javascript" src="js/controllers/other-settings.js"></script>
+    <script type="text/javascript" src="js/controllers/app-data.js"></script>
     <script type="text/javascript" src="js/controllers/system-settings.js"></script>
 
 
