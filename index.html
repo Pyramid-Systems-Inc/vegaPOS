@@ -25,6 +25,7 @@
     <link rel="import" for="bill-settings" href="views/bill-settings.html">
     <link rel="import" for="user-settings" href="views/user-settings.html">
     <link rel="import" for="other-settings" href="views/other-settings.html">
+    <link rel="import" for="system-settings" href="views/system-settings.html">
 
   
 </head>
@@ -135,10 +136,12 @@
                                 <a href="#"><i class="fa fa-circle-o"></i> Table Layout</a></li>
                             <li onclick="renderPage('bill-settings', 'Bill Settings')">
                                 <a href="#"><i class="fa fa-circle-o"></i> Bill Settings</a></li>
-                            <li onclick="renderPage('user-settings', 'User Settings')">
-                                <a href="#"><i class="fa fa-circle-o"></i> Users Settings</a></li>
                             <li onclick="renderPage('other-settings', 'Other Settings')">
                                 <a href="#"><i class="fa fa-circle-o"></i> Other Settings</a></li>
+                            <li onclick="renderPage('user-settings', 'User Settings')">
+                                <a href="#"><i class="fa fa-circle-o"></i> Users Settings</a></li>
+                            <li onclick="renderPage('system-settings', 'System Settings')">
+                                <a href="#"><i class="fa fa-circle-o"></i> System Settings</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -188,6 +191,8 @@
     <script src="lib/pouchdb.min.js"></script>
     <script src="lib/moment.min.js"></script>
     
+    <script type="text/javascript" src="js/sound.js"></script>
+
     <!-- All the common functions specific to the overall layout (Sidebar and Top Navigation bar)-->
     <script type="text/javascript" src="js/layout.js"></script>
 
@@ -204,6 +209,7 @@
     <script type="text/javascript" src="js/controllers/bill-settings.js"></script>
     <script type="text/javascript" src="js/controllers/user-settings.js"></script>
     <script type="text/javascript" src="js/controllers/other-settings.js"></script>
+    <script type="text/javascript" src="js/controllers/system-settings.js"></script>
 
 
     <!-- Navigator routes the pages based on clicks -->
