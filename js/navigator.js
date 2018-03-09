@@ -46,6 +46,10 @@ function fetchInitFunctions(pageReference){
 			fetchAllCategories();
 			break;
 		}	
+		case 'photos-manager':{
+			fetchAllCategoriesPhotos();
+			break;
+		}			
 		case 'table-layout':{
 			fetchAllTables()
 			fetchAllTableSections()
@@ -94,4 +98,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('seating-status', 'New Order');
+renderPage('new-order', 'New Order');

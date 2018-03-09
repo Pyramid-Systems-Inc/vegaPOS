@@ -1912,6 +1912,14 @@ ol ol {
   margin-bottom: 5px;
 }
 
+.tableOptionsButtonBig{
+  width: 100%;
+  font-size: 18px;
+  min-height: 60px;
+  margin-bottom: 5px;
+}
+
+
 .tableOptionsHeader{
       margin: 0 0 5px 0;
     font-size: 21px;
