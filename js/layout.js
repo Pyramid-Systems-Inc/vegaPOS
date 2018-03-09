@@ -118,7 +118,12 @@ function showToast(message, color){
         }
 		x.innerHTML = message;
 		x.className = "show";
-		setTimeout(function(){ x.className = x.className.replace("show", ""); }, 5000);   	
+		setTimeout(function(){ x.className = x.className.replace("show", ""); }, 5000); 
+
+    if(color == '#e74c3c'){ //Error
+      playNotificationSound('ERROR')
+    }
+
 }
 
 /* Virtual Keyboard */
@@ -459,19 +464,6 @@ var IDLE_TIMEOUT = 900; //default time delay = 15mins
 var idleSecondsCounter = 0;
 var refreshInterval;
 
-document.onclick = function() {
-    idleSecondsCounter = 0;
-};
-
-document.onmousemove = function() {
-    idleSecondsCounter = 0;
-};
-
-document.onkeypress = function() {
-    idleSecondsCounter = 0;
-};
-
-
 function initScreenSaver(){
 
   idleSecondsCounter = 0;
@@ -506,6 +498,18 @@ function initScreenSaver(){
       
     }
 
+    //Start Tracking Events
+      document.onclick = function() {
+          idleSecondsCounter = 0;
+      };
+
+      document.onmousemove = function() {
+          idleSecondsCounter = 0;
+      };
+
+      document.onkeypress = function() {
+          idleSecondsCounter = 0;
+      };
   }
 }
 

@@ -58,7 +58,7 @@ function fetchInitFunctions(pageReference){
 
 			break;
 		}	
-		case 'other-settings':{
+		case 'app-data':{
 
 			break;
 		}
@@ -94,4 +94,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('system-settings', 'New Order');
+renderPage('seating-status', 'New Order');

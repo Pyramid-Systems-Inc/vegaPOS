@@ -242,7 +242,7 @@ function generateBillFromKOT(kotID){
 
 
           var discountButtonPart = '';
-          if(kotfile.discount.amount && kotfile.discount.type != 'COUPON'){ /*Discount is Applied Already*/
+          if(kotfile.discount.amount && kotfile.discount.type != 'COUPON' && kotfile.discount.type != 'NOCOSTBILL' && kotfile.discount.type != 'VOUCHER'){ /*Discount is Applied Already*/
           	discountButtonPart ='                        <div class="">'+
 								'                          <button class="btn btn-danger tableOptionsButton" onclick="removeBillDiscountOnKOT(\''+kotfile.KOTNumber+'\')">Remove Discount</button>'+
 								'                        </div>';
@@ -305,6 +305,31 @@ function generateBillFromKOT(kotID){
           }
 
 
+          var noCostButtonPart = '';
+          if(kotfile.discount.amount && kotfile.discount.type == 'NOCOSTBILL'){ /*No Cost is Applied Already*/         	
+          	noCostButtonPart ='                        	 <div class="">'+
+								'                          <button class="btn btn-danger tableOptionsButton" onclick="removeNoCostBillOnKOT(\''+kotfile.KOTNumber+'\')">Remove No Cost Bill</button>'+
+								'                        </div>';
+          }   
+          else{       	
+          	noCostButtonPart ='                        <div class="" id="applyNoCostBillWindow">'+
+								'                          <div id="applyNoCostBillWindowActions" style="display: none">'+
+								'                             <div class="row">'+
+								'                                <div class="col-lg-12">'+
+								'                                   <div class="form-group" style="margin-bottom: 2px">'+
+								'                                    <label style="font-size: 10px; font-weight: 300">COMMENTS</label>'+
+								'                                      <input type="text" value="" placeholder="Comments" style="text-align: center; color: #444; margin-bottom: 5px; font-size: 14px;" class="form-control tip" id="applyNoCostBillWindow_comments" required="required" />'+
+								'                                   </div>'+
+								'                                </div>'+
+								'                                '+
+								'                             </div> '+
+								'                              <button class="btn btn-default tableOptionsButton" onclick="closeApplyNoCostBillWindow(\''+kotfile.KOTNumber+'\')">Cancel</button>                           '+
+								'                          </div>'+
+								'                          <div id="applyNoCostBillButtonWrap"><button class="btn btn-default tableOptionsButton" id="applyNoCostBillButton" onclick="openMarkNoCostBill(\''+kotfile.KOTNumber+'\')">No Cost Bill</button></div>'+
+								'                        </div>';
+          }
+
+
           document.getElementById("billPreviewContent").innerHTML = '<div class="row">'+
 								'                    <div class="col-sm-8">'+
 								'                        <h1 style="text-align: center; margin-top: 10px; font-size: 14px; text-transform: uppercase; font-weight: 400; color: #444">Bill Preview</h1>'+
@@ -356,10 +381,7 @@ function generateBillFromKOT(kotID){
 								'                        <h1 style="text-align: center; margin-top: 10px; font-size: 14px; text-transform: uppercase; font-weight: 400; color: #444">Options</h1>'+discountButtonPart+couponButtonPart+
 								'                        <div class="">'+
 								'                          <button class="btn btn-default tableOptionsButton" onclick="redeemPointsIfAny()">Redeem Points</button>'+
-								'                        </div>'+								
-								'                        <div class="">'+
-								'                          <button class="btn btn-default tableOptionsButton" onclick="markNoCostBill()">No Cost Bill</button>'+
-								'                        </div>'+
+								'                        </div>'+noCostButtonPart+
 								'                        <div class="">'+
 								'                          <button class="btn btn-default tableOptionsButton" onclick="mergeDifferentBills(\''+kotfile.table+'\')">Merge Bills</button>'+
 								'                        </div>'+
@@ -384,6 +406,10 @@ function openApplyBillCouponWindow(kotID){
 
 	/*Change apply button action*/
 	document.getElementById("applyBillCouponButtonWrap").innerHTML = '<button class="btn btn-success tableOptionsButton" id="applyBillCouponButton" onclick="applyBillCouponOnKOT(\''+kotID+'\')">Apply Discount</button>';
+
+	//minimize all other open windows
+	//closeApplyBillDiscountWindow(kotID);
+	//closeApplyNoCostBillWindow(kotID);
 
 	document.getElementById("applyBillCouponWindow").classList.add('billOptionWindowFrame');
 	document.getElementById("applyBillCouponWindowActions").style.display = 'block';
@@ -578,6 +604,12 @@ function openApplyBillDiscountWindow(kotID){
         showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
       } 
 
+
+	//minimize all other open windows
+	//closeApplyBillCouponWindow(kotID);
+	//closeApplyNoCostBillWindow(kotID);
+
+
 	document.getElementById("applyBillDiscountWindow").classList.add('billOptionWindowFrame');
 	document.getElementById("applyBillDiscountWindowActions").style.display = 'block';
 	document.getElementById("applyBillDiscountButton").classList.remove('btn-default');
@@ -720,6 +752,121 @@ function closeApplyBillDiscountWindow(kotID){
 	document.getElementById("applyBillDiscountButton").classList.remove('btn-success');
 	document.getElementById("applyBillDiscountButton").classList.add('btn-remove');
 }
+
+
+/* NO COST BILL */
+
+function openMarkNoCostBill(kotID){
+	/*Change apply button action*/
+	document.getElementById("applyNoCostBillButtonWrap").innerHTML = '<button class="btn btn-success tableOptionsButton" id="applyNoCostBillButton" onclick="markNoCostBill(\''+kotID+'\')">Confirm</button>';
+
+	//minimize all other open windows
+	//closeApplyBillCouponWindow(kotID);
+	//closeApplyBillDiscountWindow(kotID);
+
+	document.getElementById("applyNoCostBillWindow").classList.add('billOptionWindowFrame');
+	document.getElementById("applyNoCostBillWindowActions").style.display = 'block';
+	document.getElementById("applyNoCostBillButton").classList.remove('btn-default');
+	document.getElementById("applyNoCostBillButton").classList.add('btn-success');
+
+}
+
+function closeApplyNoCostBillWindow(kotID){
+	/*Change apply button action*/
+	document.getElementById("applyNoCostBillButtonWrap").innerHTML = '<button class="btn btn-default tableOptionsButton" id="applyNoCostBillButton" onclick="openMarkNoCostBill(\''+kotID+'\')">No Cost Bill</button>';
+
+	document.getElementById("applyNoCostBillWindow").classList.remove('billOptionWindowFrame');
+	document.getElementById("applyNoCostBillWindowActions").style.display = 'none';	
+
+	document.getElementById("applyNoCostBillButton").classList.remove('btn-success');
+	document.getElementById("applyNoCostBillButton").classList.add('btn-remove');
+
+}
+
+
+function markNoCostBill(kotID){ //APPLY FULL DISCOUNT
+
+	/*Read mentioned KOT - kotID*/
+   if(fs.existsSync('./data/KOT/'+kotID+'.json')) {
+      fs.readFile('./data/KOT/'+kotID+'.json', 'utf8', function readFileCallback(err, data){
+    if (err){
+        showToast('Error: Order was not found. Please contact Accelerate Support.', '#e74c3c');
+    } else {
+          var kotfile = JSON.parse(data);
+
+          /*Calculate Discount*/
+          var comments = document.getElementById("applyNoCostBillWindow_comments").value;
+
+          if(comments == ''){
+          	showToast('Warning: Add some comments why you are marking this order as No Cost Bill', '#e67e22');
+          	return '';
+          }
+
+          var grandSum = 0;
+
+          var n = 0;
+          while(kotfile.cart[n]){
+          	grandSum = grandSum + (kotfile.cart[n].price * kotfile.cart[n].qty);
+          	n++;
+          }
+
+          	var totalDiscount = grandSum;
+
+			kotfile.discount.amount = totalDiscount;
+			kotfile.discount.type = 'NOCOSTBILL';
+			kotfile.discount.unit = 'FIXED';
+			kotfile.discount.value = totalDiscount;
+			kotfile.discount.reference = comments;
+		       
+		       var newjson = JSON.stringify(kotfile);
+		       fs.writeFile('./data/KOT/'+kotID+'.json', newjson, 'utf8', (err) => {
+		         if(err){
+		            showToast('System Error: Unable to make changes. Please contact Accelerate Support.', '#e74c3c');
+		           }
+		           else{
+		           	showToast('Marked as No Cost Bill with a discount of <i class="fa fa-inr"></i>'+totalDiscount, '#27ae60');
+		        	generateBillFromKOT(kotID);
+		        	}
+		       }); 			
+
+	}});
+   } else {
+      showToast('Error: Order was not found. Please contact Accelerate Support.', '#e74c3c');
+   }  	
+}
+
+function removeNoCostBillOnKOT(kotID){
+	/*Read mentioned KOT - kotID*/
+   if(fs.existsSync('./data/KOT/'+kotID+'.json')) {
+      fs.readFile('./data/KOT/'+kotID+'.json', 'utf8', function readFileCallback(err, data){
+    if (err){
+        showToast('Error: Order was not found. Please contact Accelerate Support.', '#e74c3c');
+    } else {
+          var kotfile = JSON.parse(data);
+
+			if(kotfile.discount.amount){
+				kotfile.discount = {};
+			}
+		       
+		       var newjson = JSON.stringify(kotfile);
+		       fs.writeFile('./data/KOT/'+kotID+'.json', newjson, 'utf8', (err) => {
+		         if(err){
+		            showToast('System Error: Unable to make changes. Please contact Accelerate Support.', '#e74c3c');
+		           }
+		           else{
+		           	showToast('Removed No Cost Bill', '#27ae60');
+		           	generateBillFromKOT(kotID);
+
+		        	}
+		       }); 			
+
+	}});
+   } else {
+      showToast('Error: Order was not found. Please contact Accelerate Support.', '#e74c3c');
+   }  	
+
+}
+
 
 function hideBillPreviewModal(){
 	document.getElementById("billPreviewModal").style.display = 'none';
