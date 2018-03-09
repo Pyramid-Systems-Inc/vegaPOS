@@ -59,7 +59,18 @@ function applyPersonalisations(){
               
               /*update localstorage*/             
               window.localStorage.appCustomSettings_InactivityScreenDelay = tempVal;
-            }                       
+            } 
+            else if(params[i].name == "securityPasscodeProtection"){
+
+              var tempVal = params[i].value == 'YES'? true: false;
+
+              if(tempVal){
+                lockScreen();
+              }
+
+              /*update localstorage*/             
+              window.localStorage.appCustomSettings_PasscodeProtection = tempVal;
+            }                      
           }
 
     }
@@ -311,7 +322,7 @@ function recoveryLogin(){
                                         '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Username" type="text" id="loginHome_server_username" value="" class="form-control loginWindowInput"> </div> </div>'+
                                         '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Password" type="password" id="loginHome_server_password" value="" class="form-control loginWindowInput"> </div> </div>'+                     
                                     '</div>'+
-                                    '<button type="button" onclick="performRecovryLogin()" class="btn btn-success loginWindowButton">Login</button>'+
+                                    '<button type="button" onclick="performRecoveryLogin()" class="btn btn-success loginWindowButton">Login</button>'+
                                     '<button type="button" onclick="cancelLoginWindow()" class="btn btn-default loginWindowButton">Cancel</button>'+
                                    '</form>'+
                                 '</section>';
@@ -319,7 +330,7 @@ function recoveryLogin(){
     document.getElementById("loginModalHome").style.display = 'block';
 }
 
-function performRecovryLogin(){
+function performRecoveryLogin(){
 
   var username = document.getElementById("loginHome_server_username").value;
   var password = document.getElementById("loginHome_server_password").value;
@@ -473,11 +484,14 @@ function initScreenSaver(){
     
     if(window.localStorage.appCustomSettings_InactivityEnabled == 'LOCKSCREEN'){
       //Lock Screen options
+      /*IMPORTANT -- run only if Lock Code is set*/
+      if(window.localStorage.appCustomSettings_InactivityToken && window.localStorage.appCustomSettings_InactivityToken != ''){
           if(window.localStorage.appCustomSettings_InactivityScreenDelay && window.localStorage.appCustomSettings_InactivityScreenDelay != ''){
             IDLE_TIMEOUT = window.localStorage.appCustomSettings_InactivityScreenDelay;
           }
 
-          refreshInterval = window.setInterval(function() { CheckIdleTime('LOCKSCREEN'); }, 1000);      
+          refreshInterval = window.setInterval(function() { CheckIdleTime('LOCKSCREEN'); }, 1000);  
+      }    
         
     }
     else if(window.localStorage.appCustomSettings_InactivityEnabled == 'SCREENSAVER'){
@@ -586,4 +600,8 @@ function validateScreenLockCode(code){
     return false;
   }  
   
+}
+
+function lockScreen(){
+  document.getElementById("inactivityLock").style.display = 'block';
 }

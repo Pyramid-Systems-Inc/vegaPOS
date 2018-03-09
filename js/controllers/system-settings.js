@@ -16,7 +16,7 @@ function openSystemSettings(id){
       break;
     } 
     case "systemSecurity":{
- 
+      renderSecurityOptions();
       break;
     }  
     case "resetOptions":{
@@ -91,6 +91,38 @@ function renderPersonalisations(){
       }   
 }
 
+
+
+/*read security data*/
+function renderSecurityOptions(){
+
+    if(fs.existsSync('./data/static/personalisations.json')) {
+        fs.readFile('./data/static/personalisations.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          showToast('System Error: Unable to read Security Information. Please contact Accelerate Support.', '#e74c3c');
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var params = JSON.parse(data);
+
+ 
+          //Render
+          for (var i=0; i<params.length; i++){         
+            if(params[i].name == "securityPasscodeProtection"){
+              document.getElementById("securityPasscodeProtection").value = params[i].value;
+            }                      
+          }
+
+    }
+    });
+      } else {
+        showToast('System Error: Unable to read Security Information. Please contact Accelerate Support.', '#e74c3c');
+      }   
+}
+
+
+
 function changePersonalisationFile(type, changedValue){
 
     if(fs.existsSync('./data/static/personalisations.json')) {
@@ -115,6 +147,10 @@ function changePersonalisationFile(type, changedValue){
            fs.writeFile('./data/static/personalisations.json', newjson, 'utf8', (err) => {
              if(err){
                 showToast('System Error: Unable to save Personalisations data. Please contact Accelerate Support.', '#e74c3c');
+               }
+               else{
+                renderPersonalisations();
+                renderSecurityOptions();
                }
            }); 
 
@@ -183,8 +219,15 @@ function changePersonalisationLock(){
     document.getElementById("personalisationInactiveScreen_TimeOptions").style.display = 'table-row';
   }
   else if(optName == 'LOCKSCREEN'){
-    showToast('Screen will be Locked when the Screen is idle', '#27ae60');
-    document.getElementById("personalisationInactiveScreen_TimeOptions").style.display = 'table-row';
+    if(window.localStorage.appCustomSettings_InactivityToken && window.localStorage.appCustomSettings_InactivityToken != ''){
+      showToast('Screen will be Locked when the Screen is idle', '#27ae60');
+      document.getElementById("personalisationInactiveScreen_TimeOptions").style.display = 'table-row';
+    }
+    else{
+      showToast('Warning! Set the Screen Passcode before enabling this option', '#e67e22');
+      openSystemSettings('systemSecurity');
+      return '';
+    }
   }
   else{
     optName = '';
@@ -231,3 +274,225 @@ function changePersonalisationKeyboard(){
   changePersonalisationFile("virtualKeyboard", optName);
 }
 
+
+/*Security Options*/
+
+function changeSecurityPasscodeProtection(){
+  var optName = document.getElementById("securityPasscodeProtection").value == 'YES'? true: false;
+
+  //Disable --> Enable (Ask to set a code)
+  if(optName){
+    document.getElementById("setNewPassCodeModal").style.display = 'block';
+  }
+  else{ //Enable --> Disable (Ask to confirm the code)
+    document.getElementById("confirmCurrentPassCodeModal").style.display = 'block';
+  }
+}
+
+//To ENABLE
+function securityPasscodeProtectionSetCode(){
+
+  var newCode = document.getElementById("screenlock_passcode_new").value;
+  var confirmCode = document.getElementById("screenlock_passcode_confirm").value;
+
+  if(newCode == '' || confirmCode == '')
+  {
+    showToast('Warning! Confirm the passcodes', '#e67e22');
+    return '';
+  }
+
+  if(newCode.length != 4 || confirmCode.length != 4)
+  {
+    showToast('Warning! Passcode must be 4 characters long.', '#e67e22');
+    return '';
+  }
+
+  if(newCode == confirmCode){
+    showToast('Passcode Protection has been enabled', '#27ae60');
+    
+    //Update
+    window.localStorage.appCustomSettings_InactivityToken = btoa(newCode);
+    window.localStorage.appCustomSettings_PasscodeProtection = true;
+    changePersonalisationFile("securityPasscodeProtection", 'YES');  
+
+    securityPasscodeProtectionSetCodeHIDE();
+  }
+  else{
+    showToast('Failed! Codes doesn\'t match.', '#e74c3c');
+  }
+
+
+}
+
+function securityPasscodeProtectionSetCodeHIDE(){
+  document.getElementById("setNewPassCodeModal").style.display = 'none';
+  renderSecurityOptions();
+}
+
+//To DISABLE
+function securityPasscodeProtectionConfirmCode(){
+  var currentPassword = '';
+  if(window.localStorage.appCustomSettings_InactivityToken && window.localStorage.appCustomSettings_InactivityToken != ''){
+    currentPassword = atob(window.localStorage.appCustomSettings_InactivityToken)
+  }else{
+    showToast('Something went wrong. Try Passcode Reset Tool.', '#e74c3c');
+  }
+
+  var enteredPassword = document.getElementById("screenlock_passcode_old_confirm").value;
+
+  if(enteredPassword == currentPassword){
+    showToast('Passcode Protection has been disabled', '#27ae60');
+
+    //Update
+    window.localStorage.appCustomSettings_PasscodeProtection = false;
+    changePersonalisationFile("securityPasscodeProtection", 'NO'); 
+    window.localStorage.appCustomSettings_InactivityToken = '';
+
+    securityPasscodeProtectionConfirmCodeHIDE();
+
+    //Disable Lockscreen (Screensaver);
+    if(window.localStorage.appCustomSettings_InactivityEnabled == 'LOCKSCREEN'){
+      window.localStorage.appCustomSettings_InactivityEnabled = '';
+    }
+
+  }
+  else{
+    showToast('Failed! Incorrect code.', '#e74c3c');
+  } 
+
+
+}
+
+function securityPasscodeProtectionConfirmCodeHIDE(){
+  document.getElementById("confirmCurrentPassCodeModal").style.display = 'none';
+  renderSecurityOptions();
+}
+
+
+
+/*Change Passcode to New*/
+function changePasscodeToNew(){
+  document.getElementById("setChangePassCodeModal").style.display = 'block';
+}
+
+function setChangedPasscodeToNew(){
+  var code_original = document.getElementById("screenlock_passcode_original").value;
+  var code_one = document.getElementById("screenlock_passcode_new_1").value;
+  var code_two = document.getElementById("screenlock_passcode_new_2").value;
+
+  if(code_one.length != 4 || code_two.length != 4)
+  {
+    showToast('Warning! Passcode must be 4 characters long.', '#e67e22');
+    return '';
+  }
+
+
+  var currentPassword = '';
+  if(window.localStorage.appCustomSettings_InactivityToken && window.localStorage.appCustomSettings_InactivityToken != ''){
+    currentPassword = atob(window.localStorage.appCustomSettings_InactivityToken)
+  }else{
+    showToast('Something went wrong. Try Passcode Reset Tool.', '#e74c3c');
+  }  
+
+  if(code_one != code_two){
+    showToast('Failed! Codes doesn\'t match.', '#e74c3c');
+    
+
+  }
+  else if(code_original != currentPassword){
+    showToast('Failed! Current Passcode doesn\'t match.', '#e74c3c');
+  }
+  else{
+    showToast('New Passcode has been enabled', '#27ae60');
+
+    //Update
+    window.localStorage.appCustomSettings_InactivityToken = btoa(code_one);
+    window.localStorage.appCustomSettings_PasscodeProtection = true;
+    changePersonalisationFile("securityPasscodeProtection", 'YES');  
+
+    changePasscodeToNewHIDE();    
+  }
+}
+
+function changePasscodeToNewHIDE(){
+  document.getElementById("setChangePassCodeModal").style.display = 'none';
+  renderSecurityOptions();
+}
+
+
+
+/*Recovery*/
+function recoveryPasscodeLogin(){
+
+    showToast('Login to the Server and Prove your identity. We will reset your Screen Lock Code!', '#8e44ad')
+
+    document.getElementById("loginModalResetCodeContent").innerHTML = '<section id="main" style="padding: 35px 44px 20px 44px">'+
+                                   '<header>'+
+                                      '<span class="avatar"><img src="data/photos/brand/brand-square.jpg" alt=""></span>'+
+                                      '<h1 style="font-size: 21px; font-family: \'Roboto\'; color: #3e5b6b;">Login to the Server</h1>'+
+                                   '</header>'+
+                                   '<form style="margin: 0">'+
+                                    '<div class="row" style="margin: 15px 0">'+
+                                        '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Username" type="text" id="loginReset_server_username" value="" class="form-control loginWindowInput"> </div> </div>'+
+                                        '<div class="col-lg-12"> <div class="form-group"> <input placeholder="Password" type="password" id="loginReset_server_password" value="" class="form-control loginWindowInput"> </div> </div>'+                     
+                                    '</div>'+
+                                    '<button type="button" onclick="performRecoveryResetLogin()" class="btn btn-success loginWindowButton">Login</button>'+
+                                    '<button type="button" onclick="cancelLoginResetWindow()" class="btn btn-default loginWindowButton">Cancel</button>'+
+                                   '</form>'+
+                                '</section>';
+
+    document.getElementById("loginModalResetPasscode").style.display = 'block';
+}
+
+function cancelLoginResetWindow(){
+    document.getElementById("loginModalResetPasscode").style.display = 'none';
+}
+
+
+function performRecoveryResetLogin(){
+
+  var username = document.getElementById("loginReset_server_username").value;
+  var password = document.getElementById("loginReset_server_password").value;
+
+  if(username == '' || password ==''){
+    showToast('Warning! Enter credentials correctly', '#e67e22');
+    return '';
+  }
+
+  var tempToken = '';
+  if(window.localStorage.loggedInAdmin && window.localStorage.loggedInAdmin != ''){
+    tempToken = window.localStorage.loggedInAdmin;
+  }
+
+  var data = {
+    "mobile": username,
+    "password": password,
+    "token": tempToken
+  }
+
+  $.ajax({
+    type: 'POST',
+    url: 'https://www.zaitoon.online/services/posserverrecoverylogin.php',
+    data: JSON.stringify(data),
+    contentType: "application/json",
+    dataType: 'json',
+    timeout: 10000,
+    success: function(data) {
+      if(data.status){
+        window.localStorage.appCustomSettings_InactivityToken = btoa('0000');
+        showToast('Screen Lock successfully reset to <b>0000</b>. Change it now.', '#27ae60');
+        initScreenSaver(); //Screensaver changes
+        cancelLoginResetWindow();
+      }
+      else
+      {
+        showToast(data.error, '#e74c3c');
+      }
+
+    },
+    error: function(data){
+      showToast('Server not responding. Check your connection.', '#e74c3c');
+    }
+
+  });    
+}
