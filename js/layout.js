@@ -47,6 +47,19 @@ function applyPersonalisations(){
               /*update localstorage*/             
               window.localStorage.appCustomSettings_Keyboard = tempVal;
             }
+            else if(params[i].name == "screenLockOptions"){
+              var tempVal = params[i].value;
+              
+              /*update localstorage*/             
+              window.localStorage.appCustomSettings_InactivityEnabled = tempVal;
+            } 
+            else if(params[i].name == "screenLockDuration"){
+              var tempVal = params[i].value;
+              tempVal = parseInt(tempVal);
+              
+              /*update localstorage*/             
+              window.localStorage.appCustomSettings_InactivityScreenDelay = tempVal;
+            }                       
           }
 
     }
@@ -439,8 +452,9 @@ getCurrentTime();
 
 
 /*Track Inactivity*/
-var IDLE_TIMEOUT = 54000; //default time delay = 15mins
+var IDLE_TIMEOUT = 900; //default time delay = 15mins
 var idleSecondsCounter = 0;
+var refreshInterval;
 
 document.onclick = function() {
     idleSecondsCounter = 0;
@@ -456,7 +470,10 @@ document.onkeypress = function() {
 
 
 function initScreenSaver(){
-  console.log('Checking SAVER/LOCK:')
+
+  idleSecondsCounter = 0;
+  clearInterval(refreshInterval);
+
   if(window.localStorage.appCustomSettings_InactivityEnabled && window.localStorage.appCustomSettings_InactivityEnabled != ''){
     
     if(window.localStorage.appCustomSettings_InactivityEnabled == 'LOCKSCREEN'){
@@ -465,7 +482,7 @@ function initScreenSaver(){
             IDLE_TIMEOUT = window.localStorage.appCustomSettings_InactivityScreenDelay;
           }
 
-          window.setInterval(function() { CheckIdleTime('LOCKSCREEN'); }, 1000);      
+          refreshInterval = window.setInterval(function() { CheckIdleTime('LOCKSCREEN'); }, 1000);      
         
     }
     else if(window.localStorage.appCustomSettings_InactivityEnabled == 'SCREENSAVER'){
@@ -482,7 +499,7 @@ function initScreenSaver(){
                 document.getElementById("inactivityBranchName").innerHTML = '<b>'+loggedInAdminInfo.branch+'</b>';
           }
 
-          window.setInterval(function() { CheckIdleTime('SCREENSAVER'); }, 1000);
+          refreshInterval = window.setInterval(function() { CheckIdleTime('SCREENSAVER'); }, 1000);
       
     }
 
@@ -530,10 +547,12 @@ $("#lockScreePasscode").keyup(function(){
     if($(this).val().length == 4){
       if(!validateScreenLockCode($(this).val()))//Wrong Passcode
       {
+        playNotificationSound('ERROR');
         $("#lockScreePasscode").css("background-color", "#fdb6c2");
       }
       else{
         //Unlock Screen
+        playNotificationSound('STARTUP');
         $(this).val('');
         document.getElementById("inactivityLock").style.display = 'none';
       }

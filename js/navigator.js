@@ -62,6 +62,10 @@ function fetchInitFunctions(pageReference){
 
 			break;
 		}
+		case 'system-settings':{
+
+			break;
+		}
 	}
 }
 
@@ -90,4 +94,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('seating-status', 'New Order');
+renderPage('system-settings', 'New Order');
