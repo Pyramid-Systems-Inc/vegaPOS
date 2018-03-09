@@ -70,6 +70,9 @@ function applyPersonalisations(){
 
 applyPersonalisations();
 
+/*Start Up Sound*/
+playNotificationSound('STARTUP');
+
 
 /* Expand/Contract Sidebar */
 function activateSidebarElement(barID){
