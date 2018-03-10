@@ -16,19 +16,12 @@
                                        <th style="text-align: left">Name</th>
                                        <th style="text-align: left">Role</th>
                                        <th style="text-align: left">Phone</th>
-                                       <th style="text-align: left">Actions</th>
+                                       <th style="text-align: left"></th>
                                     </tr>
                                  </thead>
-                                 <tbody>
-                                    <tr role="row" class="odd">
-                                       <td>#1</td>
-                                       <td>Anas Jafry</td>
-                                       <td>Admin</td>
-                                       <td>9884179675</td>
-                                       <td onclick="openEditUserModal()">
-                                          <i class="fa fa-edit"></i>
-                                       </td>
-                                    </tr>
+                                 <tbody id="allUsersRenderArea">
+
+
                                  </tbody>
                               </table>
                            </div>
@@ -47,23 +40,22 @@
                            <div class="col-lg-12">
                               <form action="" method="post" accept-charset="utf-8">
                                  <div class="form-group">
-                                    <label for="group">Group</label> 
-                                    <select name="group" id="group" data-placeholder="Select Group" class="form-control input-tip select2" style="width:100%;">
-                                       <option value="" selected="selected"></option>
-                                       <option value="1">admin</option>
-                                       <option value="2">staff</option>
+                                    <label for="group">Role</label> 
+                                    <select id="user_profile_new_user_role" class="form-control input-tip select2" style="width:100%;">
+                                       <option value="ADMIN">Admin</option>
+                                       <option value="STEWARD" selected="selected">Staff</option>
                                     </select>
                                  </div>
                                  <div class="form-group">
-                                    <label for="first_name">First Name</label> <input type="text" name="first_name" value="" class="form-control tip" id="first_name" required="required" />
+                                    <label for="first_name">Name</label> <input type="text" value="" class="form-control tip" id="user_profile_new_user_name" required="required" />
                                  </div>
                                  <div class="form-group">
-                                    <label for="phone">Phone</label> <input type="text" name="phone" value="" class="form-control tip" id="phone" required="required" />
+                                    <label for="phone">Mobile</label> <input type="text" value="" class="form-control tip" id="user_profile_new_user_mobile" required="required" />
                                  </div>
                                  <div class="form-group">
-                                    <input type="submit" style="float: right" name="add_user" value="Add User" class="btn btn-primary" />
-
+                                    
                                     <button type="button" class="btn btn-default" onclick="hideNewUser()" >Cancel</button>
+                                    <button type="button" style="float: right" class="btn btn-default" onclick="addNewUserProfile()" >Add User</button>
 
 
                                  </div>
@@ -75,61 +67,22 @@
                   </div>
                </div>
 
+
+
       <!-- Modal -->
-      <div id="newUserModal" class="modal">
+      <div id="deleteUserConsentModal" class="modal">
          <div class="modal-dialog" style="top: 20%">
             <!-- Modal content-->
             <div class="modal-content">
-               <div class="modal-header">
-                  <button type="button" onclick="closeEditUserModal()" style="float: right;" class="btn clearButton">X</button>
-                  <h4 class="modal-title">Edit User</h4>
-               </div>
                <div class="modal-body" style="max-height: 420px; overflow: scroll">
-                  <form action="" method="post" accept-charset="utf-8">
-                     <div class="row">
-                        <div class="col-lg-12">
-                           <div class="form-group">
-                              <label for="first_name">First Name</label> <input type="text" name="first_name" value="" class="form-control tip" id="first_name" required="required" />
-                           </div>
-                        </div>
-                        <div class="col-lg-12">
-                           <div class="form-group">
-                              <label for="group">Group</label> 
-                              <select name="group" id="group" data-placeholder="Select Group" class="form-control input-tip select2" style="width:100%;">
-                                 <option value="ADMIN">admin</option>
-                                 <option value="STAFF" selected="selected">staff</option>
-                              </select>
-                           </div>
-                        </div>
-                     </div>
-                     <div class="row">
-                        <div class="col-lg-12">
-                           <div class="form-group">
-                              <label for="phone">Phone</label> <input type="text" name="phone" value="" class="form-control tip" id="phone" required="required" />
-                           </div>
-                        </div>
-                     </div>
-                     <div class="row">
-                        <div class="col-lg-6">
-                           <div class="form-group">
-                              <label for="password">Password</label> <input type="password" name="password" value="" class="form-control tip" id="password" required="required" />
-                           </div>
-                        </div>
-                        <div class="col-lg-6">
-                           <div class="form-group">
-                              <label for="confirm_password">Confirm Password</label> <input type="password" name="confirm_password" value="" class="form-control tip" id="confirm_password" required="required" />
-                           </div>
-                        </div>
-                     </div>
-                  </form>
+                <p style="font-size: 16px; margin: 0; color: #e74c3c;" id="deleteUserConsentModalText"></P>
                </div>
-               <div class="modal-footer">
-                  <button type="button" class="btn btn-default" onclick="closeEditUserModal()" style="float: left">Cancel</button>
-                  <button type="button" class="btn btn-success">Save</button>
+               <div class="modal-footer" id="deleteUserConsentModalConsent">
                </div>
             </div>
          </div>
       </div>
+
 
    </template>
       

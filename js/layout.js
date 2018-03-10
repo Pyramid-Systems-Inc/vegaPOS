@@ -737,7 +737,7 @@ function renderCurrentUserDisplay(){
   }
 
   if(loggedInStaffInfo.name != '' && loggedInStaffInfo.code != ''){
-    document.getElementById("currentUserProfileDisplay").innerHTML = '<tag class="currentUserImage"/>'+getTwoLetterImageCode(loggedInStaffInfo.name)+'</tag><span>'+loggedInStaffInfo.name+'</span>';
+    document.getElementById("currentUserProfileDisplay").innerHTML = '<tag class="currentUserImage"/>'+getTwoLetterImageCode(loggedInStaffInfo.name)+'</tag><span style="font-weight: bold">'+loggedInStaffInfo.name+'</span>';
   }
 }
 

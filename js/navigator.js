@@ -59,7 +59,7 @@ function fetchInitFunctions(pageReference){
 			break;
 		}				
 		case 'user-settings':{
-
+			fetchAllUsersInfo();
 			break;
 		}	
 		case 'app-data':{
@@ -98,4 +98,4 @@ function renderPage(pageReference, title){
 }
 
 //Default View
-renderPage('new-order', 'New Order');
+renderPage('user-settings', 'New Order');
