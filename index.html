@@ -88,9 +88,9 @@
                         <li><a href="#" onclick="renderPage('live-orders', 'Live Orders')">Live Orders</a></li>
                         <li><a href="#" onclick="renderPage('sales-summary', 'Sales Summary')">Today's Sales</a></li>
                         <li class="dropdown user user-menu">
-                            <a href="#" onclick="renderPage('user-settings', 'User Settings')">
+                            <a href="#" onclick="selectStewardWindow()" id="currentUserProfileDisplay">
                                 <img src="images/default_user.png" class="user-image" alt="Avatar" />
-                                <span>Anas Jafry</span>
+                                <span>Profile Not Selected</span>
                             </a>
                         </li>
                     </ul>
@@ -183,6 +183,15 @@
           </div>
 
 
+        <!-- STEWARDS MODAL -->
+        <div id="stewardModalHome" class="modal">
+             <div class="modal-dialog" style="width: 27em !important;">
+                <!-- Modal content-->
+                <div class="modal-content" style="border-radius: 4px; right: 10px !important; top: 60px !important; position: fixed; width: 420px; min-height: 240px; max-height: 480px; overflow: scroll; padding: 8px" id="stewardModalHomeContent">
+                    
+                </div>
+             </div>
+          </div>
 
 
 
