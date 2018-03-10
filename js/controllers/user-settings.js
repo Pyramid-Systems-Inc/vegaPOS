@@ -171,6 +171,8 @@ function deleteUserFromUserProfile(code, name){
 					showToast(name+' has been removed successfully', '#27ae60');
 					fetchAllUsersInfo();
 					hideDeleteUserConsent();
+
+					removeFromCurrentUser(code);
 	          }
 	       }); 
       }
@@ -178,5 +180,20 @@ function deleteUserFromUserProfile(code, name){
    } else {
       showToast('System Error: Unable to modify User Profiles data. Please contact Accelerate Support.', '#e74c3c');
    }
+}
 
+
+function removeFromCurrentUser(code){
+ //Remove the current user if deleting the same user
+   var loggedInStaffInfo = window.localStorage.loggedInStaffData ? JSON.parse(window.localStorage.loggedInStaffData): {};
+  
+  if(jQuery.isEmptyObject(loggedInStaffInfo)){
+    loggedInStaffInfo.name = "";
+    loggedInStaffInfo.code = "";
+  }
+
+  if(loggedInStaffInfo.code == code){
+  	window.localStorage.loggedInStaffData = '';
+  	renderCurrentUserDisplay();
+  }
 }
