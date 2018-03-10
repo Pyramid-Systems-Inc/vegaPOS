@@ -82,7 +82,7 @@ function applyPersonalisations(){
 applyPersonalisations();
 
 /*Start Up Sound*/
-playNotificationSound('STARTUP');
+//playNotificationSound('STARTUP');
 
 
 /* Expand/Contract Sidebar */
@@ -110,7 +110,6 @@ function activateSidebar(){
 
 /* Open KOT Modal */
 function viewKOTModal(){
-	console.log('Viewing Modal')
 }
 
 
@@ -142,6 +141,10 @@ $(function () {
     "use strict";
     jqKeyboard.init();
 });
+
+
+
+
 
 /* Server Connectivity */
 function pingServer(){
@@ -605,3 +608,138 @@ function validateScreenLockCode(code){
 function lockScreen(){
   document.getElementById("inactivityLock").style.display = 'block';
 }
+
+
+function getTwoLetterImageCode(text){
+  text = text.replace(/[^a-zA-Z ]/g, "");
+  var words = text.split(' ');
+
+  if(words.length > 1){
+    return words[0].substring(0,1)+words[1].substring(0,1);
+  }
+  else{
+    return (text.substring(0, 2)).toUpperCase();
+  }
+}
+
+
+function switchProfile(name, code){
+
+   var loggedInStaffInfo = window.localStorage.loggedInStaffData ? JSON.parse(window.localStorage.loggedInStaffData): {};
+  
+  if(jQuery.isEmptyObject(loggedInStaffInfo)){
+    loggedInStaffInfo.name = "";
+    loggedInStaffInfo.code = "";
+  }
+ 
+    loggedInStaffInfo.name = name;
+    loggedInStaffInfo.code = code;
+
+    window.localStorage.loggedInStaffData = JSON.stringify(loggedInStaffInfo);
+    renderCurrentUserDisplay();
+    selectStewardWindowClose();
+}
+
+
+/*Steward Selection*/
+function selectStewardWindow(){
+  var loggedInStaffInfo = window.localStorage.loggedInStaffData ? JSON.parse(window.localStorage.loggedInStaffData): {};
+  
+  if(jQuery.isEmptyObject(loggedInStaffInfo)){
+    loggedInStaffInfo.name = "";
+    loggedInStaffInfo.code = "";
+  }
+
+
+    if(fs.existsSync('./data/static/userprofiles.json')) {
+        fs.readFile('./data/static/userprofiles.json', 'utf8', function readFileCallback(err, data){
+      if (err){
+          showToast('System Error: Unable to read User Profiles. Please contact Accelerate Support.', '#e74c3c');
+      } else {
+
+          if(data == ''){ data = '[]'; }
+
+              var users = JSON.parse(data);
+              users.sort(); //alphabetical sorting 
+
+              if(users.length == 1){
+                showToast('Warning: No other profiles created yet.', '#e67e22');
+                return '';
+              }
+
+              if(users.length == 0){
+                showToast('Warning: No profile created yet.', '#e67e22');
+                return '';
+              }
+
+              var n = 0;
+              var renderContent = '';
+              var isRendered = false;
+              var currentUserFound = false;
+              while(users[n]){
+
+                isRendered = false;
+
+                if(n == 0){
+                  isRendered = true;
+                  renderContent = '<tag onclick="selectStewardWindowClose()" class="stewardWindowClose">X</tag> <div class="row" style="margin: 0">';
+                  renderContent += '<div onclick="switchProfile(\''+users[n].name+'\', \''+users[n].code+'\')" class="col-sm-6" style="margin: 0; padding: 0"> <div class="stewardProfile" id="user_switch_'+users[n].code+'"> <h1 class="stewardName">'+users[n].name+'</h1> <div class="stewardIcon">'+getTwoLetterImageCode(users[n].name)+'</div> </div> </div>';
+                }
+                else if(n == 1){
+                  isRendered = true;
+                  renderContent += '<div onclick="switchProfile(\''+users[n].name+'\', \''+users[n].code+'\')" class="col-sm-6" style="margin: 0; padding: 0"> <div class="stewardProfile" id="user_switch_'+users[n].code+'"> <h1 class="stewardName">'+users[n].name+'</h1> <div class="stewardIcon">'+getTwoLetterImageCode(users[n].name)+'</div> </div> </div>';
+                  renderContent += '</div>';
+                }
+                else if(n > 1 && n%2 == 0){
+                  renderContent += '<div class="row" style="margin: 4px 0 0 0">';
+                }
+
+                if(!isRendered){
+                  renderContent += '<div onclick="switchProfile(\''+users[n].name+'\', \''+users[n].code+'\')" class="col-sm-6" style="margin: 0; padding: 0"> <div class="stewardProfile" id="user_switch_'+users[n].code+'"> <h1 class="stewardName">'+users[n].name+'</h1> <div class="stewardIcon">'+getTwoLetterImageCode(users[n].name)+'</div> </div> </div>';
+                }
+
+                if(n > 1 && n%2 == 1){
+                  renderContent += '</div>';
+                }
+
+                //Find Current User
+                if(loggedInStaffInfo.code == users[n].code){
+                  currentUserFound = true;
+                }
+
+                n++;
+              }
+
+          document.getElementById("stewardModalHomeContent").innerHTML = renderContent;
+          document.getElementById("stewardModalHome").style.display = 'block';
+
+          if(currentUserFound){
+            document.getElementById("user_switch_"+loggedInStaffInfo.code).classList.add('selectUserProfile');
+          }
+
+    }
+    });
+      } else {
+        showToast('System Error: Unable to read User Profiles. Please contact Accelerate Support.', '#e74c3c');
+      } 
+}
+
+function selectStewardWindowClose(){
+  document.getElementById("stewardModalHome").style.display = 'none';
+}
+
+function renderCurrentUserDisplay(){
+   var loggedInStaffInfo = window.localStorage.loggedInStaffData ? JSON.parse(window.localStorage.loggedInStaffData): {};
+  
+  if(jQuery.isEmptyObject(loggedInStaffInfo)){
+    loggedInStaffInfo.name = "";
+    loggedInStaffInfo.code = "";
+  }
+
+  if(loggedInStaffInfo.name != '' && loggedInStaffInfo.code != ''){
+    document.getElementById("currentUserProfileDisplay").innerHTML = '<tag class="currentUserImage"/>'+getTwoLetterImageCode(loggedInStaffInfo.name)+'</tag><span>'+loggedInStaffInfo.name+'</span>';
+  }
+}
+
+renderCurrentUserDisplay();
+
