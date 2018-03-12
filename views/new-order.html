@@ -9,7 +9,7 @@
                <div class="well well-sm punchPOS" id="leftdiv" style="padding: 2px 2px 8px 2px">
                   <div id="lefttop" style="margin-bottom:5px;">
 
-                        <h1 class="posCartHead">New Order</h1>
+                        <h1 class="posCartHead" id="ongoingOrderTitle">New Order</h1>
                         <hr style="margin-top: 0">
 
                         <h2 class="posCartSubHead">Customer Details</h2>
@@ -61,23 +61,8 @@
             </form>
                   
 
-                  <div id="cartButtons" class="col-xs-12 text-center">
-                     <div class="row">
-                        <div class="col-xs-4" style="padding: 0;">
-                           <div class="btn-group-vertical btn-block">
-                              <button type="button" style="margin-bottom: 4px" class="btn btn-warning btn-block btn-flat" id="suspend">Hold</button>
-                              <button type="button" class="btn btn-danger btn-block btn-flat" id="reset">Cancel</button>
-                           </div>
-                        </div>
-                        <div class="col-xs-4" style="padding: 0 4px;">
-                           <div class="btn-group-vertical btn-block">
-                              <button type="button" style="margin-bottom: 4px; height:71px; background: #2980b9 !important" class="btn bg-purple btn-block btn-flat" onclick="generateKOT()">Print KOT</button>
-                           </div>
-                        </div>
-                        <div class="col-xs-4" style="padding: 0;">
-                           <button type="button" class="btn btn-success btn-block btn-flat" id="payment" style="height:71px;">Print Bill</button>
-                        </div>
-                     </div>
+                  <div id="cartActionButtons" class="col-xs-12 text-center">
+
                   </div>
 
 
