@@ -27,7 +27,7 @@ function renderKOT() {
                         i++;
                     }
 
-                    items = begKOT + itemsInCart + '</table> </div><more class="more">More Items</more> <tag class="bottomTag"> <p class="tagSteward">' + kot.customerName + '</p> <p class="tagUpdate">First KOT Printed 10 mins ago</p> </tag> </a>';
+                    items = begKOT + itemsInCart + '</table> </div>'+(i > 6?'<more class="more">More Items</more>':'')+'<tag class="bottomTag"> <p class="tagSteward">' + kot.customerName + '</p> <p class="tagUpdate">First KOT Printed 10 mins ago</p> </tag> </a>';
                     fullKOT = fullKOT + items + '</li>';
                     finalRender(fullKOT)
                 }
@@ -96,3 +96,4 @@ function overWriteCurrentOrder(encodedKOT){
     window.localStorage.edit_KOT_originalCopy = decodeURI(encodedKOT);
     renderPage('new-order', 'Editing Order');
 }
+
