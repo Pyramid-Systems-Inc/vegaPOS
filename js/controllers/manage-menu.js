@@ -929,7 +929,7 @@ function deleteCategory(name) {
            showToast('System Error: Unable to read Categories data. Please contact Accelerate Support.', '#e74c3c');
        } else {
        	if(data == ''){ data = '[]'; }
-       obj = JSON.parse(data); //now it an object
+       var obj = JSON.parse(data); //now it an object
        //console.log(obj.length)
        for (var i=0; i<obj.length; i++) {  
          if (obj[i] == name){

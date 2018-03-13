@@ -1,4 +1,3 @@
-
 /*Add Item to Cart */
 
 function saveToCart(productToAdd){
@@ -241,9 +240,13 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
 	if(cart_products.length < 1){
 		document.getElementById("cartTitleHead").innerHTML = '';
 		document.getElementById("summaryDisplay").innerHTML = '';
-		document.getElementById("cartDetails").innerHTML = '<p style="font-size: 21px; text-align: center; font-weight: 300; color: #b9b9b9; }">'+
-							'<img style="width: 20%; margin: 20px 0px 5px 0px;" src="images/common/emptycart.png"><br>Order Cart is empty!</p>'+
-							'<p style="font-size: 12px; text-align: center; color: #c3c3c3;">To add an item to the cart, enter its name in the above box or clicking on the item from the item list in the right.</p>';
+		document.getElementById("summarySumDisplay").innerHTML = '<div style="height: 30vh !important;"></div>';
+
+		document.getElementById("cartDetails").innerHTML = '<p style="font-size: 21px; margin: 50px 0 0 0 ; text-align: center; font-weight: 300; color: #b9b9b9; }">'+
+							'<img style="width: 25%; margin: 20px 0px 5px 0px;" src="images/common/emptycart.png"><br>Order Cart is empty!</p>';
+		
+		document.getElementById("cartActionButtons").innerHTML = '';
+
 		return 0;
 	}
 
@@ -331,15 +334,338 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
                         '         <td width="25%" class="cartSummaryRow">Total</td>'+
                         '         <td class="text-right cartSummaryRow" colspan="2"><span id="total"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
                         '      </tr>'+otherCharges+
+                        '   </tbody>'+
+                        '</table>';
+
+    document.getElementById("summarySumDisplay").innerHTML = '<table class="table table-condensed totals" style="margin: 0">'+
+    					'   <tbody>'+ 
                         '      <tr class="success cartSumRow">'+
                         '         <td colspan="2" class="cartSumRow" style="font-weight: 400 !important; font-size: 16px;">'+
                         '            Total Payable'+
                         '         </td>'+
                         '         <td class="text-right cartSumRow" colspan="2" ><span id="total-payable"><i class="fa fa-inr"></i>'+grandPayableSum+'</span></td>'+
-                        '      </tr>'+
-                        '   </tbody>'+
+                        '      </tr>'+ 
+    					'   </tbody>'+
                         '</table>';
+
+
+
+
+//Editing Mode
+if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
+ 	//EDIT - Actions     
+ 	if(selectedBillingModeInfo.type == 'PARCEL' || selectedBillingModeInfo.type == 'TOKEN'){
+ 		document.getElementById("cartActionButtons").innerHTML = '<div class="row">'+
+                        '<div class="col-xs-12" style="padding: 0">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px; height:71px; background: #bdc3c7 !important" class="btn bg-purple btn-block btn-flat" onclick="clearCurrentEditingOrder()">Hide</button>'+
+                           '</div>'+
+                        '</div>'+
+                     '</div>';
+ 	}   
+ 	else if(selectedBillingModeInfo.type == 'DINE'){
+ 		document.getElementById("cartActionButtons").innerHTML = '<div class="row">'+
+                        '<div class="col-xs-4" style="padding: 0;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px" class="btn btn-danger btn-block btn-flat" onclick="cancelKOT()">Cancel</button>'+
+                              '<button type="button" class="btn bg-purple btn-block btn-flat" style="background: #bdc3c7 !important" onclick="clearCurrentEditingOrder()">Hide</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-4" style="padding: 0 4px;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px; height:71px; background: #2980b9 !important" class="btn bg-purple btn-block btn-flat" onclick="generateKOT()">Print KOT</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-4" style="padding: 0;">'+
+                           '<button type="button" class="btn btn-success btn-block btn-flat" onclick="generateInvoice()" style="height:71px;">Print Bill</button>'+
+                        '</div>'+                            
+                     '</div>';
+ 	}  		
 }
+else{
+ 	//NEW ORDER - Actions     
+ 	if(selectedBillingModeInfo.type == 'TOKEN'){
+ 		document.getElementById("cartActionButtons").innerHTML = '<div class="row">'+
+                        '<div class="col-xs-4" style="padding: 0">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px; height:71px; background: #bdc3c7 !important" class="btn bg-purple btn-block btn-flat" onclick="clearCurrentOrder()">Close</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-8" style="padding: 0 0 0 4px;">'+
+                           '<button type="button" class="btn btn-success btn-block btn-flat" id="payment" style="height:71px;" onclick="generateKOT()">Print KOT & Bill</button>'+
+                        '</div>'+
+                     '</div>';
+ 	}   
+ 	else if(selectedBillingModeInfo.type == 'PARCEL'){
+ 		document.getElementById("cartActionButtons").innerHTML = '<div class="row">'+
+                        '<div class="col-xs-4" style="padding: 0;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px" class="btn btn-warning btn-block btn-flat" onclick="addToHoldKOT()">Hold</button>'+
+                              '<button type="button" class="btn bg-purple btn-block btn-flat" style="background: #bdc3c7 !important" onclick="clearCurrentOrder()">Close</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-8" style="padding: 0 0 0 4px;">'+
+                           '<button type="button" class="btn btn-success btn-block btn-flat" id="payment" style="height:71px;" onclick="generateKOT()">Print KOT & Bill</button>'+
+                        '</div>'+
+                     '</div>';
+ 	}
+ 	else if(selectedBillingModeInfo.type == 'DINE'){
+ 		document.getElementById("cartActionButtons").innerHTML = '<div class="row">'+
+                        '<div class="col-xs-4" style="padding: 0;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px" class="btn btn-warning btn-block btn-flat" onclick="addToHoldKOT()">Hold</button>'+
+                              '<button type="button" class="btn bg-purple btn-block btn-flat" style="background: #bdc3c7 !important" onclick="clearCurrentOrder()">Close</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-8" style="padding: 0 0 0 4px;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px; height:71px; background: #2980b9 !important" class="btn bg-purple btn-block btn-flat" onclick="generateKOT()">Print KOT</button>'+
+                           '</div>'+
+                        '</div>'+                    
+                     '</div>';
+ 	}  
+}
+
+    
+}
+
+/* Default Actions 
+
+					'<div class="row">'+
+                        '<div class="col-xs-4" style="padding: 0;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px" class="btn btn-warning btn-block btn-flat" id="suspend">Hold</button>'+
+                              '<button type="button" class="btn btn-danger btn-block btn-flat" id="reset">Cancel</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-4" style="padding: 0 4px;">'+
+                           '<div class="btn-group-vertical btn-block">'+
+                              '<button type="button" style="margin-bottom: 4px; height:71px; background: #2980b9 !important" class="btn bg-purple btn-block btn-flat" onclick="generateKOT()">Print KOT</button>'+
+                           '</div>'+
+                        '</div>'+
+                        '<div class="col-xs-4" style="padding: 0;">'+
+                           '<button type="button" class="btn btn-success btn-block btn-flat" id="payment" style="height:71px;">Print Bill</button>'+
+                        '</div>'+
+                     '</div>';
+
+*/
+
+function cancelKOT(){
+	//cancel the original_KOT in local storage
+}
+
+function clearCurrentOrder(){
+	clearAllMetaData();
+	renderCustomerInfo();
+}
+
+function addHoldOrderToCurrent(encodedItem, id){
+
+	if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
+		confirmHoldOverWritingModal(encodedItem, id);
+		return '';
+	}
+	else if(window.localStorage.zaitoon_cart && window.localStorage.zaitoon_cart != ''){
+		confirmHoldOverWritingModal(encodedItem, id);
+		return '';
+	}
+
+	
+	var holding_orders = window.localStorage.holdingOrdersData ? JSON.parse(window.localStorage.holdingOrdersData): [];
+	holding_orders.splice(id,1);
+
+	window.localStorage.holdingOrdersData = JSON.stringify(holding_orders);
+	showToast('Order has been moved off the Hold List', '#27ae60');
+
+
+	var order = JSON.parse(decodeURI(encodedItem));
+	window.localStorage.customerData = JSON.stringify(order.customerDetails);
+	window.localStorage.zaitoon_cart = JSON.stringify(order.cartDetails);
+
+	//Remove from Table mapping (if already added)
+	if(order.customerDetails.modeType == 'DINE' && order.customerDetails.mappedAddress != ''){
+			removeTableFromReserveList(order.customerDetails.mappedAddress)
+	}
+
+
+	renderCustomerInfo();
+}
+
+function confirmHoldOverWritingModal(encodedItem, id){
+	document.getElementById("overWriteHoldOrderModal").style.display = 'block';
+	document.getElementById("overWriteHoldOrderModalActions").innerHTML = '<button type="button" class="btn btn-default" onclick="confirmHoldOverWritingModalHide()" style="float: left">Cancel</button>'+
+                  						'<button type="button" class="btn btn-danger" onclick="openHeldOrderConfirm(\''+encodedItem+'\', \''+id+'\')">Open Held Order</button>';
+}
+
+function confirmHoldOverWritingModalHide(){
+	document.getElementById("overWriteHoldOrderModal").style.display = 'none';
+}
+
+
+function openHeldOrderConfirm(encodedItem, id){
+
+	window.localStorage.edit_KOT_originalCopy = '';
+	window.localStorage.zaitoon_cart = '';
+	window.localStorage.customerData = '';
+
+	addHoldOrderToCurrent(encodedItem);
+
+	confirmHoldOverWritingModalHide();
+
+}
+
+
+function generateInvoice(){
+	//generate Invoice for original_KOT
+}
+
+function clearCurrentEditingOrder(){
+	//clear customer info, cart
+	window.localStorage.zaitoon_cart = "";
+	window.localStorage.customerData = "";
+
+	if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
+		window.localStorage.edit_KOT_originalCopy = '';
+	}
+
+	renderCustomerInfo();	
+}
+
+/*Hold KOT*/
+function addToHoldKOT(){
+	//ensure its a NEW ORDER
+	if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
+		showToast('Oops! The Order has already been printed.', '#e67e22');
+		return '';
+	}
+	else{
+
+		var time = getCurrentTime('TIME');
+
+		var holding_orders = window.localStorage.holdingOrdersData ? JSON.parse(window.localStorage.holdingOrdersData): [];
+
+		var customerInfo = window.localStorage.customerData ? JSON.parse(window.localStorage.customerData): [];
+		var product_cart = window.localStorage.zaitoon_cart ? JSON.parse(window.localStorage.zaitoon_cart): [];
+
+		if(customerInfo.length == 0){
+			showToast('Oops! The Customer Details missing.', '#e67e22');
+			return '';
+		}
+		else if(product_cart.length == 0){
+			showToast('Oops! The Order Cart is empty!', '#e67e22');
+			return '';
+		}
+
+		var new_holding_order = {};
+		new_holding_order.customerDetails = customerInfo;
+		new_holding_order.cartDetails = product_cart;
+		new_holding_order.timestamp = time;
+
+		holding_orders.push(new_holding_order);
+		window.localStorage.holdingOrdersData = JSON.stringify(holding_orders);
+
+		//Mark the table as 'Reserved' if added to hold list
+		if(customerInfo.modeType == 'DINE' && customerInfo.mappedAddress != ''){
+			addTableToReserveList(customerInfo.mappedAddress, 'Hold Order')
+		}
+
+		clearAllMetaData();
+		renderCustomerInfo();
+
+		showToast('The Order has been moved to Hold List', '#27ae60');
+	}	
+}
+
+function removeAllHoldOrders(){
+	window.localStorage.holdingOrdersData = '';
+	renderCustomerInfo();
+}
+
+
+
+
+function addTableToReserveList(tableID, optionalComments){
+
+		var comments = optionalComments;
+
+		if(fs.existsSync('./data/static/tablemapping.json')) {
+	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	       
+	    } else {
+	    	if(data == ''){ data = '[]'; }
+	          var tableMapping = JSON.parse(data); 
+
+	          var isUpdated = false;
+
+	          var timestamp = getCurrentTime('TIME');
+
+	          for(var i=0; i<tableMapping.length; i++){
+	          	if(tableMapping[i].table == tableID){
+
+	          		if(tableMapping[i].status != 0){
+	          			return '';
+	          		}
+
+	          		tableMapping[i].assigned = comments;
+	          		tableMapping[i].KOT = "";
+	          		tableMapping[i].status = 5;
+	          		tableMapping[i].lastUpdate = timestamp;
+
+	          		isUpdated = true;
+
+	          		break;
+	          	}
+	          }
+
+	          if(!isUpdated){
+	          	tableMapping.push({ "table": tableID, "assigned": comments, "KOT": "", "status": 5, "lastUpdate": timestamp });
+		      }
+
+		       var newjson = JSON.stringify(tableMapping);
+		       fs.writeFile('./data/static/tablemapping.json', newjson, 'utf8', (err) => {
+		       }); 
+
+		}
+		});
+	    }
+}
+
+
+function removeTableFromReserveList(tableID){
+		if(fs.existsSync('./data/static/tablemapping.json')) {
+	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
+	    if (err){
+	       
+	    } else {
+	    	if(data == ''){ data = '[]'; }
+	          var tableMapping = JSON.parse(data); 
+
+	          for(var i=0; i<tableMapping.length; i++){
+	          	if(tableMapping[i].table == tableID){
+
+	          		if(tableMapping[i].status != 5){
+	          			return '';
+	          		}
+
+	          		tableMapping.splice(i,1);
+
+	          		break;
+	          	}
+	          }
+
+		       var newjson = JSON.stringify(tableMapping);
+		       fs.writeFile('./data/static/tablemapping.json', newjson, 'utf8', (err) => {
+		         
+		       }); 
+
+		}
+		});
+	    }
+}
+
+
+
 
 /*Clear cart*/
 function clearCart(){
@@ -356,8 +682,84 @@ function hideClearCartModal(){
 	document.getElementById("clearCartConsentModal").style.display = "none";
 }
 
+
+function getLapsedTimeFormmated(time){
+	var tempTime = moment(time, 'hhmm').fromNow(true);
+	tempTime = tempTime.replace("seconds", "s");
+	tempTime = tempTime.replace("a few s", "seconds");
+	tempTime = tempTime.replace("a minute", "1m");
+	tempTime = tempTime.replace(" minutes", "m");
+	tempTime = tempTime.replace("an hour", "1h");
+	tempTime = tempTime.replace(" hours", "h");
+	return tempTime;
+}
+
+
+
 /*customer info*/
 function renderCustomerInfo(){
+
+	//Check if New Order / Editing KOT
+	var isEditingKOT = false;
+	if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
+		isEditingKOT = true;
+		var kotCopy = window.localStorage.edit_KOT_originalCopy ?  JSON.parse(window.localStorage.edit_KOT_originalCopy) : {};
+		document.getElementById("ongoingOrderTitle").innerHTML = 'Edit Order <tag style="float: right; font-weight: 300;">Table <b>#'+kotCopy.table+'</b></tag>';
+	}
+	else{
+
+		//Check if any order in Hold List
+		if(window.localStorage.holdingOrdersData && window.localStorage.holdingOrdersData != ''){
+			
+			var holding_orders = window.localStorage.holdingOrdersData ? JSON.parse(window.localStorage.holdingOrdersData): [];
+			
+
+			var n = 0;
+			var holdListRender = '';
+			while(holding_orders[n]){
+
+				var itemList = '';
+				for(var i = 0; i <  holding_orders[n].cartDetails.length; i++){
+					if(i == 0)
+						itemList = holding_orders[n].cartDetails[i].name;
+					else
+						itemList = itemList+', '+holding_orders[n].cartDetails[i].name;
+				}
+
+				var displayAddress = holding_orders[n].customerDetails.mappedAddress;
+				if(holding_orders[n].customerDetails.mappedAddress == ''){
+					if(holding_orders[n].customerDetails.modeType =='DINE'){
+						displayAddress = '<tag style="font-weight: 400">'+holding_orders[n].customerDetails.mode+'</tag>';
+					}
+					else if(holding_orders[n].customerDetails.modeType =='PARCEL'){
+						displayAddress = '<tag style="font-weight: 400">'+holding_orders[n].customerDetails.mode+'</tag>';
+					}
+				}
+
+				holdListRender += '<a href="#" onclick="addHoldOrderToCurrent(\''+encodeURI(JSON.stringify(holding_orders[n]))+'\')"><p class="holdTableName">'+displayAddress+
+									'<tag class="holdTimeAgo">'+getLapsedTimeFormmated(holding_orders[n].timestamp)+' ago</tag></p>'+
+									'<p class="holdItemsBrief">'+itemList+'</p>'+
+								  '</a>';
+				n++;
+			}
+
+			if(holding_orders.length != 0){
+				document.getElementById("ongoingOrderTitle").innerHTML = 'New Order'+
+													        '<div class="holddropdown">'+
+											                 	'<div class="holddropbtn">'+n+' '+(n == 1? 'Order': 'Orders')+' on Hold</div>'+
+											                 	'<div class="holddropdown-content"><div class="holdContentArea">'+holdListRender+'</div>'+
+											                 	'<div class="holdCancelButton" onclick="removeAllHoldOrders()">Remove All</div>'+
+											                 	'</div>'+
+											               	'</div>';
+			}
+			else{
+				document.getElementById("ongoingOrderTitle").innerHTML = 'New Order'
+			}
+		}
+		else{
+			document.getElementById("ongoingOrderTitle").innerHTML = 'New Order'
+		}
+	}
 
 	var customerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
 	var billingModesInfo = {};
@@ -422,6 +824,7 @@ function renderCustomerInfo(){
 					}
 
 					//Ask for MappedAddress value
+					if(!isEditingKOT){
 						if(tempModeType == 'PARCEL'){ //ask for address
 							selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-danger" style=" width: 100%; text-overflow: ellipsis; overflow: hidden;" onclick="pickAddressForNewOrder()">Set Address</tag>';
 							
@@ -443,10 +846,70 @@ function renderCustomerInfo(){
 							}
 							customerInfo.mappedAddress = tempToken;
 							selectMappedAddressButton = '<label class="cartCustomerLabel">Token No.</label><tag class="btn btn-default" onclick="setTokenManually()" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
-						}			
+						}
+					}
+					else{
+
+						console.log(customerInfo)
+						if(tempModeType == 'PARCEL'){ //ask for address
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-danger disabled" style=" width: 100%; text-overflow: ellipsis; overflow: hidden;" >Not Set</tag>';
+							
+							if(customerInfo.mappedAddress){
+								selectMappedAddressButton = '<label class="cartCustomerLabel">Address</label><tag class="btn btn-default disabled" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							}
+						}
+						else if(tempModeType == 'DINE'){ //ask for table
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Table No.</label><tag class="btn btn-danger disabled" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">Not Set</tag>';
+							
+							if(customerInfo.mappedAddress){
+								selectMappedAddressButton = '<label class="cartCustomerLabel">Table No.</label><tag class="btn btn-default disabled" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+							}
+						}					
+						else if(tempModeType == 'TOKEN'){ //assign token
+							var tempToken = window.localStorage.lastPrintedToken;
+							if(!tempToken || tempToken == ''){
+								tempToken = 1;
+							}
+							customerInfo.mappedAddress = tempToken;
+							selectMappedAddressButton = '<label class="cartCustomerLabel">Token No.</label><tag class="btn btn-default disabled" style="width: 100%; text-overflow: ellipsis; overflow: hidden;">'+customerInfo.mappedAddress+'</tag>';
+						}						
+					}	
+
+
+
+
 
 			
-
+					if(isEditingKOT){ //Editing KOT
+					
+					document.getElementById("orderCustomerInfo").innerHTML = '<div class="row" style="padding: 0 15px"> '+
+			                                 '<div class="col-xs-8" style="padding: 0; padding-right: 2px">'+
+			                                    '<div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<div class="input-group" style="width:100%;">'+
+			                                       		 '<label class="cartCustomerLabel">Order Type</label>'+
+			                                             '<input type="text" value="'+customerInfo.mode+'" id="customer_form_data_mode" class="form-control kb-text" disabled/>'+
+			                                       '</div>'+
+			                                       '<div style="clear:both;"></div>'+
+			                                    '</div>'+
+			                                ' </div>'+
+			                                 '<div class="col-xs-4" style="padding: 0; padding-left: 2px">'+selectMappedAddressButton+
+			                                 '</div> '+                       
+			                           '</div>'+
+			                           '<div class="row" style="padding: 0 15px">'+
+			                                 '<div class="col-xs-6" style="padding: 0; padding-right: 2px">'+
+			                                    '<div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'name\')" value="'+customerInfo.name+'" id="customer_form_data_name" class="form-control kb-text" placeholder="Guest Name" />'+
+			                                    '</div>'+
+			                                 '</div>'+
+			                                 '<div class="col-xs-6" style="padding: 0; padding-left: 2px">'+
+			                                   ' <div class="form-group" style="margin-bottom:5px;">'+
+			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Guest Mobile" />'+
+			                                    '</div>'+
+			                                 '</div>   '+                     
+			                           '</div>';
+					}
+					else{ //New Order
+					
 					document.getElementById("orderCustomerInfo").innerHTML = '<div class="row" style="padding: 0 15px"> '+
 			                                 '<div class="col-xs-8" style="padding: 0; padding-right: 2px">'+
 			                                    '<div class="form-group" style="margin-bottom:5px;">'+
@@ -471,7 +934,8 @@ function renderCustomerInfo(){
 			                                       '<input type="text" onchange="changeCustomerInfo(\'mobile\')" value="'+customerInfo.mobile+'" id="customer_form_data_mobile" class="form-control kb-text" placeholder="Guest Mobile" />'+
 			                                    '</div>'+
 			                                 '</div>   '+                     
-			                           '</div>';	
+			                           '</div>';
+			        }	
 
 
 			        document.getElementById("customer_form_data_mode").value = customerInfo.mode;
@@ -786,6 +1250,109 @@ function renderMenu(subtype){
 */
 
 function generateKOT(){
+	//Editing Case
+	if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
+		generateEditedKOT();
+	}
+	else if(!window.localStorage.edit_KOT_originalCopy || window.localStorage.edit_KOT_originalCopy == ''){ //New Order Case
+		generateNewKOT();
+	}
+}
+
+/*Generate KOT for Editing Order */
+function generateEditedKOT(){
+	var originalData = window.localStorage.edit_KOT_originalCopy ?  JSON.parse(window.localStorage.edit_KOT_originalCopy) : [];
+	
+	var changedCustomerInfo = window.localStorage.customerData ?  JSON.parse(window.localStorage.customerData) : {};
+	if(jQuery.isEmptyObject(changedCustomerInfo)){
+		showToast('Customer Details missing', '#e74c3c');
+		return '';
+	}
+
+	var changed_cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
+	if(changed_cart_products.length == 0){
+		showToast('Empty Cart! Add items and try again', '#e74c3c');
+		return '';
+	}
+
+
+	//Compare changes in the Cart
+	var original_cart_products = originalData.cart;
+
+	//Search for changes in the existing items
+	var n = 0;
+	while(original_cart_products[n]){
+		
+		//Find each item in original cart in the changed cart
+		var itemFound = false;
+		for(var i = 0; i < changed_cart_products.length; i++){
+			//same item found, check for its quantity and report changes
+			if(!original_cart_products[n].isCustom && (original_cart_products[n].code == changed_cart_products[i].code)){
+				
+				itemFound = true;
+
+				//Change in Quantity
+				if(changed_cart_products[i].qty > original_cart_products[n].qty){ //qty increased
+					console.log(changed_cart_products[n].name+' x '+changed_cart_products[n].qty+' ('+(changed_cart_products[n].qty-original_cart_products[i].qty)+' More)');
+				}
+				else if(changed_cart_products[i].qty < original_cart_products[n].qty){ //qty decreased
+					console.log(changed_cart_products[n].name+' x '+changed_cart_products[n].qty+' ('+(original_cart_products[n].qty-changed_cart_products[i].qty)+' Less)');
+				}
+				else{ //same qty
+					console.log(original_cart_products[n].name+' x '+original_cart_products[n].qty);
+				}
+
+				break;
+				
+			}
+			else if(original_cart_products[n].isCustom && (original_cart_products[n].code == changed_cart_products[i].code) && (original_cart_products[n].variant == changed_cart_products[i].variant)){
+				
+				//itemFound = true;
+
+			}
+
+			//Last iteration to find the item
+			if(i == changed_cart_products.length-1){
+				if(!itemFound){ //Item Deleted
+					console.log(original_cart_products[n].name+' x 0 (Deleted)');
+				}
+			}
+		} 
+
+		n++;
+	}
+
+
+	//Search for new additions to the Cart
+	var j = 0;
+	while(changed_cart_products[j]){
+
+		for(var m = 0; m < original_cart_products.length; m++){
+			//check if item is found, not found implies New Item!
+			if(!changed_cart_products[j].isCustom && (changed_cart_products[j].code == original_cart_products[m].code)){
+				//Item Found
+				break;
+			}
+			else if(changed_cart_products[j].isCustom && (changed_cart_products[j].code == original_cart_products[m].code) && (changed_cart_products[j].variant == original_cart_products[m].variant)){
+				//Item Found
+				break;
+			}
+
+			//Last iteration to find the item
+			if(m == original_cart_products.length-1){
+				//console.log('** New Item: '+changed_cart_products[j].name)
+				console.log(changed_cart_products[j].name+' x '+changed_cart_products[j].qty+' (New)');
+			}
+		} 
+
+		j++;
+	}
+
+}
+
+
+/* Generate KOT for Fresh Order */
+function generateNewKOT(){
 
 	//Render Cart Items based on local storage
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
@@ -842,6 +1409,45 @@ function generateKOT(){
 	    } else {
 	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
 	    }	
+}
+
+function getCurrentTime(type){
+          
+          var today = new Date();
+          var time;
+          var dd = today.getDate();
+          var mm = today.getMonth()+1; //January is 0!
+          var yyyy = today.getFullYear();
+          var hour = today.getHours();
+          var mins = today.getMinutes();
+
+          if(dd<10) {
+              dd = '0'+dd;
+          } 
+
+          if(mm<10) {
+              mm = '0'+mm;
+          } 
+
+          if(hour<10) {
+              hour = '0'+hour;
+          } 
+
+          if(mins<10) {
+              mins = '0'+mins;
+          }
+
+          today = dd + '-' + mm + '-' + yyyy;
+          time = hour + '' + mins;
+
+
+    if(type == 'TIME'){
+    	return time;
+    }
+
+    if(type == 'DATE')
+    	return today;
+	 
 }
 
 function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selectedModeExtras){
@@ -906,8 +1512,14 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
 		}
 	*/
 
-	var stewName = '';
-	var stewCode = '9884169765';
+	//Get staff info.
+	var loggedInStaffInfo = window.localStorage.loggedInStaffData ?  JSON.parse(window.localStorage.loggedInStaffData) : {};
+	
+	if(jQuery.isEmptyObject(loggedInStaffInfo)){
+		loggedInStaffInfo.name = 'Default';
+		loggedInStaffInfo.code = '0000000000';
+	}	
+
 	var spremarks = '';
 
 	var orderMetaInfo = {};
@@ -923,32 +1535,10 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
        } else{
           var num = parseInt(data) + 1;
           var kot = 'KOT' + num;
-          var today = new Date();
-          var time;
-          var dd = today.getDate();
-          var mm = today.getMonth()+1; //January is 0!
-          var yyyy = today.getFullYear();
-          var hour = today.getHours();
-          var mins = today.getMinutes();
+         
 
-          if(dd<10) {
-              dd = '0'+dd;
-          } 
-
-          if(mm<10) {
-              mm = '0'+mm;
-          } 
-
-          if(hour<10) {
-              hour = '0'+hour;
-          } 
-
-          if(mins<10) {
-              mins = '0'+mins;
-          }
-
-          today = dd + '-' + mm + '-' + yyyy;
-          time = hour + '' + mins;
+          var today = getCurrentTime('DATE');
+          var time = getCurrentTime('TIME');
 
           var obj = {}; 
           obj.KOTNumber = kot;
@@ -956,8 +1546,8 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
           obj.table = customerInfo.mappedAddress;
           obj.customerName = customerInfo.name;
           obj.customerMobile = customerInfo.mobile; 
-          obj.stewardName = 'STEWARD NAME';
-          obj.stewardCode = 'STEWARD CODE';
+          obj.stewardName = loggedInStaffInfo.name;
+          obj.stewardCode = loggedInStaffInfo.code;
           obj.orderStatus = 1;
           obj.date = today;
           obj.timePunch = time;
@@ -975,10 +1565,14 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
               if(err){
 				showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
               }
-              else{
-              	showToast('#'+kot+' generated Successfully', '#27ae60');
+              else{          
               	if(orderMetaInfo.modeType == 'DINE'){
               		addToTableMapping(obj.table, kot, obj.customerName);
+              		showToast('#'+kot+' generated Successfully', '#27ae60');
+		           	clearAllMetaData();
+	              	renderCustomerInfo();
+	              	$("#add_item_by_search").focus();
+
               	}
               	else if(orderMetaInfo.modeType == 'TOKEN'){
               		/*Increment Token Counter*/
@@ -986,10 +1580,16 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
               		if(!tempToken || tempToken == ''){
               			tempToken = 1;
               		}
+              		showToast('#'+kot+' generated Successfully', '#27ae60');
               		window.localStorage.lastPrintedToken = parseInt(tempToken) + 1;
               		clearAllMetaData();
               		renderCustomerInfo();
-              		renderCart();
+              		$("#add_item_by_search").focus();
+              	}
+              	else if(orderMetaInfo.modeType == 'PARCEL'){
+              		showToast('#'+kot+' generated Successfully', '#27ae60');
+              		clearAllMetaData();
+              		renderCustomerInfo();
               		$("#add_item_by_search").focus();
               	}
               }
@@ -1043,6 +1643,8 @@ function addToTableMapping(tableID, kotID, assignedTo){
 
 	          var isUpdated = false;
 
+	          var timestamp = getCurrentTime('TIME');
+
 	          for(var i=0; i<tableMapping.length; i++){
 	          	if(tableMapping[i].table == tableID){
 
@@ -1062,7 +1664,7 @@ function addToTableMapping(tableID, kotID, assignedTo){
 	          }
 
 	          if(!isUpdated){
-	          	tableMapping.push({ "table": tableID, "assigned": assignedTo, "KOT": kotID, "status": 1, "lastUpdate": hour+''+mins });
+	          	tableMapping.push({ "table": tableID, "assigned": assignedTo, "KOT": kotID, "status": 1, "lastUpdate": timestamp });
 		      }
 
 		       var newjson = JSON.stringify(tableMapping);
@@ -1216,7 +1818,7 @@ function pickTableForNewOrder(currentTableID){
 							              		}
 							              	}
 
-							              	renderSectionArea = renderSectionArea + '<div class="row" style="margin-top: 25px">'+
+							              	renderSectionArea = renderSectionArea + '<div class="row" style="margin: 0">'+
 																	   '<h1 class="seatingPlanHead">'+tableSections[n]+'</h1>'+
 																	   '<div class="col-lg-12" style="text-align: center;">'+renderTableArea+
 																	    '</div>'+

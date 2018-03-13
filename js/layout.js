@@ -737,7 +737,10 @@ function renderCurrentUserDisplay(){
   }
 
   if(loggedInStaffInfo.name != '' && loggedInStaffInfo.code != ''){
-    document.getElementById("currentUserProfileDisplay").innerHTML = '<tag class="currentUserImage"/>'+getTwoLetterImageCode(loggedInStaffInfo.name)+'</tag><span>'+loggedInStaffInfo.name+'</span>';
+    document.getElementById("currentUserProfileDisplay").innerHTML = '<tag class="currentUserImage"/>'+getTwoLetterImageCode(loggedInStaffInfo.name)+'</tag><span style="font-weight: bold">'+loggedInStaffInfo.name+'</span>';
+  }
+  else{
+    document.getElementById("currentUserProfileDisplay").innerHTML = '<img src="images/default_user.png" class="user-image" alt="Avatar" /> <span>Profile Not Selected</span>';
   }
 }
 

@@ -7,6 +7,16 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
+/*
+  PRINTER
+*/
+const fs = require('fs')
+const os = require('os')
+const ipc = electron.ipcMain;
+const shell = electron.shell;
+
+
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -67,3 +77,55 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+/* Printer Processes */
+ipc.on('print-to-pdf', function(event){
+
+  var pageSettings = {
+    'marginsType': 1, //No Margin
+    'printBackground': true, 
+    'pageSize': {
+      "height": 297000,
+      "width": 72000
+    }
+  }
+
+
+  const pdfPath = path.join(os.tmpdir(), 'print.pdf')
+  const win =   new BrowserWindow({width: 800, height: 1500});
+
+  win.loadURL(url.format({
+    pathname: path.join(__dirname+'/templates', 'kot.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+
+setTimeout(function(){ 
+
+  win.webContents.printToPDF(pageSettings, function(error, data){
+    if(error){
+      console.log(error.message)
+      return
+    }
+    else{
+      fs.writeFile(pdfPath, data, function(err){
+        if(err){
+          console.log(error.message)
+          return
+        }
+        else{
+          shell.openExternal('file://'+pdfPath);
+          event.sender.send('wrote-pdf', pdfPath);
+        }
+      })
+
+    }
+  });
+
+
+}, 3000);
+
+
+
+});
+
