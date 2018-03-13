@@ -47,8 +47,6 @@ function finalRender(fullKOT) {
 
 /*Add to edit KOT*/
 function pushToEditKOT(encodedKOT){
-
-    console.log('Edit KOT request...')
     
     var kot = JSON.parse(decodeURI(encodedKOT));
    
@@ -84,8 +82,17 @@ function overWriteCurrentOrderModalClose(){
 function overWriteCurrentOrder(encodedKOT){
     var kot = JSON.parse(decodeURI(encodedKOT));
 
+    var customerInfo = {};
+    customerInfo.name = kot.customerName;
+    customerInfo.mobile = kot.customerMobile;
+    customerInfo.mappedAddress = kot.table;
+    customerInfo.mode = kot.orderDetails.mode;
+    customerInfo.modeType = kot.orderDetails.modeType;
+    customerInfo.reference = kot.orderDetails.reference;
+
     //Pending new order will be removed off the cart.
     window.localStorage.zaitoon_cart = JSON.stringify(kot.cart);
+    window.localStorage.customerData = JSON.stringify(customerInfo);
     window.localStorage.edit_KOT_originalCopy = decodeURI(encodedKOT);
     renderPage('new-order', 'Editing Order');
 }

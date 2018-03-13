@@ -6,16 +6,16 @@
          <div id="pos">
             <form>
             
-               <div class="well well-sm punchPOS" id="leftdiv" style="padding: 2px 2px 8px 2px">
+               <div class="well well-sm punchPOS" id="leftdiv" style="padding: 2px 2px 8px 2px; margin-bottom: 5px;">
                   <div id="lefttop" style="margin-bottom:5px;">
 
                         <h1 class="posCartHead" id="ongoingOrderTitle">New Order</h1>
-                        <hr style="margin-top: 0">
+                        <hr style="margin: 0">
 
-                        <h2 class="posCartSubHead">Customer Details</h2>
+                        <h2 class="posCartSubHead" style="margin-top: 12px">Customer Details</h2>
                         <div style="padding: 0 6px" id="orderCustomerInfo"></div>
 
-                        <h2 class="posCartSubHead" style="margin-top: 20px">Order Cart</h2>
+                        <h2 class="posCartSubHead" style="margin-top: 8px">Order Cart</h2>
 
                      <div class="form-group" style="margin-bottom:5px; margin-right: 6px; margin-left: 6px">
                         <input type="text" name="code" id="add_item_by_search" class="form-control ui-autocomplete-input" placeholder="Search item by name or short code"/>
@@ -52,7 +52,10 @@
                      </div>
 
                      <div style="clear:both;"></div>
-                     <div id="summaryDisplay" style="margin-right: 6px; margin-left: 6px">
+                     <div id="summaryDisplay" style="margin-left: 6px; max-height: 120px; overflow-y: scroll;">
+                     </div>
+                     <div id="summarySumDisplay" style="margin-right: 6px; margin-left: 6px;">
+
                      </div>
                   </div>
 
@@ -116,6 +119,25 @@
       </div>
 
 
+
+      <!-- Modal -->
+      <div id="overWriteHoldOrderModal" class="modal">
+         <div class="modal-dialog" style="top: 20%">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-body" style="max-height: 420px; overflow: scroll; padding: 30px 15px">
+                <p style="font-size: 16px; margin: 0; color: #e74c3c;">This would over-write the current order which has unsaved changes. <br><br>Are you sure want to open this Held Order?</p>
+               </div>
+               <div class="modal-footer" id="overWriteHoldOrderModalActions">
+
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+
+
    <!-- Modal -->
    <div id="customiseItemModal" class="modal">
       <div class="modal-dialog" style="top: 20%">
@@ -148,7 +170,7 @@
                <button type="button" onclick="pickTableForNewOrderHide()" style="float: right;" class="btn clearButton">X</button>
                <h4 class="modal-title">Choose a Table</h4>
             </div>
-            <div class="modal-body" style="max-height: 70vh; overflow: scroll;" id="pickTableForNewOrderModalContent">
+            <div class="modal-body" style="max-height: 70vh; overflow: scroll; padding-top: 0" id="pickTableForNewOrderModalContent">
             </div>
             <div class="modal-footer" style="padding: 0">
                <button type="button" class="btn btn-default" onclick="pickTableForNewOrderHide()" style="width: 100%; border: none; border-radius: 0; height: 50px;">Cancel</button>
