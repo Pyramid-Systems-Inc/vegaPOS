@@ -113,13 +113,6 @@ function viewKOTModal(){
 }
 
 
-/* KOTs */
-function checkOverflow(element){
-	if(element.scrollHeight > element.clientHeight){
-		element.getElementsByClassName("more")[0].style.display = 'block';
-	}
-}
-
 /*Toast*/
 function showToast(message, color){
         var x = document.getElementById("infobar")

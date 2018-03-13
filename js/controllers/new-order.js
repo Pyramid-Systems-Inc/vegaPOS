@@ -282,13 +282,13 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
           var otherChargerRenderCount = 1;
           var k = 0;
 
-          otherCharges = '<tr class="info"><td width="25%" class="cartSummaryRow">Discount</td><td class="text-right cartSummaryRow" style="padding-right:10px;">0</td>';
+          otherCharges = '<tr class="info">';
           /*discount applied after kot generation only*/
 
           if(selectedModeExtras.length > 0){
 
           	for(k = 0; k < selectedModeExtras.length; k++){
-          		if(k%2 == 1){
+          		if(k%2 == 0){
           			otherCharges = otherCharges + '</tr><tr class="info">';
           		}
 
@@ -304,7 +304,8 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
 
           		tempExtraTotal = Math.round(tempExtraTotal * 100) / 100;
 
-          		otherCharges = otherCharges + '<td width="25%" class="cartSummaryRow">'+selectedModeExtras[k].name+' ('+(selectedModeExtras[k].unit == 'PERCENTAGE'? selectedModeExtras[k].value + '%': '<i class="fa fa-inr"></i>'+selectedModeExtras[k].value)+')</td><td class="text-right cartSummaryRow"><i class="fa fa-inr"></i>'+tempExtraTotal+'</td>';
+          		otherCharges = otherCharges + '<td width="35%" class="cartSummaryRow">'+selectedModeExtras[k].name+' ('+(selectedModeExtras[k].unit == 'PERCENTAGE'? selectedModeExtras[k].value + '%': '<i class="fa fa-inr"></i>'+selectedModeExtras[k].value)+')</td><td width="15%" class="text-right cartSummaryRow"><i class="fa fa-inr"></i>'+tempExtraTotal+'</td>';
+          	
           		otherChargesSum = otherChargesSum + tempExtraTotal;
           		
           	}
@@ -313,11 +314,14 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
 
           otherChargerRenderCount = otherChargerRenderCount + k;
 
-          if(otherChargerRenderCount%2 == 1){
-          	otherCharges = otherCharges + '<td class="cartSummaryRow"></td><td class="cartSummaryRow"></td></tr>';
+          if(otherChargerRenderCount%2 == 0){
+          	otherCharges = otherCharges + '<td width="35%" class="cartSummaryRow">Other Charges</td><td width="15%" class="text-right cartSummaryRow" style="padding-right:10px;">0</td></tr>'+
+          				'<tr class="info"><td width="35%" class="cartSummaryRow">Discount</td><td width="15%" class="text-right cartSummaryRow" style="padding-right:10px;">0</td>'+
+          				'<td class="cartSummaryRow"></td><td class="cartSummaryRow"></td></tr>';
           }
           else{
-          	otherCharges = otherCharges + '</tr>';
+          	otherCharges = otherCharges + '</tr> <tr class="info"><td width="35%" class="cartSummaryRow">Other Charges</td><td width="15%" class="text-right cartSummaryRow" style="padding-right:10px;">0</td>'+
+          					'<td width="35%" class="cartSummaryRow">Discount</td><td width="15%" class="text-right cartSummaryRow" style="padding-right:10px;">0</td></tr>';
           }
 
 
@@ -329,10 +333,10 @@ function renderCartAfterProcess(cart_products, selectedBillingModeInfo, selected
 	document.getElementById("summaryDisplay").innerHTML = '<table class="table table-condensed totals" style="margin: 0">'+
                         '   <tbody>'+
                         '     <tr class="info">'+
-                        '         <td width="25%" class="cartSummaryRow">Total Items</td>'+
-                        '        <td class="text-right cartSummaryRow" style="padding-right:10px;"><span id="count">'+totqty+'</span></td>'+
-                        '         <td width="25%" class="cartSummaryRow">Total</td>'+
-                        '         <td class="text-right cartSummaryRow" colspan="2"><span id="total"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
+                        '         <td width="35%" class="cartSummaryRow">Total Items</td>'+
+                        '        <td class="text-right cartSummaryRow" style="padding-right:10px;" width="15%"><span id="count">'+totqty+'</span></td>'+
+                        '         <td width="35%" class="cartSummaryRow">Total</td>'+
+                        '         <td class="text-right cartSummaryRow" colspan="2" width="15%"><span id="total"><i class="fa fa-inr"></i>'+tot+'</span></td>'+
                         '      </tr>'+otherCharges+
                         '   </tbody>'+
                         '</table>';
@@ -704,7 +708,7 @@ function renderCustomerInfo(){
 	if(window.localStorage.edit_KOT_originalCopy && window.localStorage.edit_KOT_originalCopy != ''){
 		isEditingKOT = true;
 		var kotCopy = window.localStorage.edit_KOT_originalCopy ?  JSON.parse(window.localStorage.edit_KOT_originalCopy) : {};
-		document.getElementById("ongoingOrderTitle").innerHTML = 'Edit Order <tag style="float: right; font-weight: 300;">Table <b>#'+kotCopy.table+'</b></tag>';
+		document.getElementById("ongoingOrderTitle").innerHTML = 'Running Order <tag style="float: right; font-weight: 300;">Table <b>#'+kotCopy.table+'</b></tag>';
 	}
 	else{
 
@@ -1557,7 +1561,8 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
           obj.cart = cart_products;
           obj.specialRemarks = 'SPECIAL COMMENTS';
           obj.extras = otherCharges,
-          obj.discount = {}
+          obj.discount = {},
+          obj.customExtras = {}
 
           var json = JSON.stringify(obj); //convert it back to json
           var file = './data/KOT/'+kot+'.json';
