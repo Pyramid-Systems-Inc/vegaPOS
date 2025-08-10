@@ -168,76 +168,45 @@ function deleteDineSessionConfirm(name){
 
 
 /* delete a dine session */
-function deleteDineSession(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/dinesessions.json')) {
-       fs.readFile('./data/static/dinesessions.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-       	if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].name == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/dinesessions.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-        
-        	/* on successful delete */
-   			  fetchAllDineSessions();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-   cancelOtherDeleteConfirmation()
-
+function deleteDineSession(name) {
+  try {
+    deleteDineSession(name);
+    fetchAllDineSessions();
+    cancelOtherDeleteConfirmation();
+  } catch (error) {
+    console.error('Error deleting dine session:', error);
+    showToast('System Error: Unable to make changes in Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
+  }
 }
 
 
 
 /* read saved comments */
 function fetchAllSavedComments(){
+	try {
+		var modes = getAllSavedComments();
+		modes.sort(); //alphabetical sorting
+		var modesTag = '';
 
-		if(fs.existsSync('./data/static/savedcomments.json')) {
-	      fs.readFile('./data/static/savedcomments.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var modes = JSON.parse(data);
-	          	modes.sort(); //alphabetical sorting 
-	          	var modesTag = '';
-
-				for (var i=0; i<modes.length; i++){
-					modesTag = modesTag + '<button type="button" style="margin-right: 5px" class="btn btn-outline" onclick="deleteSavedCommentConfirm(\''+modes[i]+'\')">'+modes[i]+'</button>';
-        }
-
-				if(!modesTag)
-					document.getElementById("savedCommentsInfo").innerHTML = '<p style="color: #bdc3c7">No comments added yet.</p>';
-				else
-					document.getElementById("savedCommentsInfo").innerHTML = modesTag;
+		for (var i=0; i<modes.length; i++){
+			modesTag = modesTag + '<button type="button" style="margin-right: 5px" class="btn btn-outline" onclick="deleteSavedCommentConfirm(\''+modes[i]+'\')">'+modes[i]+'</button>';
 		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+
+		if(!modesTag)
+			document.getElementById("savedCommentsInfo").innerHTML = '<p style="color: #bdc3c7">No comments added yet.</p>';
+		else
+			document.getElementById("savedCommentsInfo").innerHTML = modesTag;
+	} catch (error) {
+		console.error('Error fetching saved comments:', error);
+		showToast('System Error: Unable to read Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
+	}
 }
 
 
 
 
 /* add new comment */
-function addNewComment() {  
+function addNewComment() {
 
 	var commentName = document.getElementById("add_new_savedComment").value;
 
@@ -246,74 +215,28 @@ function addNewComment() {
 		return '';
 	}
 
-     //Check if file exists
-      if(fs.existsSync('./data/static/savedcomments.json')) {
-         fs.readFile('./data/static/savedcomments.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(commentName); //add some data
-            var json = JSON.stringify(obj);
-            fs.writeFile('./data/static/savedcomments.json', json, 'utf8', (err) => {
-                if(err){
-                  showToast('System Error: Unable to save Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{
-
-                fetchAllSavedComments(); //refresh the list
-                hideNewSavedComment();
-
-              }
-            });
-         }
-         else{
-             var flag=0;
-             if(data == ''){ data = '[]'; }
-             var obj = [];
-             obj = JSON.parse(data);
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i] == commentName){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Comment already exists. Please add a different comment.', '#e67e22');
-             }
-             else{
-                obj.push(commentName);
-                var json = JSON.stringify(obj);
-                fs.writeFile('./data/static/savedcomments.json', json, 'utf8', (err) => {
-                     if(err){
-                        showToast('System Error: Unable to save Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-                    }
-		            else{
-			                fetchAllSavedComments(); //refresh the list
-			                hideNewSavedComment();
-		              	
-		              }
-                  });  
-
-             }
-                 
-         }
-          
-   }});
-      } else {
-         obj.push(commentName);
-         fs.writeFile('./data/static/savedcomments.json', obj, 'utf8', (err) => {
-            if(err){
-               showToast('System Error: Unable to save Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-           }
-           else{
-                fetchAllSavedComments(); //refresh the list
-                hideNewSavedComment();         	
-           }
-         });
+  try {
+    // Check if comment already exists
+    var existingComments = getAllSavedComments();
+    var flag = 0;
+    for (var i = 0; i < existingComments.length; i++) {
+      if (existingComments[i] == commentName) {
+        flag = 1;
+        break;
       }
-  
+    }
+    
+    if (flag == 1) {
+      showToast('Warning: Comment already exists. Please add a different comment.', '#e67e22');
+    } else {
+      addSavedComment(commentName);
+      fetchAllSavedComments(); //refresh the list
+      hideNewSavedComment();
+    }
+  } catch (error) {
+    console.error('Error adding saved comment:', error);
+    showToast('System Error: Unable to save Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
+  }
 }
 
 function deleteSavedCommentConfirm(name){
@@ -321,36 +244,14 @@ function deleteSavedCommentConfirm(name){
 }
 
 /* delete a comment */
-function deleteSavedComment(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/savedcomments.json')) {
-       fs.readFile('./data/static/savedcomments.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-       	if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i] == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/savedcomments.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-        
-        	/* on successful delete */
-   			  fetchAllSavedComments();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-   cancelOtherDeleteConfirmation()
-
+function deleteSavedComment(name) {
+  try {
+    deleteSavedComment(name);
+    fetchAllSavedComments();
+    cancelOtherDeleteConfirmation();
+  } catch (error) {
+    console.error('Error deleting saved comment:', error);
+    showToast('System Error: Unable to make changes in Saved Comments data. Please contact Accelerate Support.', '#e74c3c');
+  }
 }
 

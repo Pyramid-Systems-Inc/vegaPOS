@@ -180,22 +180,22 @@ function renderCart(){
 	//Render Cart Items based on local storage
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
 
-	var billing_modes = db.prepare('SELECT * FROM billing_modes').all();
-	
-	var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
-	var selectedBillingModeInfo = '';
-	
-	var n = 0;
-	while(billing_modes[n]){
-		if(billing_modes[n].name == selectedBillingModeName){
-			selectedBillingModeInfo = billing_modes[n];
-			break;
+	try {
+		var billing_modes = getAllBillingModes();
+		
+		var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
+		var selectedBillingModeInfo = '';
+		
+		var n = 0;
+		while(billing_modes[n]){
+			if(billing_modes[n].name == selectedBillingModeName){
+				selectedBillingModeInfo = billing_modes[n];
+				break;
+			}
+			n++;
 		}
-		n++;
-	}
 
-    try {
-        const params = db.prepare('SELECT * FROM billing_parameters').all();
+        const params = getAllBillingParameters();
 
         var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
         var cartExtrasList = [];
@@ -204,8 +204,8 @@ function renderCart(){
         var m = 0;
         while(selectedModeExtrasList[n]){
             m = 0;
-            while(params[m]){  
-                if(selectedModeExtrasList[n] == params[m].name)        			
+            while(params[m]){
+                if(selectedModeExtrasList[n] == params[m].name)
                     cartExtrasList.push(params[m]);
                 m++;
             }
@@ -580,83 +580,32 @@ function removeAllHoldOrders(){
 
 
 function addTableToReserveList(tableID, optionalComments){
-
+	try {
 		var comments = optionalComments;
+		var timestamp = getCurrentTime('TIME');
 
-		if(fs.existsSync('./data/static/tablemapping.json')) {
-	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	       
-	    } else {
-	    	if(data == ''){ data = '[]'; }
-	          var tableMapping = JSON.parse(data); 
-
-	          var isUpdated = false;
-
-	          var timestamp = getCurrentTime('TIME');
-
-	          for(var i=0; i<tableMapping.length; i++){
-	          	if(tableMapping[i].table == tableID){
-
-	          		if(tableMapping[i].status != 0){
-	          			return '';
-	          		}
-
-	          		tableMapping[i].assigned = comments;
-	          		tableMapping[i].KOT = "";
-	          		tableMapping[i].status = 5;
-	          		tableMapping[i].lastUpdate = timestamp;
-
-	          		isUpdated = true;
-
-	          		break;
-	          	}
-	          }
-
-	          if(!isUpdated){
-	          	tableMapping.push({ "table": tableID, "assigned": comments, "KOT": "", "status": 5, "lastUpdate": timestamp });
-		      }
-
-		       var newjson = JSON.stringify(tableMapping);
-		       fs.writeFile('./data/static/tablemapping.json', newjson, 'utf8', (err) => {
-		       }); 
-
+		// Check if table is already reserved or occupied
+		var existingMapping = getTableMapping(tableID);
+		if (existingMapping && existingMapping.status != 0) {
+			return '';
 		}
-		});
-	    }
+
+		addOrUpdateTableMapping(tableID, "", comments, 5, timestamp);
+	} catch (error) {
+		console.error('Error adding table to reserve list:', error);
+	}
 }
 
 
 function removeTableFromReserveList(tableID){
-		if(fs.existsSync('./data/static/tablemapping.json')) {
-	      fs.readFile('./data/static/tablemapping.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	       
-	    } else {
-	    	if(data == ''){ data = '[]'; }
-	          var tableMapping = JSON.parse(data); 
-
-	          for(var i=0; i<tableMapping.length; i++){
-	          	if(tableMapping[i].table == tableID){
-
-	          		if(tableMapping[i].status != 5){
-	          			return '';
-	          		}
-
-	          		tableMapping.splice(i,1);
-
-	          		break;
-	          	}
-	          }
-
-		       var newjson = JSON.stringify(tableMapping);
-		       fs.writeFile('./data/static/tablemapping.json', newjson, 'utf8', (err) => {
-		         
-		       }); 
-
+	try {
+		var existingMapping = getTableMapping(tableID);
+		if (existingMapping && existingMapping.status == 5) {
+			deleteTableMapping(tableID);
 		}
-		});
-	    }
+	} catch (error) {
+		console.error('Error removing table from reserve list:', error);
+	}
 }
 
 
@@ -772,26 +721,19 @@ function renderCustomerInfo(){
 
 
 
-		if(fs.existsSync('./data/static/billingmodes.json')) {
-	      fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
-	    	renderCart();
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	billingModesInfo = JSON.parse(data);
-	          	billingModesInfo.sort(); //alphabetical sorting 
-
-	          	window.localStorage.billingModesData = data; /*For cart rendering purpose*/
-	          	
-				/*Billing modes not set or not rendering*/
-				if(jQuery.isEmptyObject(billingModesInfo)){
-					document.getElementById("orderCustomerInfo").innerHTML = '<p style="text-align: center; color: #dd4b39;">Billing Modes not set. <tag class="extrasSelButton" onclick="renderPage(\'bill-settings\', \'Bill Settings\'); openBillSettings(\'billingModes\')">Adding Billing Modes</tag> to continue</p>';
-					showToast('Warning: Billing Modes are not set', '#e67e22');
-					return '';
-				}
+		try {
+			billingModesInfo = getAllBillingModes();
+			billingModesInfo.sort(); //alphabetical sorting
+	
+			/*For cart rendering purpose*/
+			window.localStorage.billingModesData = JSON.stringify(billingModesInfo);
+			
+			/*Billing modes not set or not rendering*/
+			if(jQuery.isEmptyObject(billingModesInfo)){
+				document.getElementById("orderCustomerInfo").innerHTML = '<p style="text-align: center; color: #dd4b39;">Billing Modes not set. <tag class="extrasSelButton" onclick="renderPage(\'bill-settings\', \'Bill Settings\'); openBillSettings(\'billingModes\')">Adding Billing Modes</tag> to continue</p>';
+				showToast('Warning: Billing Modes are not set', '#e67e22');
+				return '';
+			}
 
 				if(jQuery.isEmptyObject(customerInfo)){
 					customerInfo.name = "";
@@ -946,13 +888,11 @@ function renderCustomerInfo(){
 
 			        renderCart();
 				}
-		}
-		});
-	    }
-	    else{
-	    	showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
-	    	renderCart();
-	    }	
+	} catch (error) {
+		console.error('Error loading billing modes:', error);
+		showToast('System Error: Unable to load Billing Modes. Please contact Accelerate Support.', '#e74c3c');
+		renderCart();
+	}
 
 }
 
@@ -1371,40 +1311,30 @@ function generateNewKOT(){
 	}
 
 
-		if(fs.existsSync('./data/static/billingparameters.json')) {
-	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var params = JSON.parse(data);
-
-	          	var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
-	          	var cartExtrasList = [];
-
-	          	var n = 0;
-	          	var m = 0;
-	          	while(selectedModeExtrasList[n]){
-	          		m = 0;
-	          		while(params[m]){	  
-	          			if(selectedModeExtrasList[n] == params[m].name)        			
-	          				cartExtrasList.push(params[m])
-	          			
-	          			m++;
-	          		}
-	          		n++;
-	          	}
-
-	          	generateKOTAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)	          	
-
+		try {
+			var params = getAllBillingParameters();
+	
+			var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
+			var cartExtrasList = [];
+	
+			var n = 0;
+			var m = 0;
+			while(selectedModeExtrasList[n]){
+				m = 0;
+				while(params[m]){
+					if(selectedModeExtrasList[n] == params[m].name)
+						cartExtrasList.push(params[m])
+					
+					m++;
+				}
+				n++;
+			}
+	
+			generateKOTAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)
+		} catch (error) {
+			console.error('Error reading billing parameters:', error);
+			showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
 		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
-}
 
 function getCurrentTime(type){
           
@@ -1522,83 +1452,69 @@ function generateKOTAfterProcess(cart_products, selectedBillingModeInfo, selecte
 	orderMetaInfo.modeType = customerInfo.modeType;
 	orderMetaInfo.reference = customerInfo.reference;
    
-      //Check if file exists
+ try {
+  // Get last KOT number from settings
+  var lastKOT = getSetting('last_kot') || 1000;
+  var num = parseInt(lastKOT) + 1;
+  var kot = 'KOT' + num;
 
-      fs.readFile('./data/static/lastKOT.txt', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read order related data. Please contact Accelerate Support.', '#e74c3c');
-       } else{
-          var num = parseInt(data) + 1;
-          var kot = 'KOT' + num;
-         
+  var today = getCurrentTime('DATE');
+  var time = getCurrentTime('TIME');
 
-          var today = getCurrentTime('DATE');
-          var time = getCurrentTime('TIME');
+  var obj = {};
+  obj.kot_number = kot;
+  obj.order_details_json = JSON.stringify(orderMetaInfo);
+  obj.table_name = customerInfo.mappedAddress;
+  obj.customer_name = customerInfo.name;
+  obj.customer_mobile = customerInfo.mobile;
+  obj.steward_name = loggedInStaffInfo.name;
+  obj.steward_code = loggedInStaffInfo.code;
+  obj.order_status = 1;
+  obj.date = today;
+  obj.time_punch = time;
+  obj.time_kot = "";
+  obj.time_bill = "";
+  obj.time_settle = "";
+  obj.cart_json = JSON.stringify(cart_products);
+  obj.extras_json = JSON.stringify(otherCharges);
+  obj.discount_json = JSON.stringify({});
+  obj.special_remarks = 'SPECIAL COMMENTS';
 
-          var obj = {}; 
-          obj.KOTNumber = kot;
-          obj.orderDetails = orderMetaInfo;
-          obj.table = customerInfo.mappedAddress;
-          obj.customerName = customerInfo.name;
-          obj.customerMobile = customerInfo.mobile; 
-          obj.stewardName = loggedInStaffInfo.name;
-          obj.stewardCode = loggedInStaffInfo.code;
-          obj.orderStatus = 1;
-          obj.date = today;
-          obj.timePunch = time;
-          obj.timeKOT = "";
-          obj.timeBill = "";
-          obj.timeSettle = "";
-          obj.cart = cart_products;
-          obj.specialRemarks = 'SPECIAL COMMENTS';
-          obj.extras = otherCharges,
-          obj.discount = {},
-          obj.customExtras = {}
+  // Add order to database
+  addOrder(obj);
 
-          var json = JSON.stringify(obj); //convert it back to json
-          var file = './data/KOT/'+kot+'.json';
-          fs.writeFile(file, json, 'utf8', (err) => {
-              if(err){
-				showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{          
-              	if(orderMetaInfo.modeType == 'DINE'){
-              		addToTableMapping(obj.table, kot, obj.customerName);
-              		showToast('#'+kot+' generated Successfully', '#27ae60');
-		           	clearAllMetaData();
-	              	renderCustomerInfo();
-	              	$("#add_item_by_search").focus();
+  // Update last KOT number
+  setSetting('last_kot', num);
 
-              	}
-              	else if(orderMetaInfo.modeType == 'TOKEN'){
-              		/*Increment Token Counter*/
-              		var tempToken = window.localStorage.lastPrintedToken;
-              		if(!tempToken || tempToken == ''){
-              			tempToken = 1;
-              		}
-              		showToast('#'+kot+' generated Successfully', '#27ae60');
-              		window.localStorage.lastPrintedToken = parseInt(tempToken) + 1;
-              		clearAllMetaData();
-              		renderCustomerInfo();
-              		$("#add_item_by_search").focus();
-              	}
-              	else if(orderMetaInfo.modeType == 'PARCEL'){
-              		showToast('#'+kot+' generated Successfully', '#27ae60');
-              		clearAllMetaData();
-              		renderCustomerInfo();
-              		$("#add_item_by_search").focus();
-              	}
-              }
-              	 
-           });
-
-
-          fs.writeFile("./data/static/lastKOT.txt", num, 'utf8', (err) => {
-              if(err)
-                 showToast('System Error: Unable to modify order related data. Please contact Accelerate Support.', '#e74c3c');
-           });
-       }
-       });
+  if(orderMetaInfo.modeType == 'DINE'){
+   addOrUpdateTableMapping(obj.table_name, kot, obj.customer_name, 1, time);
+   showToast('#'+kot+' generated Successfully', '#27ae60');
+   clearAllMetaData();
+   renderCustomerInfo();
+   $("#add_item_by_search").focus();
+  }
+  else if(orderMetaInfo.modeType == 'TOKEN'){
+   /*Increment Token Counter*/
+   var tempToken = window.localStorage.lastPrintedToken;
+   if(!tempToken || tempToken == ''){
+    tempToken = 1;
+   }
+   showToast('#'+kot+' generated Successfully', '#27ae60');
+   window.localStorage.lastPrintedToken = parseInt(tempToken) + 1;
+   clearAllMetaData();
+   renderCustomerInfo();
+   $("#add_item_by_search").focus();
+  }
+  else if(orderMetaInfo.modeType == 'PARCEL'){
+   showToast('#'+kot+' generated Successfully', '#27ae60');
+   clearAllMetaData();
+   renderCustomerInfo();
+   $("#add_item_by_search").focus();
+  }
+ } catch (error) {
+  console.error('Error generating KOT:', error);
+  showToast('System Error: Unable to generate KOT. Please contact Accelerate Support.', '#e74c3c');
+ }
 }
 
 function clearAllMetaData(){
@@ -2043,29 +1959,22 @@ function openItemWiseCommentModal(itemCode, variant){
 			}			
 		}
 
-		if(fs.existsSync('./data/static/savedcomments.json')) {
-	      fs.readFile('./data/static/savedcomments.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var modes = JSON.parse(data);
-	          	modes.sort(); //alphabetical sorting 
-	          	var modesTag = '';
-
-				for (var i=0; i<modes.length; i++){
-					modesTag = modesTag + '<button type="button" style="margin-right: 5px" class="btn btn-outline" onclick="addFromSuggestions(\''+modes[i]+'\')">'+modes[i]+'</button>';
-        		}
-
-				if(!modesTag)
-					document.getElementById("savedCommentsSuggestions").innerHTML = '';
-				else
-					document.getElementById("savedCommentsSuggestions").innerHTML = modesTag;
+		try {
+			var modes = getAllSavedComments();
+			modes.sort(); //alphabetical sorting
+			var modesTag = '';
+	
+			for (var i=0; i<modes.length; i++){
+				modesTag = modesTag + '<button type="button" style="margin-right: 5px" class="btn btn-outline" onclick="addFromSuggestions(\''+modes[i]+'\')">'+modes[i]+'</button>';
+			}
+	
+			if(!modesTag)
+				document.getElementById("savedCommentsSuggestions").innerHTML = '';
+			else
+				document.getElementById("savedCommentsSuggestions").innerHTML = modesTag;
+		} catch (error) {
+			console.error('Error loading saved comments:', error);
 		}
-		});
-	    }
 
 
 	    document.getElementById("itemWiseCommentsModal").style.display = 'block';
