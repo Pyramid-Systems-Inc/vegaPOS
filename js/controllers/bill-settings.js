@@ -1,848 +1,339 @@
+const { db } = require('../database-init.js');
 
-function openNewBill(){
-	document.getElementById("newBillArea").style.display = "block";
-	document.getElementById("openNewBillButton").style.display = "none";
-}
+function openBillSettings(id) {
+    // Hide all sections
+    $("#detailsDisplayBillSettings").children().hide();
+    $("#detailsNewBillSettings").children().hide();
 
-function hideNewBill(){
-	
-	document.getElementById("newBillArea").style.display = "none";
-	document.getElementById("openNewBillButton").style.display = "block";
-}
+    // Show the correct section
+    document.getElementById(id).style.display = "block";
 
-
-function addExtraToInput(name, id){
-  if(document.getElementById("add_new_mode_extras").value == "" || document.getElementById("add_new_mode_extras").value =="Choose from below list"){
-    document.getElementById("add_new_mode_extras").value = name;
-  }
-  else{
-    document.getElementById("add_new_mode_extras").value = document.getElementById("add_new_mode_extras").value + ',' +name;
-  }
-
-  document.getElementById(id).style.display = "none";
-}
-
-
-function openNewMode(){
-
-  document.getElementById("add_new_mode_extras").value="";
-
-  /*render extras list*/
-
-    if(fs.existsSync('./data/static/billingparameters.json')) {
-        fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
-      if (err){
-          
-      } else {
-
-          if(data == ''){ data = '[]'; }
-
-              var modes = JSON.parse(data);
-              modes.sort(); //alphabetical sorting 
-              var modesTag = '';
-
-        for (var i=0; i<modes.length; i++){
-          modesTag = modesTag + '<tag class="extrasSelButton" onclick="addExtraToInput(\''+modes[i].name+'\', \'extra_'+i+'\')" id="extra_'+i+'">'+modes[i].name+' ('+(modes[i].unit == 'FIXED'? 'Rs. '+modes[i].value : modes[i].value+'%')+')</tag>';
-        }
-
-        if(!modesTag){
-            document.getElementById("extrasList").innerHTML = '<i>*Please update <b style="cursor: pointer" onclick="openBillSettings(\'billingExtras\')">Taxes & Other Extras</b> first.</i>';
-        }
-        else{            
-            document.getElementById("extrasList").innerHTML = 'Extras List: '+modesTag;
-        }
-
-          document.getElementById("newModeArea").style.display = "block";
-          document.getElementById("openNewModeButton").style.display = "none";
+    switch (id) {
+        case "billingExtras":
+            fetchAllParams();
+            break;
+        case "billingModes":
+            fetchAllModes();
+            break;
+        case "paymentModes":
+            fetchAllPaymentModes();
+            break;
+        case "discountTypes":
+            fetchAllDiscountTypes();
+            break;
     }
-    });
-  }
-
 }
 
-function hideNewMode(){
-	
-	document.getElementById("newModeArea").style.display = "none";
-	document.getElementById("openNewModeButton").style.display = "block";
-}
+/*
+ * =======================================================================================
+ * Billing Parameters (Taxes & Extras)
+ * =======================================================================================
+ */
 
-function openNewPaymentMode(){
-	document.getElementById("newPaymentModeArea").style.display = "block";
-	document.getElementById("openNewPaymentModeButton").style.display = "none";
-}
+function fetchAllParams() {
+    try {
+        const params = db.prepare('SELECT * FROM billing_parameters ORDER BY name').all();
+        let paramsTag = '';
+        params.forEach((param, i) => {
+            paramsTag += `<tr role="row">
+                            <td>#${i + 1}</td>
+                            <td>${param.name}</td>
+                            <td>${param.value}</td>
+                            <td>${param.unit_name}</td>
+                            <td>${param.is_compulsary ? "Yes" : "No"}</td>
+                            <td onclick="deleteParameterConfirm('${param.name}')"><i class="fa fa-trash-o"></i></td>
+                        </tr>`;
+        });
 
-function hideNewPaymentMode(){
-	
-	document.getElementById("newPaymentModeArea").style.display = "none";
-	document.getElementById("openNewPaymentModeButton").style.display = "block";
-
-}
-
-
-function openNewDiscountType(){
-  document.getElementById("newDiscountTypeArea").style.display = "block";
-  document.getElementById("openNewDiscountButton").style.display = "none";
-}
-
-function hideNewDiscountType(){
-  
-  document.getElementById("newDiscountTypeArea").style.display = "none";
-  document.getElementById("openNewDiscountButton").style.display = "block";
-
-}
-
-
-
-function openBillSettings(id){
-	
-	/*Tweak - Hide all */
-	$( "#detailsDisplayBillSettings" ).children().css( "display", "none" );
-	$( "#detailsNewBillSettings" ).children().css( "display", "none" );
-	document.getElementById("openNewPaymentModeButton").style.display = "block";
-	document.getElementById("openNewModeButton").style.display = "block";
-	document.getElementById("openNewBillButton").style.display = "block";
-
-	document.getElementById(id).style.display = "block";
-
-	switch(id){
-		case "billingExtras":{
-			fetchAllParams();
-			break;
-		}
-		case "billingModes":{
-			fetchAllModes();
-			break;
-		}
-		case "paymentModes":{
-			fetchAllPaymentModes();
-			break;
-		}		
-    case "discountTypes":{
-      fetchAllDiscountTypes();
-      break;
-    }
-	}
-}
-
-
-function openSettingsDeleteConfirmation(type, functionName){
-	document.getElementById("settingsDeleteConfirmationConsent").innerHTML = '<button type="button" class="btn btn-default" onclick="cancelSettingsDeleteConfirmation()" style="float: left">Cancel</button>'+
-                  							'<button type="button" class="btn btn-danger" onclick="'+functionName+'(\''+type+'\')">Delete</button>';
-
-	document.getElementById("settingsDeleteConfirmationText").innerHTML = 'Are you sure want to delete <b>'+type+'</b>?';
-	document.getElementById("settingsDeleteConfirmation").style.display = 'block';
-}
-
-function cancelSettingsDeleteConfirmation(){
-	document.getElementById("settingsDeleteConfirmation").style.display = 'none';
-}
-
-
-
-/* read billing params */
-function fetchAllParams(){
-
-		if(fs.existsSync('./data/static/billingparameters.json')) {
-	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var params = JSON.parse(data);
-	          	params.sort(); //alphabetical sorting 
-	          	var paramsTag = '';
-
-				for (var i=0; i<params.length; i++){
-					paramsTag = paramsTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+params[i].name+'</td> <td>'+params[i].value+'</td> <td>'+params[i].unitName+'</td> <td>'+(params[i].isCompulsary?"Yes": "No")+'</td> <td onclick="deleteParameterConfirm(\''+params[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
-				}
-
-				if(!paramsTag)
-					document.getElementById("billingParamsTable").innerHTML = '<p style="color: #bdc3c7">No parameters added yet.</p>';
-				else
-					document.getElementById("billingParamsTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Name</th> <th style="text-align: left">Value</th> <th style="text-align: left">Unit</th> <th style="text-align: left">Compulsary</th> <th style="text-align: left"></th> </tr> </thead>'+
-																	'<tbody>'+paramsTag+'</tbody>';
-		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
-}
-
-
-/* add new param */
-function addParameter() {  
-
-	var paramObj = {};
-	paramObj.name = document.getElementById("add_new_param_name").value;
-  paramObj.name = (paramObj.name).replace (/,/g, "");
-	paramObj.isCompulsary = document.getElementById("add_new_param_compulsary").value == 'YES'? true: false;
-	paramObj.value = document.getElementById("add_new_param_value").value;
-	var tempUnit = document.getElementById("add_new_param_unit").value;
-
-
-	paramObj.value = parseFloat(paramObj.value);
-
-	if(tempUnit == 'PERCENTAGE'){
-		paramObj.unit = 'PERCENTAGE',
-		paramObj.unitName = 'Percentage (%)';
-
-	}
-	else if(tempUnit == 'FIXED'){
-		paramObj.unit = 'FIXED',
-		paramObj.unitName = 'Fixed Amount (Rs)';
-	}
-	else{
-		showToast('System Error: Something went wrong. Please contact Accelerate Support.', '#e74c3c');
-		return '';
-	}
-
-
-	if(paramObj.name == ''){
-		showToast('Warning: Please set a name.', '#e67e22');
-		return '';
-	}
-	else if(paramObj.value == ''){
-		showToast('Warning: Please set a value.', '#e67e22');
-		return '';
-	}
-	else if(Number.isNaN(paramObj.value)){
-		showToast('Warning: Invalid value.', '#e67e22');
-		return '';
-	}	
-
-
-      //Check if file exists
-      if(fs.existsSync('./data/static/billingparameters.json')) {
-         fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(paramObj); //add some data
-            var json = JSON.stringify(obj);
-            fs.writeFile('./data/static/billingparameters.json', json, 'utf8', (err) => {
-                if(err){
-                  showToast('System Error: Unable to save Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{
-
-                fetchAllParams(); //refresh the list
-                hideNewBill();
-
-              }
-            });
-         }
-         else{
-             var flag=0;
-             if(data == ''){ data = '[]'; }
-             var obj = [];
-             obj = JSON.parse(data);
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i].name == paramObj.name){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Parameter already exists. Please choose a different name.', '#e67e22');
-             }
-             else{
-                obj.push(paramObj);
-                var json = JSON.stringify(obj);
-                fs.writeFile('./data/static/billingparameters.json', json, 'utf8', (err) => {
-                     if(err){
-                        showToast('System Error: Unable to save Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-                    }
-		            else{
-			                fetchAllParams(); //refresh the list
-			                hideNewBill();
-		              	
-		              }
-                  });  
-
-             }
-                 
-         }
-          
-   }});
-      } else {
-         obj.push(paramObj);
-         fs.writeFile('./data/static/billingparameters.json', obj, 'utf8', (err) => {
-            if(err){
-               showToast('System Error: Unable to save Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-           }
-           else{
-                fetchAllParams(); //refresh the list
-                hideNewBill();         	
-           }
-         });
-      }
-  
-}
-
-
-function deleteParameterConfirm(name){
-	openSettingsDeleteConfirmation(name, 'deleteParameter');
-}
-
-
-/* delete a param */
-function deleteParameter(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/billingparameters.json')) {
-       fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-       	if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].name == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/billingparameters.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-        
-        	/* on successful delete */
-   			fetchAllParams();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-   cancelSettingsDeleteConfirmation()
-
-}
-
-
-
-/*Discount Types*/
-
-function fetchAllDiscountTypes(){
-
-    if(fs.existsSync('./data/static/discounttypes.json')) {
-        fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){
-      if (err){
-          showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-      } else {
-
-          if(data == ''){ data = '[]'; }
-
-              var modes = JSON.parse(data);
-              modes.sort(); //alphabetical sorting 
-              var modesTag = '';
-
-        for (var i=0; i<modes.length; i++){
-          modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+modes[i].name+'</td> <td>'+(modes[i].maxDiscountUnit == 'PERCENTAGE'? (modes[i].maxDiscountValue+'%'): ('<i class="fa fa-inr"></i> '+modes[i].maxDiscountValue))+'</td> <td onclick="deleteDiscountTypeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
+        if (!paramsTag) {
+            document.getElementById("billingParamsTable").innerHTML = '<p style="color: #bdc3c7">No parameters added yet.</p>';
+        } else {
+            document.getElementById("billingParamsTable").innerHTML = `<thead style="background: #f4f4f4;"><tr><th></th><th>Name</th><th>Value</th><th>Unit</th><th>Compulsory</th><th></th></tr></thead><tbody>${paramsTag}</tbody>`;
         }
-
-        if(!modesTag)
-          document.getElementById("discountTypesTable").innerHTML = '<p style="color: #bdc3c7">No discount types added yet.</p>';
-        else
-          document.getElementById("discountTypesTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Type Name</th> <th style="text-align: left">Max Discount</th> <th style="text-align: left"></th> </tr> </thead>'+
-                                  '<tbody>'+modesTag+'</tbody>';
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Billing Parameters.', '#e74c3c');
     }
-    });
-      } else {
-        showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-      } 
 }
 
+function addParameter() {
+    const name = document.getElementById("add_new_param_name").value.trim().replace(/,/g, "");
+    const isCompulsary = document.getElementById("add_new_param_compulsary").value === 'YES';
+    const value = parseFloat(document.getElementById("add_new_param_value").value);
+    const unit = document.getElementById("add_new_param_unit").value;
+    const unitName = unit === 'PERCENTAGE' ? 'Percentage (%)' : 'Fixed Amount (Rs)';
 
+    if (!name || isNaN(value)) {
+        showToast('Warning: Invalid name or value.', '#e67e22');
+        return;
+    }
 
-
-/* add new discount type */
-function addDiscountType() {  
-
-  var paramObj = {};
-  paramObj.name = document.getElementById("add_new_discount_name").value;
-  paramObj.maxDiscountUnit = document.getElementById("add_new_discount_unit").value;
-  paramObj.maxDiscountValue = document.getElementById("add_new_discount_maxValue").value;
-
-  paramObj.maxDiscountValue = parseFloat(paramObj.maxDiscountValue);
-
-  if(paramObj.name == ''){
-    showToast('Warning: Please set a name', '#e67e22');
-    return '';
-  }
-
-
-  if((paramObj.name).toUpperCase() == 'COUPON' || (paramObj.name).toUpperCase() == 'VOUCHER' || (paramObj.name).toUpperCase() == 'NOCOSTBILL'){
-    showToast('Warning: Reserved Keyword. Please set different a name', '#e67e22');
-    return '';
-  }
-
-      //Check if file exists
-      if(fs.existsSync('./data/static/discounttypes.json')) {
-         fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(paramObj); //add some data
-            var json = JSON.stringify(obj);
-            fs.writeFile('./data/static/discounttypes.json', json, 'utf8', (err) => {
-                if(err){
-                  showToast('System Error: Unable to save Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{
-
-                fetchAllDiscountTypes(); //refresh the list
-                hideNewDiscountType();
-
-              }
-            });
-         }
-         else{
-             var flag=0;
-             if(data == ''){ data = '[]'; }
-             var obj = [];
-             obj = JSON.parse(data);
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i].name == paramObj.name){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Discount type name already exists. Please choose a different name', '#e67e22');
-             }
-             else{
-                obj.push(paramObj);
-                var json = JSON.stringify(obj);
-                fs.writeFile('./data/static/discounttypes.json', json, 'utf8', (err) => {
-                     if(err){
-                        showToast('System Error: Unable to save Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-                    }
-                else{
-                      fetchAllDiscountTypes(); //refresh the list
-                      hideNewDiscountType();
-                    
-                  }
-                  });  
-
-             }
-                 
-         }
-          
-   }});
-      } else {
-         obj.push(paramObj);
-         fs.writeFile('./data/static/discounttypes.json', obj, 'utf8', (err) => {
-            if(err){
-               showToast('System Error: Unable to save Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-           }
-           else{
-                fetchAllDiscountTypes(); //refresh the list
-                hideNewDiscountType();           
-           }
-         });
-      }
-  
-}
-
-
-function deleteDiscountTypeConfirm(name){
-  openSettingsDeleteConfirmation(name, 'deleteDiscountType');
-}
-
-
-/* delete a discount type */
-function deleteDiscountType(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/discounttypes.json')) {
-       fs.readFile('./data/static/discounttypes.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-        if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].name == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/discounttypes.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-        
-          /* on successful delete */
-          fetchAllDiscountTypes();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Discount Types data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-
-   cancelSettingsDeleteConfirmation()
-}
-
-
-
-/* read billing params */
-function fetchAllModes(){
-
-		if(fs.existsSync('./data/static/billingmodes.json')) {
-	      fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var modes = JSON.parse(data);
-	          	modes.sort(); //alphabetical sorting 
-	          	var modesTag = '';
-
-				for (var i=0; i<modes.length; i++){
-					modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td><p style="margin: 0">'+modes[i].name+'</p><p style="margin: 0; font-size: 65%; color: #f39c12;">'+modes[i].type+'</p></td> <td>'+( modes[i].extras == ''? '-' :((modes[i].extras).toString()).replace(/\,/g , ", "))+'</td> <td>'+(modes[i].minimumBill != 0? '<i class="fa fa-inr"></i>'+modes[i].minimumBill :'-')+'</td> <td>'+(modes[i].isDiscountable?"Yes": "No")+'</td> <td>'+(modes[i].maxDiscount != 0? '<i class="fa fa-inr"></i>'+modes[i].maxDiscount :'-')+'</td> <td onclick="deleteModeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
-				}
-
-				if(!modesTag){
-					document.getElementById("billingModesTable").innerHTML = '<p style="color: #bdc3c7">No modes added yet.</p>';
-				}else{
-					document.getElementById("billingModesTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Mode</th> <th style="text-align: left">Extras Collected</th> <th style="text-align: left">Min Bill Amount</th> <th style="text-align: left">Discountable</th><th style="text-align: left">Max Discount</th> <th style="text-align: left"></th> </tr> </thead>'+
-																	'<tbody>'+modesTag+'</tbody>';
+    try {
+        db.prepare('INSERT INTO billing_parameters (name, is_compulsary, value, unit, unit_name) VALUES (?, ?, ?, ?, ?)').run(name, isCompulsary ? 1 : 0, value, unit, unitName);
+        showToast(`Parameter '${name}' added successfully.`, '#27ae60');
+        fetchAllParams();
+        hideNewBill();
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            showToast('Warning: A parameter with this name already exists.', '#e67e22');
+        } else {
+            console.error(err);
+            showToast('System Error: Could not add parameter.', '#e74c3c');
         }
-		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+    }
 }
 
-
-
-
-/* add new mode */
-function addMode() {  
-
-	var paramObj = {};
-	paramObj.name = document.getElementById("add_new_mode_name").value;
-	paramObj.isDiscountable = document.getElementById("add_new_mode_discountable").value == 'YES'? true: false;
-	paramObj.extras = document.getElementById("add_new_mode_extras").value;
-	paramObj.type = document.getElementById("add_new_mode_type").value;
-	paramObj.minimumBill = document.getElementById("add_new_mode_minBill").value;
-	paramObj.maxDiscount = document.getElementById("add_new_mode_maxDisc").value;
-
-	paramObj.minimumBill = parseFloat(paramObj.minimumBill);
-	paramObj.maxDiscount = parseFloat(paramObj.maxDiscount);
-
-	paramObj.extras = paramObj.extras == 'Choose from below'? '': paramObj.extras;
-
-	console.log(paramObj)
-
-	if(paramObj.name == ''){
-		showToast('Warning: Please set a name', '#e67e22');
-		return '';
-	}
-	else if(Number.isNaN(paramObj.minimumBill)){
-		showToast('Warning: Invalid minimum bill amount. Keep it as Zero or any number', '#e67e22');
-		return '';
-	}	
-	else if(Number.isNaN(paramObj.maxDiscount) && paramObj.isDiscountable){
-		showToast('Warning: Invalid maximum discount amount', '#e67e22');
-		return '';
-	}	
-
-	if(paramObj.isDiscountable && !paramObj.maxDiscount){
-		showToast('Warning: Please set a non-zero maximum discount, as you have marked it Discountable', '#e67e22');
-		return '';
-	}	
-
-	if(!paramObj.isDiscountable){
-		paramObj.maxDiscount = "";
-	}
-
-      //Check if file exists
-      if(fs.existsSync('./data/static/billingmodes.json')) {
-         fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(paramObj); //add some data
-            var json = JSON.stringify(obj);
-            fs.writeFile('./data/static/billingmodes.json', json, 'utf8', (err) => {
-                if(err){
-                  showToast('System Error: Unable to save Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{
-
-                fetchAllModes(); //refresh the list
-                hideNewMode();
-
-              }
-            });
-         }
-         else{
-             var flag=0;
-             if(data == ''){ data = '[]'; }
-             var obj = [];
-             obj = JSON.parse(data);
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i].name == paramObj.name){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Mode already exists. Please choose a different name.', '#e67e22');
-             }
-             else{
-                obj.push(paramObj);
-                var json = JSON.stringify(obj);
-                fs.writeFile('./data/static/billingmodes.json', json, 'utf8', (err) => {
-                     if(err){
-                        showToast('System Error: Unable to save Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-                    }
-		            else{
-			                fetchAllModes(); //refresh the list
-			                hideNewMode();
-		              	
-		              }
-                  });  
-
-             }
-                 
-         }
-          
-   }});
-      } else {
-         obj.push(paramObj);
-         fs.writeFile('./data/static/billingmodes.json', obj, 'utf8', (err) => {
-            if(err){
-               showToast('System Error: Unable to save Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-           }
-           else{
-                fetchAllModes(); //refresh the list
-                hideNewMode();         	
-           }
-         });
-      }
-  
+function deleteParameter(name) {
+    try {
+        db.prepare('DELETE FROM billing_parameters WHERE name = ?').run(name);
+        showToast(`Parameter '${name}' deleted successfully.`, '#27ae60');
+        fetchAllParams();
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not delete parameter.', '#e74c3c');
+    }
+    cancelSettingsDeleteConfirmation();
 }
 
-function deleteModeConfirm(name){
-	openSettingsDeleteConfirmation(name, 'deleteMode');
+/*
+ * =======================================================================================
+ * Billing Modes
+ * =======================================================================================
+ */
+
+function fetchAllModes() {
+    try {
+        const modes = db.prepare('SELECT * FROM billing_modes ORDER BY name').all();
+        let modesTag = '';
+        modes.forEach((mode, i) => {
+            modesTag += `<tr role="row">
+                           <td>#${i + 1}</td>
+                           <td><p style="margin: 0">${mode.name}</p><p style="margin: 0; font-size: 65%; color: #f39c12;">${mode.type}</p></td>
+                           <td>${mode.extras ? mode.extras.replace(/,/g, ", ") : '-'}</td>
+                           <td>${mode.minimum_bill ? `<i class="fa fa-inr"></i>${mode.minimum_bill}` : '-'}</td>
+                           <td>${mode.is_discountable ? "Yes" : "No"}</td>
+                           <td>${mode.max_discount ? `<i class="fa fa-inr"></i>${mode.max_discount}` : '-'}</td>
+                           <td onclick="deleteModeConfirm('${mode.name}')"><i class="fa fa-trash-o"></i></td>
+                       </tr>`;
+        });
+        if (!modesTag) {
+            document.getElementById("billingModesTable").innerHTML = '<p style="color: #bdc3c7">No modes added yet.</p>';
+        } else {
+            document.getElementById("billingModesTable").innerHTML = `<thead style="background: #f4f4f4;"><tr><th></th><th>Mode</th><th>Extras</th><th>Min Bill</th><th>Discountable</th><th>Max Discount</th><th></th></tr></thead><tbody>${modesTag}</tbody>`;
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Billing Modes.', '#e74c3c');
+    }
 }
 
-/* delete a param */
-function deleteMode(name) {  
+function addMode() {
+    const name = document.getElementById("add_new_mode_name").value.trim();
+    const isDiscountable = document.getElementById("add_new_mode_discountable").value === 'YES';
+    const extras = document.getElementById("add_new_mode_extras").value.trim();
+    const type = document.getElementById("add_new_mode_type").value;
+    const minimumBill = parseFloat(document.getElementById("add_new_mode_minBill").value) || 0;
+    let maxDiscount = parseFloat(document.getElementById("add_new_mode_maxDisc").value) || 0;
 
-   //Check if file exists
-   if(fs.existsSync('./data/static/billingmodes.json')) {
-       fs.readFile('./data/static/billingmodes.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-       	if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].name == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/billingmodes.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-        
-        	/* on successful delete */
-   			fetchAllModes();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-   }
+    if (!name) {
+        showToast('Warning: Please set a name.', '#e67e22');
+        return;
+    }
+    if (isDiscountable && !maxDiscount) {
+        showToast('Warning: Please set a non-zero maximum discount.', '#e67e22');
+        return;
+    }
+    if (!isDiscountable) maxDiscount = 0;
 
-   cancelSettingsDeleteConfirmation()
-
+    try {
+        db.prepare('INSERT INTO billing_modes (name, is_discountable, extras, type, minimum_bill, max_discount) VALUES (?, ?, ?, ?, ?, ?)')
+          .run(name, isDiscountable ? 1 : 0, extras, type, minimumBill, maxDiscount);
+        showToast(`Mode '${name}' added successfully.`, '#27ae60');
+        fetchAllModes();
+        hideNewMode();
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            showToast('Warning: A mode with this name already exists.', '#e67e22');
+        } else {
+            console.error(err);
+            showToast('System Error: Could not add mode.', '#e74c3c');
+        }
+    }
 }
 
-
-
-/* read payment modes */
-function fetchAllPaymentModes(){
-
-		if(fs.existsSync('./data/static/paymentmodes.json')) {
-	      fs.readFile('./data/static/paymentmodes.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Billing Modes data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var modes = JSON.parse(data);
-	          	modes.sort(); //alphabetical sorting 
-	          	var modesTag = '';
-
-				for (var i=0; i<modes.length; i++){
-					modesTag = modesTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+modes[i].name+'</td> <td>'+modes[i].code+'</td> <td onclick="deletePaymentModeConfirm(\''+modes[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
-				}
-
-				if(!modesTag)
-					document.getElementById("paymentModesTable").innerHTML = '<p style="color: #bdc3c7">No payment modes added yet.</p>';
-				else
-					document.getElementById("paymentModesTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Payment Mode</th> <th style="text-align: left">Code</th> <th style="text-align: left"></th> </tr> </thead>'+
-																	'<tbody>'+modesTag+'</tbody>';
-		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+function deleteMode(name) {
+    try {
+        db.prepare('DELETE FROM billing_modes WHERE name = ?').run(name);
+        showToast(`Mode '${name}' deleted successfully.`, '#27ae60');
+        fetchAllModes();
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not delete mode.', '#e74c3c');
+    }
+    cancelSettingsDeleteConfirmation();
 }
 
+/*
+ * =======================================================================================
+ * Payment Modes
+ * =======================================================================================
+ */
 
-
-
-/* add new payment mode */
-function addPaymentMode() {  
-
-	var paramObj = {};
-	paramObj.name = document.getElementById("add_new_payment_name").value;
-	paramObj.code = document.getElementById("add_new_payment_code").value;
-
-	if(paramObj.name == ''){
-		showToast('Warning: Please set a name', '#e67e22');
-		return '';
-	}
-	else if(paramObj.code == ''){
-		showToast('Warning: Please set a code', '#e67e22');
-		return '';
-	}
-
-      //Check if file exists
-      if(fs.existsSync('./data/static/paymentmodes.json')) {
-         fs.readFile('./data/static/paymentmodes.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(paramObj); //add some data
-            var json = JSON.stringify(obj);
-            fs.writeFile('./data/static/paymentmodes.json', json, 'utf8', (err) => {
-                if(err){
-                  showToast('System Error: Unable to save Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{
-
-                fetchAllPaymentModes(); //refresh the list
-                hideNewPaymentMode();
-
-              }
-            });
-         }
-         else{
-             var flag=0;
-             if(data == ''){ data = '[]'; }
-             var obj = [];
-             obj = JSON.parse(data);
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i].name == paramObj.name){
-                  flag=1;
-                  break;
-               }
-               else if (obj[i].code == paramObj.code){
-                  flag=2;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Mode Name already exists. Please choose a different name', '#e67e22');
-             }
-             else if(flag==2){
-             	showToast('Warning: Mode Code already exists. Please choose a different code', '#e67e22');
-             }
-             else{
-                obj.push(paramObj);
-                var json = JSON.stringify(obj);
-                fs.writeFile('./data/static/paymentmodes.json', json, 'utf8', (err) => {
-                     if(err){
-                        showToast('System Error: Unable to save Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-                    }
-		            else{
-			                fetchAllPaymentModes(); //refresh the list
-			                hideNewPaymentMode();
-		              	
-		              }
-                  });  
-
-             }
-                 
-         }
-          
-   }});
-      } else {
-         obj.push(paramObj);
-         fs.writeFile('./data/static/paymentmodes.json', obj, 'utf8', (err) => {
-            if(err){
-               showToast('System Error: Unable to save Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-           }
-           else{
-                fetchAllPaymentModes(); //refresh the list
-                hideNewPaymentMode();         	
-           }
-         });
-      }
-  
+function fetchAllPaymentModes() {
+    try {
+        const modes = db.prepare('SELECT * FROM payment_modes ORDER BY name').all();
+        let modesTag = '';
+        modes.forEach((mode, i) => {
+            modesTag += `<tr role="row">
+                           <td>#${i + 1}</td>
+                           <td>${mode.name}</td>
+                           <td>${mode.code}</td>
+                           <td onclick="deletePaymentModeConfirm('${mode.name}')"><i class="fa fa-trash-o"></i></td>
+                       </tr>`;
+        });
+        if (!modesTag) {
+            document.getElementById("paymentModesTable").innerHTML = '<p style="color: #bdc3c7">No payment modes added yet.</p>';
+        } else {
+            document.getElementById("paymentModesTable").innerHTML = `<thead style="background: #f4f4f4;"><tr><th></th><th>Payment Mode</th><th>Code</th><th></th></tr></thead><tbody>${modesTag}</tbody>`;
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Payment Modes.', '#e74c3c');
+    }
 }
 
-
-function deletePaymentModeConfirm(name){
-	openSettingsDeleteConfirmation(name, 'deletePaymentMode');
+function addPaymentMode() {
+    const name = document.getElementById("add_new_payment_name").value.trim();
+    const code = document.getElementById("add_new_payment_code").value.trim().toUpperCase();
+    if (!name || !code) {
+        showToast('Warning: Please provide a name and a code.', '#e67e22');
+        return;
+    }
+    try {
+        db.prepare('INSERT INTO payment_modes (name, code) VALUES (?, ?)').run(name, code);
+        showToast(`Payment mode '${name}' added successfully.`, '#27ae60');
+        fetchAllPaymentModes();
+        hideNewPaymentMode();
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            showToast('Warning: A payment mode with this name or code already exists.', '#e67e22');
+        } else {
+            console.error(err);
+            showToast('System Error: Could not add payment mode.', '#e74c3c');
+        }
+    }
 }
 
-
-/* delete a payment mode */
-function deletePaymentMode(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/paymentmodes.json')) {
-       fs.readFile('./data/static/paymentmodes.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-       	if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].name == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/paymentmodes.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-        
-        	/* on successful delete */
-   			fetchAllPaymentModes();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Payment Modes data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-
-   cancelSettingsDeleteConfirmation()
+function deletePaymentMode(name) {
+    try {
+        db.prepare('DELETE FROM payment_modes WHERE name = ?').run(name);
+        showToast(`Payment mode '${name}' deleted successfully.`, '#27ae60');
+        fetchAllPaymentModes();
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not delete payment mode.', '#e74c3c');
+    }
+    cancelSettingsDeleteConfirmation();
 }
 
+/*
+ * =======================================================================================
+ * Discount Types
+ * =======================================================================================
+ */
 
+function fetchAllDiscountTypes() {
+    try {
+        const types = db.prepare('SELECT * FROM discount_types ORDER BY name').all();
+        let typesTag = '';
+        types.forEach((type, i) => {
+            const maxDiscount = type.max_discount_unit === 'PERCENTAGE' ? `${type.max_discount_value}%` : `<i class="fa fa-inr"></i> ${type.max_discount_value}`;
+            typesTag += `<tr role="row">
+                           <td>#${i + 1}</td>
+                           <td>${type.name}</td>
+                           <td>${maxDiscount}</td>
+                           <td onclick="deleteDiscountTypeConfirm('${type.name}')"><i class="fa fa-trash-o"></i></td>
+                       </tr>`;
+        });
+        if (!typesTag) {
+            document.getElementById("discountTypesTable").innerHTML = '<p style="color: #bdc3c7">No discount types added yet.</p>';
+        } else {
+            document.getElementById("discountTypesTable").innerHTML = `<thead style="background: #f4f4f4;"><tr><th></th><th>Type Name</th><th>Max Discount</th><th></th></tr></thead><tbody>${typesTag}</tbody>`;
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Discount Types.', '#e74c3c');
+    }
+}
+
+function addDiscountType() {
+    const name = document.getElementById("add_new_discount_name").value.trim();
+    const unit = document.getElementById("add_new_discount_unit").value;
+    const value = parseFloat(document.getElementById("add_new_discount_maxValue").value);
+
+    if (!name || isNaN(value)) {
+        showToast('Warning: Invalid name or value.', '#e67e22');
+        return;
+    }
+    if (['COUPON', 'VOUCHER', 'NOCOSTBILL'].includes(name.toUpperCase())) {
+        showToast('Warning: That is a reserved keyword. Please choose a different name.', '#e67e22');
+        return;
+    }
+
+    try {
+        db.prepare('INSERT INTO discount_types (name, max_discount_unit, max_discount_value) VALUES (?, ?, ?)').run(name, unit, value);
+        showToast(`Discount type '${name}' added successfully.`, '#27ae60');
+        fetchAllDiscountTypes();
+        hideNewDiscountType();
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            showToast('Warning: A discount type with this name already exists.', '#e67e22');
+        } else {
+            console.error(err);
+            showToast('System Error: Could not add discount type.', '#e74c3c');
+        }
+    }
+}
+
+function deleteDiscountType(name) {
+    try {
+        db.prepare('DELETE FROM discount_types WHERE name = ?').run(name);
+        showToast(`Discount type '${name}' deleted successfully.`, '#27ae60');
+        fetchAllDiscountTypes();
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not delete discount type.', '#e74c3c');
+    }
+    cancelSettingsDeleteConfirmation();
+}
+
+/*
+ * =======================================================================================
+ * MODAL and UI Helpers
+ * =======================================================================================
+ */
+
+function openNewBill() { document.getElementById("newBillArea").style.display = "block"; document.getElementById("openNewBillButton").style.display = "none"; }
+function hideNewBill() { document.getElementById("newBillArea").style.display = "none"; document.getElementById("openNewBillButton").style.display = "block"; }
+function openNewMode() { document.getElementById("newModeArea").style.display = "block"; document.getElementById("openNewModeButton").style.display = "none"; }
+function hideNewMode() { document.getElementById("newModeArea").style.display = "none"; document.getElementById("openNewModeButton").style.display = "block"; }
+function openNewPaymentMode() { document.getElementById("newPaymentModeArea").style.display = "block"; document.getElementById("openNewPaymentModeButton").style.display = "none"; }
+function hideNewPaymentMode() { document.getElementById("newPaymentModeArea").style.display = "none"; document.getElementById("openNewPaymentModeButton").style.display = "block"; }
+function openNewDiscountType() { document.getElementById("newDiscountTypeArea").style.display = "block"; document.getElementById("openNewDiscountButton").style.display = "none"; }
+function hideNewDiscountType() { document.getElementById("newDiscountTypeArea").style.display = "none"; document.getElementById("openNewDiscountButton").style.display = "block"; }
+
+function openSettingsDeleteConfirmation(name, functionName) {
+    document.getElementById("settingsDeleteConfirmationConsent").innerHTML = `<button type="button" class="btn btn-default" onclick="cancelSettingsDeleteConfirmation()" style="float: left">Cancel</button><button type="button" class="btn btn-danger" onclick="${functionName}('${name}')">Delete</button>`;
+    document.getElementById("settingsDeleteConfirmationText").innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
+    document.getElementById("settingsDeleteConfirmation").style.display = 'block';
+}
+
+function cancelSettingsDeleteConfirmation() {
+    document.getElementById("settingsDeleteConfirmation").style.display = 'none';
+}
+
+// Confirmation dialog wrappers
+function deleteParameterConfirm(name) { openSettingsDeleteConfirmation(name, 'deleteParameter'); }
+function deleteModeConfirm(name) { openSettingsDeleteConfirmation(name, 'deleteMode'); }
+function deletePaymentModeConfirm(name) { openSettingsDeleteConfirmation(name, 'deletePaymentMode'); }
+function deleteDiscountTypeConfirm(name) { openSettingsDeleteConfirmation(name, 'deleteDiscountType'); }

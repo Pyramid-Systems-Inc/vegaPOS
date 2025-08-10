@@ -118,6 +118,25 @@ function initializeDatabase() {
                 value_json TEXT
             )
         `).run();
+
+        // Payment Modes (from paymentmodes.json)
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS payment_modes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                code TEXT NOT NULL UNIQUE
+            )
+        `).run();
+
+        // Discount Types (from discounttypes.json)
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS discount_types (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                max_discount_unit TEXT,
+                max_discount_value REAL
+            )
+        `).run();
     });
 
     createTables();
