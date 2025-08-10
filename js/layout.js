@@ -383,46 +383,29 @@ function doHomeLogin(){
     return '';
   }
 
-  var data = {
-    "mobile": username,
-    "password": password
-  }
-
-  $.ajax({
-    type: 'POST',
-    url: 'https://www.zaitoon.online/services/posserverlogin.php',
-    data: JSON.stringify(data),
-    contentType: "application/json",
-    dataType: 'json',
-    timeout: 10000,
-    success: function(data) {
-      if(data.status){
-
-        var userInfo = {};
-        userInfo.name = data.user;
-        userInfo.mobile = data.mobile;
-        userInfo.branch = data.branch;
-        userInfo.branchCode = data.branchCode;
-
-        window.localStorage.loggedInAdminData = JSON.stringify(userInfo);
-
-        window.localStorage.loggedInAdmin = data.response;
-        showToast('Succesfully logged in to '+data.branch, '#27ae60');
-        initScreenSaver(); //Screensaver changes
-        cancelLoginWindow();
-        renderServerConnectionStatus();
-      }
-      else
-      {
-        showToast(data.error, '#e74c3c');
-      }
-
-    },
-    error: function(data){
-      showToast('Server not responding. Check your connection.', '#e74c3c');
+  // Use Electron preload API for authentication
+  window.vegaAPI.login(username, password).then(result => {
+    if (result.success) {
+      var user = result.user;
+      var userInfo = {
+        name: user.name,
+        mobile: user.code,
+        branch: user.branch || '',
+        branchCode: user.branchCode || ''
+      };
+      window.localStorage.loggedInAdminData = JSON.stringify(userInfo);
+      window.localStorage.loggedInAdmin = true;
+      showToast('Successfully logged in as ' + user.name, '#27ae60');
+      initScreenSaver();
+      cancelLoginWindow();
+      if (typeof renderServerConnectionStatus === 'function') renderServerConnectionStatus();
+    } else {
+      showToast(result.error || 'Invalid username or password.', '#e74c3c');
     }
-
-  });   
+  }).catch(err => {
+    console.error(err);
+    showToast('System Error: Unable to login.', '#e74c3c');
+  });
 
 }
 

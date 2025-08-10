@@ -33,8 +33,9 @@ function addNewUserProfile() {
     const role = document.getElementById("user_profile_new_user_role").value;
     const name = document.getElementById("user_profile_new_user_name").value.trim();
     const mobile = document.getElementById("user_profile_new_user_mobile").value.trim();
+    const password = document.getElementById("user_profile_new_user_password").value;
 
-    if (!role || !name || !mobile) {
+    if (!role || !name || !mobile || !password) {
         showToast('Warning: Missing some values', '#e67e22');
         return;
     }
@@ -53,7 +54,7 @@ function addNewUserProfile() {
             return;
         }
 
-        users.push({ name, code: mobile, role, password: "" });
+        users.push({ name, code: mobile, role, password });
 
         db.prepare("UPDATE settings SET value_json = ? WHERE key = 'userprofiles'").run(JSON.stringify(users));
 

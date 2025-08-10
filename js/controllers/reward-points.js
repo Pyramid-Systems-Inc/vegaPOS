@@ -28,51 +28,39 @@ function processRedeemCoupon(){
 
 
 function doLogin(){
-	var username = document.getElementById("login_server_username").value;
-	var password = document.getElementById("login_server_password").value;
+		var username = document.getElementById("login_server_username").value;
+		var password = document.getElementById("login_server_password").value;
 
-	var data = {
-		"mobile": username,
-		"password": password
-	}
-
-	$.ajax({
-		type: 'POST',
-		url: 'https://www.zaitoon.online/services/posserverlogin.php',
-		data: JSON.stringify(data),
-		contentType: "application/json",
-		dataType: 'json',
-	    timeout: 10000,
-	    success: function(data) {
-	      if(data.status){
-
-	        var userInfo = {};
-	        userInfo.name = data.user;
-	        userInfo.mobile = data.mobile;
-	        userInfo.branch = data.branch;
-	        userInfo.branchCode = data.branchCode;
-
-	        window.localStorage.loggedInAdminData = JSON.stringify(userInfo);
-
-	        window.localStorage.loggedInAdmin = data.response;
-	        showToast('Succesfully logged in to '+data.branch, '#27ae60');
-				
+		// Use local database for authentication
+		try {
+			const { db } = require('../database-init.js');
+			const userSettings = db.prepare("SELECT value_json FROM settings WHERE key = 'userprofiles'").get();
+			if (!userSettings || !userSettings.value_json) {
+				showToast('No users found. Please contact admin.', '#e74c3c');
+				return;
+			}
+			const users = JSON.parse(userSettings.value_json);
+			const user = users.find(u => u.code === username && u.password === password);
+			if (user) {
+				var userInfo = {
+					name: user.name,
+					mobile: user.code,
+					role: user.role
+				};
+				window.localStorage.loggedInAdminData = JSON.stringify(userInfo);
+				window.localStorage.loggedInAdmin = true;
+				showToast('Successfully logged in as ' + user.name, '#27ae60');
 				hideLoginModal();
 				renderDefaults();
-				initScreenSaver(); //Screensaver changes
-				renderServerConnectionStatus(); 
-	      }
-	      else
-	      {
-	        showToast(data.error, '#e74c3c');
-	      }
-
-	    },
-	    error: function(data){
-	      showToast('Server not responding. Check your connection.', '#e74c3c');
-	    }
-
-	});		
+				initScreenSaver();
+				renderServerConnectionStatus && renderServerConnectionStatus();
+			} else {
+				showToast('Invalid username or password.', '#e74c3c');
+			}
+		} catch (err) {
+			console.error(err);
+			showToast('System Error: Unable to login.', '#e74c3c');
+		}
 
 }
 
@@ -117,70 +105,87 @@ function searchRequest(){
 
 
 	var user = document.getElementById("rewardsSearchInput").value;
-
-
-	var data = {
-		"token": window.localStorage.loggedInAdmin,
-		"id": 0,
-		"key": user
-	}
-
-	$.ajax({
-		type: 'POST',
-		url: 'https://www.zaitoon.online/services/possearchrewards.php',
-		data: JSON.stringify(data),
-		contentType: "application/json",
-		dataType: 'json',
-		success: function(data) {
-			if(data.status){
-				if(data.type == 'REDEEM'){
-					openCouponRedeemModal(data.couponData);
-					return '';
-				}
-				renderHistory(data, user);
-				renderDefaults();
-			}
-			else
-			{
-				document.getElementById("errorRenderArea").innerHTML = '<p style="color: #dd4b39; font-size: 18px; font-weight: 400; text-align: center;">'+data.error+'</p>';
-				showToast(data.error, '#e74c3c');
-			}
-
-			if(data.errorCode == 404){
-				forceLogout(data.error);
-			}
-
+	// Use local orders to calculate reward points and history
+	try {
+		const { getAllOrders } = require('../database-access.js');
+		const orders = getAllOrders();
+		// Filter orders by customer mobile
+		const userOrders = orders.filter(o => o.customer_mobile === user);
+		if (userOrders.length === 0) {
+			document.getElementById("errorRenderArea").innerHTML = '<p style="color: #dd4b39; font-size: 18px; font-weight: 400; text-align: center;">No records found for this customer.</p>';
+			showToast('No records found for this customer.', '#e74c3c');
+			return;
 		}
-	});	
+		// Calculate stats
+		const visits = userOrders.length;
+		let totalSpent = 0;
+		let totalPoints = 0;
+		let name = userOrders[0].customer_name || user;
+		let email = '';
+		let list = [];
+		userOrders.forEach(order => {
+			let cart = {};
+			try {
+				cart = JSON.parse(order.cart_json || '{}');
+			} catch (e) { cart = {}; }
+			let cartTotal = cart.cartTotal || 0;
+			let cartPoints = cart.cartPoints || 0;
+			totalSpent += cartTotal;
+			totalPoints += cartPoints;
+			list.push({
+				date: order.date,
+				cart: {
+					items: (cart.items || []).map(i => ({ itemName: i.name, qty: i.qty })),
+					cartTotal,
+					cartPoints
+				}
+			});
+		});
+		// Compose data object similar to server response
+		const data = {
+			status: true,
+			response: { name, mobile: user, email },
+			count: visits,
+			volume: totalSpent,
+			points: totalPoints,
+			list
+		};
+		renderHistory(data, user);
+		renderDefaults();
+	} catch (err) {
+		console.error(err);
+		document.getElementById("errorRenderArea").innerHTML = '<p style="color: #dd4b39; font-size: 18px; font-weight: 400; text-align: center;">System Error: Unable to fetch rewards data.</p>';
+		showToast('System Error: Unable to fetch rewards data.', '#e74c3c');
+	}
 }
 
 function loadMoreOrders(user, nextID){
-	
-	var data = {
-		"token": window.localStorage.loggedInAdmin,
-		"id": nextID*5,
-		"key": user
-	}
-
-	$.ajax({
-		type: 'POST',
-		url: 'https://www.zaitoon.online/services/possearchrewards.php',
-		data: JSON.stringify(data),
-		contentType: "application/json",
-		dataType: 'json',
-		success: function(data) {
-			if(data.status){
-				console.log(data)
-				appendToHistory(data, nextID, user)
-
-			}
-
-			if(data.errorCode == 404){
-				forceLogout(data.error);
-			}
-
+		// For offline, just re-use the same logic as searchRequest, paginated
+		try {
+			const { getAllOrders } = require('../database-access.js');
+			const orders = getAllOrders();
+			const userOrders = orders.filter(o => o.customer_mobile === user);
+			// Paginate 5 at a time
+			const pagedList = userOrders.slice(nextID * 5, (nextID + 1) * 5).map(order => {
+				let cart = {};
+				try {
+					cart = JSON.parse(order.cart_json || '{}');
+				} catch (e) { cart = {}; }
+				return {
+					date: order.date,
+					cart: {
+						items: (cart.items || []).map(i => ({ itemName: i.name, qty: i.qty })),
+						cartTotal: cart.cartTotal || 0,
+						cartPoints: cart.cartPoints || 0
+					}
+				};
+			});
+			const data = { list: pagedList };
+			appendToHistory(data, nextID, user);
+		} catch (err) {
+			console.error(err);
+			showToast('System Error: Unable to load more orders.', '#e74c3c');
 		}
-	});		
 }
 
 

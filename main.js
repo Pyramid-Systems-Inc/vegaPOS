@@ -32,7 +32,12 @@ function createWindow () {
       width: 1080,
       minWidth: 680,
       height: 840,
-      title: app.getName()
+      title: app.getName(),
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        contextIsolation: true,
+        nodeIntegration: false
+      }
     })
 
   // and load the index.html of the app.
@@ -81,6 +86,7 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+require('./js/electron-ipc-handlers.js');
 
 /* Printer Processes */
 ipc.on('print-to-pdf', function(event){
