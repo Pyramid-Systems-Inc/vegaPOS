@@ -16,8 +16,8 @@ const ipc = electron.ipcMain;
 const shell = electron.shell;
 
 // Initialize database
-require('./js/database.js');
-
+const { initializeDatabase } = require('./js/database-init.js');
+initializeDatabase();
 
 
 
