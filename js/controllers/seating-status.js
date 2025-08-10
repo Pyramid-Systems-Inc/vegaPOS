@@ -170,14 +170,15 @@ async function mergeBillsInTheHoldListAfterProcess(kotList, tableList) {
     if (kotList.length < 2) return;
 
     try {
-        const orders = kotList.map(kot => getOrderByKotNumber(kot));
+         const orders = await Promise.all(kotList.map(kot => getOrderByKotNumber(kot)));
         
         let mergedCart = [];
         let mergedExtras = [];
 
         orders.forEach(order => {
+            if (!order) return; // Skip if an order wasn't found
             const cart = JSON.parse(order.cart_json);
-            const extras = JSON.parse(order.extras_json);
+            const extras = order.extras_json ? JSON.parse(order.extras_json) : [];
 
             // Merge extras
             extras.forEach(extra => {
