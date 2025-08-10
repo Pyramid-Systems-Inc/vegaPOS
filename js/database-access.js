@@ -51,18 +51,15 @@ function getAllMenuItems() {
 
 function getMenuItemsByCategory(categoryName) {
     try {
-        return db.prepare(`
-            SELECT mi.*, c.name as category_name 
-            FROM menu_items mi 
-            LEFT JOIN categories c ON mi.category_id = c.id 
-            WHERE c.name = ? 
-            ORDER BY mi.name
-        `).all(categoryName);
+        const category = db.prepare('SELECT id FROM categories WHERE name = ?').get(categoryName);
+        if (!category) return [];
+        return db.prepare('SELECT * FROM menu_items WHERE category_id = ? ORDER BY name').all(category.id);
     } catch (error) {
         console.error('Error fetching menu items by category:', error);
         return [];
     }
 }
+
 
 function addMenuItem(categoryId, code, name, price, isAvailable = 1, isCustom = 0, isPhoto = 0) {
     try {
@@ -92,6 +89,22 @@ function updateMenuItem(id, updates) {
         throw error;
     }
 }
+
+function updateMenuItemByCode(code, updates) {
+    try {
+        const setClause = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+        const values = Object.values(updates);
+        values.push(code);
+        
+        const stmt = db.prepare(`UPDATE menu_items SET ${setClause} WHERE code = ?`);
+        const result = stmt.run(...values);
+        return result.changes > 0;
+    } catch (error) {
+        console.error('Error updating menu item by code:', error);
+        throw error;
+    }
+}
+
 
 function deleteMenuItem(id) {
     try {
@@ -322,6 +335,17 @@ function updateOrder(kotNumber, updates) {
     }
 }
 
+function deleteOrder(kotNumber) {
+    try {
+        const stmt = db.prepare('DELETE FROM orders WHERE kot_number = ?');
+        const result = stmt.run(kotNumber);
+        return result.changes > 0;
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        throw error;
+    }
+}
+
 // Settings functions
 function getSetting(key) {
     try {
@@ -520,6 +544,7 @@ module.exports = {
     getMenuItemsByCategory,
     addMenuItem,
     updateMenuItem,
+    updateMenuItemByCode,
     deleteMenuItem,
     
     // Menu Item Options
@@ -550,6 +575,7 @@ module.exports = {
     getOrderByKotNumber,
     addOrder,
     updateOrder,
+    deleteOrder,
     
     // Settings
     getSetting,
