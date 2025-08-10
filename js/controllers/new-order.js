@@ -180,7 +180,7 @@ function renderCart(){
 	//Render Cart Items based on local storage
 	var cart_products = window.localStorage.zaitoon_cart ?  JSON.parse(window.localStorage.zaitoon_cart) : [];
 
-	var billing_modes = window.localStorage.billingModesData ? JSON.parse(window.localStorage.billingModesData): [];
+	var billing_modes = db.prepare('SELECT * FROM billing_modes').all();
 	
 	var selectedBillingModeName = document.getElementById("customer_form_data_mode").value;
 	var selectedBillingModeInfo = '';
@@ -194,38 +194,29 @@ function renderCart(){
 		n++;
 	}
 
-		if(fs.existsSync('./data/static/billingparameters.json')) {
-	      fs.readFile('./data/static/billingparameters.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
+    try {
+        const params = db.prepare('SELECT * FROM billing_parameters').all();
 
-	    		if(data == ''){ data = '[]'; }
+        var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
+        var cartExtrasList = [];
 
-	          	var params = JSON.parse(data);
+        var n = 0;
+        var m = 0;
+        while(selectedModeExtrasList[n]){
+            m = 0;
+            while(params[m]){  
+                if(selectedModeExtrasList[n] == params[m].name)        			
+                    cartExtrasList.push(params[m]);
+                m++;
+            }
+            n++;
+        }
 
-	          	var selectedModeExtrasList = (selectedBillingModeInfo.extras).split(",");
-	          	var cartExtrasList = [];
-
-	          	var n = 0;
-	          	var m = 0;
-	          	while(selectedModeExtrasList[n]){
-	          		m = 0;
-	          		while(params[m]){	  
-	          			if(selectedModeExtrasList[n] == params[m].name)        			
-	          				cartExtrasList.push(params[m]);
-	          			m++;
-	          		}
-	          		n++;
-	          	}
-
-	          	renderCartAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)	          	
-
-		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+        renderCartAfterProcess(cart_products, selectedBillingModeInfo, cartExtrasList)
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Billing Parameters data. Please contact Accelerate Support.', '#e74c3c');
+    }
 
 }
 

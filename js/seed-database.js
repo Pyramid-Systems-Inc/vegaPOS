@@ -17,6 +17,7 @@ function seedDatabase() {
         db.prepare('DELETE FROM billing_parameters').run();
         db.prepare('DELETE FROM payment_modes').run();
         db.prepare('DELETE FROM discount_types').run();
+        db.prepare('DELETE FROM table_mapping').run();
         db.prepare('DELETE FROM settings').run();
 
         // 1. Category
@@ -57,6 +58,12 @@ function seedDatabase() {
         
         const sampleThemeSetting = { name: 'theme', value: 'skin-blue' };
         db.prepare('INSERT INTO settings (key, value_json) VALUES (?, ?)').run(sampleThemeSetting.name, JSON.stringify(sampleThemeSetting.value));
+
+        // 11. Table Mapping
+        db.prepare("INSERT INTO table_mapping (table_name, status) VALUES (?, ?)").run('T1', 0);
+
+        // 12. Last KOT
+        db.prepare("INSERT INTO settings (key, value_json) VALUES (?, ?)").run('last_kot', '1000');
     });
 
     try {

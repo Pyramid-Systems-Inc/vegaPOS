@@ -137,6 +137,18 @@ function initializeDatabase() {
                 max_discount_value REAL
             )
         `).run();
+
+        // Table Mapping (from tablemapping.json)
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS table_mapping (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                table_name TEXT NOT NULL UNIQUE,
+                kot_number TEXT,
+                assigned_to TEXT,
+                status INTEGER,
+                last_update TEXT
+            )
+        `).run();
     });
 
     createTables();
