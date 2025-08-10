@@ -2148,4 +2148,4 @@ function initMenuSuggestion(){
 	      return '';
 	    }		
 
-}
+}}
