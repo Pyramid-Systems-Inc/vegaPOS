@@ -1,49 +1,64 @@
-function renderKOT() {
+const { getAllOrders, getOrderByKotNumber, updateOrder, deleteOrder } = require('../database-access.js');
 
-    dirname = './data/KOT'
-    fs.readdir(dirname, function(err, filenames) {
-        if (err) {
-            showToast('System Error: Unable to load Live Orders. Please contact Accelerate Support.', '#e74c3c');
+function renderKOT() {
+    try {
+        // Assuming orderStatus < 3 means it's a live order (not settled/cancelled)
+        const liveOrders = getAllOrders().filter(o => o.order_status < 3);
+        
+        let fullKOT = "";
+        if (liveOrders.length === 0) {
+            document.getElementById("fullKOT").innerHTML = '<p style="padding: 20px; text-align: center; color: #bdc3c7;">No live orders.</p>';
             return;
         }
 
-        filenames.forEach(function(filename) {
-            fs.readFile(dirname + '/' + filename, 'utf-8', function(err, data) {
-                if (err) {
-                    showToast('System Error: Unable to load a few Live Orders. Please contact Accelerate Support.', '#e74c3c');
-                    return;
-                } else {
+        liveOrders.forEach(order => {
+            const orderDetails = JSON.parse(order.order_details_json);
+            const cart = JSON.parse(order.cart_json);
+            const extras = order.extras_json ? JSON.parse(order.extras_json) : [];
+            const discount = order.discount_json ? JSON.parse(order.discount_json) : {};
+            
+            const kot = {
+                KOTNumber: order.kot_number,
+                orderDetails: orderDetails,
+                table: order.table_name,
+                customerName: order.customer_name,
+                customerMobile: order.customer_mobile,
+                stewardName: order.steward_name,
+                stewardCode: order.steward_code,
+                orderStatus: order.order_status,
+                date: order.date,
+                timePunch: order.time_punch,
+                timeKOT: order.time_kot,
+                timeBill: order.time_bill,
+                timeSettle: order.time_settle,
+                cart: cart,
+                specialRemarks: order.special_remarks,
+                extras: extras,
+                discount: discount
+            };
 
-                    var kot = JSON.parse(data);
-                    var i = 0;
-                    var fullKOT = "";
-                    var begKOT = "";
-                    var itemsInCart = "";
-                    var items = "";
+            let i = 0;
+            let itemsInCart = "";
+            
+            const begKOT = `<li> <a href="#" onclick="pushToEditKOT('${encodeURI(JSON.stringify(kot))}')"> <h2>${kot.KOTNumber} <tag class="tableName">${kot.table}</tag></h2><div class="itemList"> <table>`;
+            
+            while (i < kot.cart.length) {
+                itemsInCart += `<tr> <td class="name">${(kot.cart[i].isCustom ? kot.cart[i].name + ' (' + kot.cart[i].variant + ')' : kot.cart[i].name)}</td> <td class="price">x ${kot.cart[i].qty}</td> </tr>`;
+                i++;
+            }
+            
+            const timeAgo = moment(kot.timePunch, "HHmm").fromNow();
 
-                    begKOT = '<li> <a href="#" onclick="pushToEditKOT(\''+encodeURI(JSON.stringify(kot))+'\')"> <h2>' + kot.KOTNumber + ' <tag class="tableName">'+kot.table+'</tag></h2><div class="itemList"> <table>';
-                    while (i < kot.cart.length) {
-                        itemsInCart = itemsInCart + '<tr> <td class="name">' +(kot.cart[i].isCustom ? kot.cart[i].name+' ('+kot.cart[i].variant+')' : kot.cart[i].name )+ '</td> <td class="price">x ' + kot.cart[i].qty + '</td> </tr>';
-                        i++;
-                    }
-
-                    items = begKOT + itemsInCart + '</table> </div>'+(i > 6?'<more class="more">More Items</more>':'')+'<tag class="bottomTag"> <p class="tagSteward">' + kot.customerName + '</p> <p class="tagUpdate">First KOT Printed 10 mins ago</p> </tag> </a>';
-                    fullKOT = fullKOT + items + '</li>';
-                    finalRender(fullKOT)
-                }
-
-            });
+            const items = `${begKOT}${itemsInCart}</table> </div>${(i > 6 ? '<more class="more">More Items</more>' : '')}<tag class="bottomTag"> <p class="tagSteward">${kot.customerName || 'Guest'}</p> <p class="tagUpdate">${timeAgo}</p> </tag> </a>`;
+            fullKOT += `${items}</li>`;
         });
         
-
-    });
+        document.getElementById("fullKOT").innerHTML = fullKOT;
+    } catch (error) {
+        console.error('Error rendering KOTs:', error);
+        showToast('System Error: Unable to load Live Orders. Please contact Accelerate Support.', '#e74c3c');
+    }
 }
-
-function finalRender(fullKOT) {
-    document.getElementById("fullKOT").innerHTML = document.getElementById("fullKOT").innerHTML + fullKOT;
-}
-
-
 
 /*Add to edit KOT*/
 function pushToEditKOT(encodedKOT){
@@ -64,15 +79,16 @@ function pushToEditKOT(encodedKOT){
         }
     }
 
-    if(window.localStorage.zaitoon_cart && window.localStorage.zaitoon_cart != ''){
+    if(window.localStorage.zaitoon_cart && window.localStorage.zaitoon_cart != '' && JSON.parse(window.localStorage.zaitoon_cart).length > 0){
         showToast('Warning! There is a new order being punched. Please complete it to continue.', '#e67e22');
         
         document.getElementById("overWriteCurrentOrderModal").style.display = 'block';
         document.getElementById("overWriteCurrentOrderModalConsent").innerHTML = '<button type="button" class="btn btn-default" onclick="overWriteCurrentOrderModalClose()" style="float: left">Cancel and Complete the New Order</button>'+
                                                 '<button type="button" class="btn btn-danger" onclick="overWriteCurrentOrder(\''+encodedKOT+'\')">Proceed to Over Write</button>';
+        return; // Wait for user action
     }    
 
-    overWriteCurrentOrder(encodedKOT)
+    overWriteCurrentOrder(encodedKOT);
 }
 
 function overWriteCurrentOrderModalClose(){
@@ -95,5 +111,5 @@ function overWriteCurrentOrder(encodedKOT){
     window.localStorage.customerData = JSON.stringify(customerInfo);
     window.localStorage.edit_KOT_originalCopy = decodeURI(encodedKOT);
     renderPage('new-order', 'Editing Order');
+    overWriteCurrentOrderModalClose();
 }
-

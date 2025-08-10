@@ -1,82 +1,67 @@
+const { getAllCategories, getMenuItemsByCategory, updateMenuItemByCode } = require('../database-access.js');
+const fs = require('fs');
+
+function getImageCode(text){
+	text = text.replace(/[^a-zA-Z ]/g, "");
+	var words = text.split(' ');
+
+	if(words.length > 1){
+		return words[0].substring(0,1)+words[1].substring(0,1);
+	}
+	else{
+		return (text.substring(0, 2)).toUpperCase();
+	}
+}
 
 /* read categories */
 function fetchAllCategoriesPhotos(){
+    try {
+        const categories = getAllCategories();
+        let categoryTag = '';
 
-		if(fs.existsSync('./data/static/menuCategories.json')) {
-	      fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
+        if (categories.length > 0) {
+            categories.forEach(category => {
+                categoryTag += `<tr class="subMenuList" onclick="openSubMenuPhotos('${category.name}')"><td>${category.name}</td></tr>`;
+            });
+        } else {
+            categoryTag = '<p style="color: #bdc3c7">No Category added yet.</p>';
+        }
 
-	    		if(data == ''){ data = '[]'; }
-
-	          	var categories = JSON.parse(data);
-	          	categories.sort(); //alphabetical sorting 
-	          	var categoryTag = '';
-
-				for (var i=0; i<categories.length; i++){
-					categoryTag = categoryTag + '<tr class="subMenuList" onclick="openSubMenuPhotos(\''+categories[i]+'\')"><td>'+categories[i]+'</td></tr>';
-				}
-
-				if(!categoryTag)
-					categoryTag = '<p style="color: #bdc3c7">No Category added yet.</p>';
-			
-
-				document.getElementById("categoryAreaPhotos").innerHTML = categoryTag;
-		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+        document.getElementById("categoryAreaPhotos").innerHTML = categoryTag;
+    } catch (error) {
+        console.error('Error fetching categories for photos:', error);
+        showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
+    }
 }
 
-function openSubMenuPhotos(subtype){	
+function openSubMenuPhotos(categoryName){	
+    try {
+        const menuItems = getMenuItemsByCategory(categoryName);
+        let itemsInSubMenu = "";
+        
+        if (menuItems.length > 0) {
+            menuItems.forEach(item => {
+                const temp = encodeURI(JSON.stringify(item));
+                if(item.is_photo){
+                    itemsInSubMenu += `<button onclick="openPhotoOptions('${item.name}', '${item.code}', 'PHOTO_AVAILABLE', '${categoryName}')" type="button" class="btn btn-both btn-flat product"><span class="bg-img" style="background: none !important;"><img src="data/photos/menu/${item.code}.jpg" alt="${item.name}" style="width: 110px; height: 110px;"></span><span><span>${item.name}</span></span></button>`;
+                }
+                else{
+                    itemsInSubMenu += `<button onclick="openPhotoOptions('${item.name}', '${item.code}', 'PHOTO_NOT_AVAILABLE', '${categoryName}')" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><div id="itemImage">${getImageCode(item.name)}</div></span><span><span>${item.name}</span></span></button>`;
+                }
+            });
+        }
+        
+        document.getElementById("item-list").innerHTML = itemsInSubMenu;
+        document.getElementById("posSubMenuTitle").innerHTML = categoryName;
 
-		if(fs.existsSync('./data/static/mastermenu.json')) {
-	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        
-	    } else {
+        if(!itemsInSubMenu){
+            document.getElementById("item-list").innerHTML = `<p style="font-size: 18px; color: #bfbfbf; padding: 20px 0;">No available items in ${categoryName}</p>`;
+        }
+    } catch (error) {
+        console.error('Error fetching menu items for photos:', error);
+        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
+    }
 
-	          		var mastermenu = JSON.parse(data); 
-
-	          		var itemsInSubMenu = "";
-
-					if(!subtype){
-						subtype = mastermenu[0].category;
-					}
-
-	         
-				for (var i=0; i<mastermenu.length; i++){
-
-					if(mastermenu[i].category == subtype){
-						itemsInSubMenu = '';
-						for(var j=0; j<mastermenu[i].items.length; j++){
-							var temp = encodeURI(JSON.stringify(mastermenu[i].items[j]));
-							if(mastermenu[i].items[j].isPhoto){
-								itemsInSubMenu = itemsInSubMenu + '<button onclick="openPhotoOptions(\''+mastermenu[i].items[j].name+'\', \''+mastermenu[i].items[j].code+'\', \'PHOTO_AVAILABLE\', \''+subtype+'\')" type="button" type="button" class="btn btn-both btn-flat product"><span class="bg-img" style="background: none !important;"><img src="data/photos/menu/'+mastermenu[i].items[j].code+'.jpg" alt="'+mastermenu[i].items[j].name+'" style="width: 110px; height: 110px;"></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
-							}
-							else{
-								itemsInSubMenu = itemsInSubMenu + '<button onclick="openPhotoOptions(\''+mastermenu[i].items[j].name+'\', \''+mastermenu[i].items[j].code+'\', \'PHOTO_NOT_AVAILABLE\', \''+subtype+'\')" type="button" type="button" class="btn btn-both btn-flat product"><span class="bg-img"><div id="itemImage">'+getImageCode(mastermenu[i].items[j].name)+'</div></span><span><span>'+mastermenu[i].items[j].name+'</span></span></button>';
-							}
-						}
-						break;
-					}
-				}
-				
-				document.getElementById("item-list").innerHTML = itemsInSubMenu;
-				document.getElementById("posSubMenuTitle").innerHTML = subtype;
-
-				if(!itemsInSubMenu){
-					document.getElementById("item-list").innerHTML = '<p style="font-size: 18px; color: #bfbfbf; padding: 20px 0;">No available items in '+subtype+'</p>';
-				}
-		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
-	    }			
-
-	//menuRenderArea
 	document.getElementById("menuDetailsAreaPhotos").style.display = "block";
 }
 
@@ -110,7 +95,6 @@ function removeItemPhoto(item, category){
 
 	changePhotoFlagInMenu(item, 5, category);
 	hidePhotoOptions();
-	openSubMenuPhotos(category);
 }
 
 //Photo Cropper
@@ -204,56 +188,25 @@ function changePhotoFlagInMenu(code, changeFlag, optionalCategory){
 
 		var optedFlag = false;
 
-		if(changeFlag == 1){ //Changing Photo
-			return '';
-		}
-		else if(changeFlag == 0){ //Uploading New Photo
+		if(changeFlag === 1){ //Changing Photo
 			optedFlag = true;
 		}
-		else if(changeFlag == 5){ //Removing Existing Photo
+		else if(changeFlag === 0){ //Uploading New Photo
+			optedFlag = true;
+		}
+		else if(changeFlag === 5){ //Removing Existing Photo
 			optedFlag = false;
 		}
 		
-		/* Just invert the item availability status here*/
-		if(fs.existsSync('./data/static/mastermenu.json')) {
-	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Failed to make changes in Menu data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
+        try {
+            updateMenuItemByCode(code, { is_photo: optedFlag ? 1 : 0 });
 
-				if(data == ''){ data = '[]'; }
-	          
-	          	var mastermenu = JSON.parse(data); 
-				for (var i=0; i<mastermenu.length; i++){
-					for(var j=0; j<mastermenu[i].items.length; j++){
-
-						if(mastermenu[i].items[j].code == code){
-
-						   mastermenu[i].items[j].isPhoto = optedFlag;
-
-					       var newjson = JSON.stringify(mastermenu);
-					       fs.writeFile('./data/static/mastermenu.json', newjson, 'utf8', (err) => {
-					         if(err){
-					            showToast('System Error: Unable to save Categories data. Please contact Accelerate Support.', '#e74c3c');
-					         }
-					         else{
-					         	if(optionalCategory){
-					         		renderPage('photos-manager', 'Photos Manager');
-					         		openSubMenuPhotos(optionalCategory);
-					         	}
-					         	return '';
-
-					         }
-					       }); 
-
-						}
-				
-					}					
-				}
-		}
-		});
-	    } else {
-	      showToast('System Error: Failed to make changes in Menu data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
-
+            if(optionalCategory){
+                openSubMenuPhotos(optionalCategory);
+            }
+            
+        } catch (error) {
+            console.error('Error updating photo flag in menu:', error);
+            showToast('System Error: Failed to make changes in Menu data. Please contact Accelerate Support.', '#e74c3c');
+        }
 }
