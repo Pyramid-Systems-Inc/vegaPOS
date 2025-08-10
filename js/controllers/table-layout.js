@@ -1,397 +1,182 @@
+const { db } = require('../database-init.js');
 
-function openNewTableModal(){
+/*
+ * =======================================================================================
+ * Table Sections Management
+ * =======================================================================================
+ */
 
-  /*Render Sections dropdown*/
-  var table_sections = window.localStorage.tableSections ?  JSON.parse(window.localStorage.tableSections) : [];
-  if(table_sections.length > 0){
+function fetchAllTableSections() {
+    try {
+        const sections = db.prepare('SELECT * FROM table_sections ORDER BY name').all();
+        let sectionsList = '';
+        sections.forEach((section, i) => {
+            sectionsList += `<tr>
+                                <th style="text-align: left">#${i + 1}</th>
+                                <th style="text-align: left">${section.name}</th>
+                                <th style="text-align: left" onclick="deleteSingleTableSectionConsent('${section.name}')"><i class="fa fa-trash-o"></i></th>
+                             </tr>`;
+        });
 
-    var i = 0;
-    var optionsList = '';
-    while(table_sections[i]){
-      if(i == 0)
-        optionsList = optionsList + '<option value="'+table_sections[i]+'" selected="selected">'+table_sections[i]+'</option>';
-      else
-        optionsList = optionsList + '<option value="'+table_sections[i]+'">'+table_sections[i]+'</option>';
+        if (sections.length === 0) {
+            document.getElementById("openNewTableButton").style.display = "none";
+            document.getElementById("allTableSectionList").innerHTML = '<p style="color: #bdc3c7">No Table Section added yet.</p>';
+        } else {
+            document.getElementById("openNewTableButton").style.display = "block";
+            document.getElementById("allTableSectionList").innerHTML = `<thead style="background: #f4f4f4;">${sectionsList}</thead>`;
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Table Sections data.', '#e74c3c');
+    }
+}
 
-      i++;
+function addNewTableSection() {
+    const sectionName = document.getElementById("add_new_tableSection_name").value.trim();
+    if (!sectionName) {
+        showToast('Warning: Please set a name for the section.', '#e67e22');
+        return;
     }
 
-    document.getElementById("add_new_table_type").innerHTML = optionsList;
-
-    document.getElementById("newTableModal").style.display = "block";
-    document.getElementById("openNewTableButton").style.display = "none";
-  }
-  else{
-    fetchAllTableSections(); /*Tweak*/
-  }
-}
-
-function hideNewTableModal(){
-  document.getElementById("newTableModal").style.display = "none";
-  document.getElementById("openNewTableButton").style.display = "block";
-}
-
-
-function openNewTableSectionModal(){
-  document.getElementById("newTableSectionModal").style.display = "block";
-  document.getElementById("openNewTableSectionButton").style.display = "none";
-}
-
-function hideNewTableSectionModal(){
-  document.getElementById("newTableSectionModal").style.display = "none";
-  document.getElementById("openNewTableSectionButton").style.display = "block";
-}
-
-function fetchAllTables(){
-    if(fs.existsSync('./data/static/tables.json')) {
-        fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
-      if (err){
-          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-      } else {
-
-          if(data == ''){ data = '[]'; }
-
-              var table = JSON.parse(data);
-              table.sort(); //alphabetical sorting 
-              var tablesList = '';
-
-        for (var i=0; i<table.length; i++){
-          tablesList = tablesList + '<tr role="row"> <td>'+table[i].name+'</td> <td>'+table[i].type+'</td> <td>'+table[i].capacity+'</td> <td onclick="deleteSingleTableConsent(\''+table[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
-        }
-
-        if(!tablesList)
-          document.getElementById("allTablesList").innerHTML = '<p style="color: #bdc3c7">No Table added yet.</p>';
-        else
-          document.getElementById("allTablesList").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left">Table</th> <th style="text-align: left">Section</th> <th style="text-align: left">Capacity</th> <th style="text-align: left"></th> </tr> </thead> <tbody>'+
-                                  '<tbody>'+tablesList+'</tbody>';
-    }
-    });
-      } else {
-        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-      } 
-}
-
-
-function fetchAllTableSections(){
-    if(fs.existsSync('./data/static/tablesections.json')) {
-        fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
-      if (err){
-          showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-      } else {
-
-          if(data == ''){ data = '[]'; }
-
-              var table = JSON.parse(data);
-              table.sort(); //alphabetical sorting 
-              var tablesList = '';
-
-        for (var i=0; i<table.length; i++){
-          tablesList = tablesList + '<tr> <th style="text-align: left">#'+(i+1)+'</th><th style="text-align: left">'+table[i]+'</th> <th style="text-align: left" onclick="deleteSingleTableSectionConsent(\''+table[i]+'\')"> <i class="fa fa-trash-o"></i> </th> </tr>';
-        }
-
-        if(!tablesList){
-          document.getElementById("openNewTableButton").style.display = "none"; /* Tweak */
-          document.getElementById("allTableSectionList").innerHTML = '<p style="color: #bdc3c7">No Table Section added yet.</p>';
-        }
-        else{
-          window.localStorage.tableSections = JSON.stringify(table);
-          document.getElementById("openNewTableButton").style.display = "block"; /* Tweak */
-          document.getElementById("allTableSectionList").innerHTML = '<thead style="background: #f4f4f4;">'+tablesList+'</thead>';
+    try {
+        db.prepare('INSERT INTO table_sections (name) VALUES (?)').run(sectionName);
+        showToast(`Section '${sectionName}' added successfully.`, '#27ae60');
+        hideNewTableSectionModal();
+        fetchAllTableSections();
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            showToast('Warning: A table section with this name already exists.', '#e67e22');
+        } else {
+            console.error(err);
+            showToast('System Error: Could not add table section.', '#e74c3c');
         }
     }
-    });
-      } else {
-        showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-      } 
 }
 
-
-
-function openTableDeleteConfirmation(type, functionName, warning){
-  document.getElementById("tableDeleteConfirmationConsent").innerHTML = '<button type="button" class="btn btn-default" onclick="cancelTableDeleteConfirmation()" style="float: left">Cancel</button>'+
-                                '<button type="button" class="btn btn-danger" onclick="'+functionName+'(\''+type+'\')">Delete</button>';
-
-  document.getElementById("tableDeleteConfirmationText").innerHTML = (warning ? warning+' ' : '' )+'Are you sure want to delete <b>'+type+'</b>?';
-  document.getElementById("tableDeleteConfirmation").style.display = 'block';
+function deleteSingleTableSection(name) {
+    try {
+        db.transaction(() => {
+            // First, delete all tables mapped to this section
+            db.prepare('DELETE FROM tables WHERE type = ?').run(name);
+            // Then, delete the section itself
+            db.prepare('DELETE FROM table_sections WHERE name = ?').run(name);
+        })();
+        showToast(`Section '${name}' and all its tables have been deleted.`, '#27ae60');
+        fetchAllTableSections();
+        fetchAllTables(); // Refresh table list as well
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not delete table section.', '#e74c3c');
+    }
+    cancelTableDeleteConfirmation();
 }
 
-function cancelTableDeleteConfirmation(){
-  document.getElementById("tableDeleteConfirmation").style.display = 'none';
+/*
+ * =======================================================================================
+ * Tables Management
+ * =======================================================================================
+ */
+
+function fetchAllTables() {
+    try {
+        const tables = db.prepare('SELECT * FROM tables ORDER BY name').all();
+        let tablesList = '';
+        tables.forEach(table => {
+            tablesList += `<tr role="row">
+                             <td>${table.name}</td>
+                             <td>${table.type}</td>
+                             <td>${table.capacity}</td>
+                             <td onclick="deleteSingleTableConsent('${table.name}')"><i class="fa fa-trash-o"></i></td>
+                         </tr>`;
+        });
+
+        if (tables.length === 0) {
+            document.getElementById("allTablesList").innerHTML = '<p style="color: #bdc3c7">No Table added yet.</p>';
+        } else {
+            document.getElementById("allTablesList").innerHTML = `<thead style="background: #f4f4f4;"><tr><th>Table</th><th>Section</th><th>Capacity</th><th></th></tr></thead><tbody>${tablesList}</tbody>`;
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Unable to read Tables data.', '#e74c3c');
+    }
 }
 
+function addNewTable() {
+    const name = document.getElementById("add_new_table_name").value.trim();
+    const capacity = parseInt(document.getElementById("add_new_table_capacity").value, 10);
+    const type = document.getElementById("add_new_table_type").value;
 
+    if (!name || !type || isNaN(capacity)) {
+        showToast('Warning: Please provide a valid name, capacity, and section.', '#e67e22');
+        return;
+    }
 
-
-function deleteSingleTableConsent(name){
-  openTableDeleteConfirmation(name, 'deleteSingleTable');
+    try {
+        db.prepare('INSERT INTO tables (name, capacity, type) VALUES (?, ?, ?)').run(name, capacity, type);
+        showToast(`Table '${name}' added successfully.`, '#27ae60');
+        hideNewTableModal();
+        fetchAllTables();
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            showToast('Warning: A table with this name already exists.', '#e67e22');
+        } else {
+            console.error(err);
+            showToast('System Error: Could not add table.', '#e74c3c');
+        }
+    }
 }
 
-
-/* delete a table */
-function deleteSingleTable(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/tables.json')) {
-       fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-        if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].name == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/tables.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Tables data. Please contact Accelerate Support.', '#e74c3c');
-        
-          /* on successful delete */
-          fetchAllTables();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Tables data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-   cancelTableDeleteConfirmation()
+function deleteSingleTable(name) {
+    try {
+        db.prepare('DELETE FROM tables WHERE name = ?').run(name);
+        showToast(`Table '${name}' deleted successfully.`, '#27ae60');
+        fetchAllTables();
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not delete table.', '#e74c3c');
+    }
+    cancelTableDeleteConfirmation();
 }
 
+/*
+ * =======================================================================================
+ * MODAL and UI Helpers
+ * =======================================================================================
+ */
 
-function deleteSingleTableSectionConsent(name){
-  openTableDeleteConfirmation(name, 'deleteSingleTableSection', 'All the Tables mapped to the Section <b>'+name+'</b> will also get deleted.');
+function openNewTableModal() {
+    try {
+        const sections = db.prepare('SELECT name FROM table_sections').all();
+        if (sections.length > 0) {
+            const optionsList = sections.map(section => `<option value="${section.name}">${section.name}</option>`).join('');
+            document.getElementById("add_new_table_type").innerHTML = optionsList;
+            document.getElementById("newTableModal").style.display = "block";
+            document.getElementById("openNewTableButton").style.display = "none";
+        } else {
+            showToast('Please add a Table Section first.', '#e67e22');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('System Error: Could not load table sections.', '#e74c3c');
+    }
 }
 
+function hideNewTableModal() { document.getElementById("newTableModal").style.display = "none"; document.getElementById("openNewTableButton").style.display = "block"; }
+function openNewTableSectionModal() { document.getElementById("newTableSectionModal").style.display = "block"; document.getElementById("openNewTableSectionButton").style.display = "none"; }
+function hideNewTableSectionModal() { document.getElementById("newTableSectionModal").style.display = "none"; document.getElementById("openNewTableSectionButton").style.display = "block"; }
 
-/* delete a table section */
-function deleteSingleTableSection(name) {  
-
-   //Check if file exists
-   if(fs.existsSync('./data/static/tablesections.json')) {
-       fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-        if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i] == name){
-            obj.splice(i,1);
-            break;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/tablesections.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Tables data. Please contact Accelerate Support.', '#e74c3c');
-        
-
-          /* on successful delete */
-          fetchAllTableSections();
-          deleteAllMappedTables(name);
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Tables data. Please contact Accelerate Support.', '#e74c3c');
-   }
-
-   cancelTableDeleteConfirmation()
+function openTableDeleteConfirmation(name, functionName, warning = '') {
+    document.getElementById("tableDeleteConfirmationConsent").innerHTML = `<button type="button" class="btn btn-default" onclick="cancelTableDeleteConfirmation()" style="float: left">Cancel</button><button type="button" class="btn btn-danger" onclick="${functionName}('${name}')">Delete</button>`;
+    document.getElementById("tableDeleteConfirmationText").innerHTML = `${warning} Are you sure you want to delete <b>${name}</b>?`;
+    document.getElementById("tableDeleteConfirmation").style.display = 'block';
 }
 
-function deleteAllMappedTables(name){
+function cancelTableDeleteConfirmation() { document.getElementById("tableDeleteConfirmation").style.display = 'none'; }
 
-   //Check if file exists
-   if(fs.existsSync('./data/static/tables.json')) {
-       fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-        if(data == ''){ data = '[]'; }
-       var obj = JSON.parse(data); //now it an object
-       for (var i=0; i<obj.length; i++) {  
-         if (obj[i].type == name){
-            obj.splice(i,1);
-            i--;
-         }
-       }
-       var newjson = JSON.stringify(obj);
-       fs.writeFile('./data/static/tables.json', newjson, 'utf8', (err) => {
-         if(err)
-            showToast('System Error: Unable to make changes in Tables data. Please contact Accelerate Support.', '#e74c3c');
-        
-          /* on successful delete */
-          fetchAllTables();
-       }); 
-      }});
-   } else {
-      showToast('System Error: Unable to modify Tables data. Please contact Accelerate Support.', '#e74c3c');
-   }
- 
-}
+// Confirmation wrappers
+function deleteSingleTableConsent(name) { openTableDeleteConfirmation(name, 'deleteSingleTable'); }
+function deleteSingleTableSectionConsent(name) { openTableDeleteConfirmation(name, 'deleteSingleTableSection', 'All tables in this section will also be deleted.'); }
 
-
-function addNewTableSection(){
-   
-   var sectionName = document.getElementById("add_new_tableSection_name").value;
-  
-   if(sectionName == ''){ 
-      showToast('Warning: Please set a name', '#e67e22');
-      return '';
-   }
-   else{ 
-      //Check if file exists
-      if(fs.existsSync('./data/static/tablesections.json')) {
-         fs.readFile('./data/static/tablesections.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Table Sections data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(sectionName); //add some data
-             var json = JSON.stringify(obj); //convert it back to json
-             fs.writeFile('./data/static/tablesections.json', json, 'utf8', (err) => {
-                  if(err)
-                     showToast('System Error: Unable to modify Table Sections data. Please contact Accelerate Support.', '#e74c3c');
-                  hideNewTableSectionModal();
-                  fetchAllTableSections();
-               });
-         }
-         else{
-             var flag=0;
-             var obj = JSON.parse(data); //now it an object
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i] == sectionName){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Table Section already exists. Please choose a different name.', '#e67e22');
-             }
-             else{
-                obj.push(sectionName); //add some data
-                var json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('./data/static/tablesections.json', json, 'utf8', (err) => {
-                     if(err)
-                        showToast('System Error: Unable to modify Table Section data. Please contact Accelerate Support.', '#e74c3c');
-                      hideNewTableSectionModal();
-                      fetchAllTableSections();
-                });  
-             }
-                 
-         }
-          
-   }});
-      } else {
-         
-         obj.push(sectionName);
-         var json = JSON.stringify(obj);
-         fs.writeFile('./data/static/tablesections.json', json, 'utf8', (err) => {
-            if(err)
-               showToast('System Error: Unable to modify Table Section data. Please contact Accelerate Support.', '#e74c3c');
-            hideNewTableSectionModal();
-            fetchAllTableSections();
-         });
-      }
-   }  
-
-
-}
-
-
-function addNewTable() {  
-   
-  var paramObj = {};
-  paramObj.name = document.getElementById("add_new_table_name").value;
-  paramObj.capacity = document.getElementById("add_new_table_capacity").value;
-  paramObj.type = document.getElementById("add_new_table_type").value;
-
-  paramObj.capacity = parseFloat(paramObj.capacity);
-
-  if(Number.isNaN(paramObj.capacity)){
-    showToast('Warning: Invalid Capacity value. It has to be a Number.', '#e67e22');
-    return '';
-  } 
-
-   if(paramObj.name == '') {
-      showToast('Warning: Please set a name', '#e67e22');
-      return '';
-   }
-   else if(paramObj.type == ''){
-      showToast('Warning: Table Section is missing', '#e67e22');
-      return '';    
-   }
-   else{ 
-      //Check if file exists
-      if(fs.existsSync('./data/static/tables.json')) {
-         fs.readFile('./data/static/tables.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Tables data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(paramObj); //add some data
-             var json = JSON.stringify(obj); //convert it back to json
-             fs.writeFile('./data/static/tables.json', json, 'utf8', (err) => {
-                  if(err)
-                     showToast('System Error: Unable to modify Tables data. Please contact Accelerate Support.', '#e74c3c');
-                      
-                      hideNewTableModal();
-                      fetchAllTables();
-               });
-         }
-         else{
-             var flag=0;
-             var obj = JSON.parse(data); //now it an object
-             for (i=0; i<obj.length; i++) {
-               if (obj[i].name == paramObj.name){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Table Name already exists. Please choose a different name.', '#e67e22');
-             }
-             else{
-                obj.push(paramObj); //add some data
-                var json = JSON.stringify(obj); //convert it back to json
-                fs.writeFile('./data/static/tables.json', json, 'utf8', (err) => {
-                     if(err)
-                        showToast('System Error: Unable to modify Tables data. Please contact Accelerate Support.', '#e74c3c');
-                      
-                      hideNewTableModal();
-                      fetchAllTables();
-                });  
-             }
-                 
-         }
-          
-   }});
-      } else {
-         
-         obj.push(paramObj);
-         var json = JSON.stringify(obj);
-         fs.writeFile('./data/static/tables.json', json, 'utf8', (err) => {
-            if(err)
-               showToast('System Error: Unable to modify Tables data. Please contact Accelerate Support.', '#e74c3c');
-        
-                      hideNewTableModal();
-                      fetchAllTables();
-         });
-      }
-   }
-}
-
-
-function deleteAll(){
-   fs.unlinkSync('./data/static/tables.json');
-}
-
-
-
-//fetchAll()
-
-//addTable("Table-","T4","4","Normal")
+// Initial data load
+fetchAllTables();
+fetchAllTableSections();
