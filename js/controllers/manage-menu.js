@@ -45,90 +45,53 @@ sync();
 
 */
 
+const database = require('../database.js');
+
 /* read categories */
 function fetchAllCategories(){
+	try {
+		var categories = database.getAllCategories();
+		var categoryTag = '';
 
-		if(fs.existsSync('./data/static/menuCategories.json')) {
-	      fs.readFile('./data/static/menuCategories.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var categories = JSON.parse(data);
-	          	categories.sort(); //alphabetical sorting 
-	          	var categoryTag = '';
-
-				for (var i=0; i<categories.length; i++){
-					categoryTag = categoryTag + '<tr class="subMenuList" onclick="openSubMenu(\''+categories[i]+'\')"><td>'+categories[i]+'</td></tr>';
-				}
-
-				if(!categoryTag)
-					categoryTag = '<p style="color: #bdc3c7">No Category added yet.</p>';
-			
-
-				document.getElementById("categoryArea").innerHTML = categoryTag;
+		for (var i=0; i<categories.length; i++){
+			categoryTag = categoryTag + '<tr class="subMenuList" onclick="openSubMenu(\''+categories[i].name+'\')"><td>'+categories[i].name+'</td></tr>';
 		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+
+		if(!categoryTag)
+			categoryTag = '<p style="color: #bdc3c7">No Category added yet.</p>';
+
+		document.getElementById("categoryArea").innerHTML = categoryTag;
+	} catch (err) {
+		showToast('System Error: Unable to read Category data. Please contact Accelerate Support.', '#e74c3c');
+	}
 }
 
 
 /* mark an item unavailable */
 function markAvailability(code){
+	try {
+		const database = require('../database.js');
+		const item = database.getMenuItemByCode(code);
 		
-		/* Just invert the item availability status here*/
-		if(fs.existsSync('./data/static/mastermenu.json')) {
-	      fs.readFile('./data/static/mastermenu.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
+		if (item) {
+			const newAvailability = !item.is_available;
+			database.updateMenuItem(code, {
+				...item,
+				is_available: newAvailability
+			});
 
-				if(data == ''){ data = '[]'; }
-	          
-	          	var mastermenu = JSON.parse(data); 
-				for (var i=0; i<mastermenu.length; i++){
-					for(var j=0; j<mastermenu[i].items.length; j++){
-
-						if(mastermenu[i].items[j].code == code){
-
-							mastermenu[i].items[j].isAvailable = !mastermenu[i].items[j].isAvailable;
-
-							if(document.getElementById("item_avail_"+code).innerHTML != 'Available'){
-								document.getElementById("item_avail_"+code).innerHTML = 'Available';
-								document.getElementById("item_avail_"+code).style.background = "#27ae60";	
-							}
-							else{
-								document.getElementById("item_avail_"+code).innerHTML = 'Out of Stock';
-								document.getElementById("item_avail_"+code).style.background = "#e74c3c";		
-							}
-
-					       var newjson = JSON.stringify(mastermenu);
-					       fs.writeFile('./data/static/mastermenu.json', newjson, 'utf8', (err) => {
-					         if(err){
-					            showToast('System Error: Unable to save Menu data. Please contact Accelerate Support.', '#e74c3c');
-					         }
-					         else{
-					         	return '';
-					         }
-					       }); 
-
-						}
-				
-					}					
-				}
+			if(document.getElementById("item_avail_"+code).innerHTML != 'Available'){
+				document.getElementById("item_avail_"+code).innerHTML = 'Available';
+				document.getElementById("item_avail_"+code).style.background = "#27ae60";	
+			}
+			else{
+				document.getElementById("item_avail_"+code).innerHTML = 'Out of Stock';
+				document.getElementById("item_avail_"+code).style.background = "#e74c3c";		
+			}
 		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Menu data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
-
-
-
-
+	} catch (err) {
+		showToast('System Error: Unable to update Menu data. Please contact Accelerate Support.', '#e74c3c');
+	}
 }
 
 /*edit price of the item*/

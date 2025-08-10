@@ -1,4 +1,5 @@
 const settings = require('electron-settings')
+const database = require('./database.js');
 
 let $ = require('jquery');
 

@@ -15,6 +15,10 @@ const os = require('os')
 const ipc = electron.ipcMain;
 const shell = electron.shell;
 
+// Initialize database
+require('./js/database.js');
+
+
 
 
 // Keep a global reference of the window object, if you don't, the window will
