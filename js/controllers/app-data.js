@@ -1,4 +1,13 @@
 
+const {
+	getAllDineSessions,
+	addDineSession,
+	deleteDineSession,
+	getAllSavedComments,
+	addSavedComment,
+	deleteSavedComment
+} = require('../database-access.js');
+
 function openNewSavedComment(){
 	document.getElementById("newSavedCommentArea").style.display = "block";
 	document.getElementById("openNewSavedCommentButton").style.display = "none";
@@ -75,38 +84,29 @@ function cancelOtherDeleteConfirmation(){
 
 /* read dine sessions */
 function fetchAllDineSessions(){
+	try {
+		var params = getAllDineSessions();
+		params.sort(); //alphabetical sorting
+		var paramsTag = '';
 
-		if(fs.existsSync('./data/static/dinesessions.json')) {
-	      fs.readFile('./data/static/dinesessions.json', 'utf8', function readFileCallback(err, data){
-	    if (err){
-	        showToast('System Error: Unable to read Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-	    } else {
-
-	    		if(data == ''){ data = '[]'; }
-
-	          	var params = JSON.parse(data);
-	          	params.sort(); //alphabetical sorting 
-	          	var paramsTag = '';
-
-				for (var i=0; i<params.length; i++){
-					paramsTag = paramsTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+params[i].name+'</td> <td>'+moment(params[i].startTime,"HHmm").format("HH:mm a")+'</td> <td>'+moment(params[i].endTime,"HHmm").format("hh:mm a")+'</td> <td onclick="deleteDineSessionConfirm(\''+params[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
-				}
-
-				if(!paramsTag)
-					document.getElementById("dineSessionsTable").innerHTML = '<p style="color: #bdc3c7">No sessions added yet.</p>';
-				else
-					document.getElementById("dineSessionsTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Session</th> <th style="text-align: left">Time From</th> <th style="text-align: left">Time To</th> <th style="text-align: left"></th> </tr> </thead>'+
-																	'<tbody>'+paramsTag+'</tbody>';
+		for (var i=0; i<params.length; i++){
+			paramsTag = paramsTag + '<tr role="row"> <td>#'+(i+1)+'</td> <td>'+params[i].name+'</td> <td>'+moment(params[i].startTime,"HHmm").format("HH:mm a")+'</td> <td>'+moment(params[i].endTime,"HHmm").format("hh:mm a")+'</td> <td onclick="deleteDineSessionConfirm(\''+params[i].name+'\')"> <i class="fa fa-trash-o"></i> </td> </tr>';
 		}
-		});
-	    } else {
-	      showToast('System Error: Unable to read Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-	    }	
+
+		if(!paramsTag)
+			document.getElementById("dineSessionsTable").innerHTML = '<p style="color: #bdc3c7">No sessions added yet.</p>';
+		else
+			document.getElementById("dineSessionsTable").innerHTML = '<thead style="background: #f4f4f4;"> <tr> <th style="text-align: left"></th> <th style="text-align: left">Session</th> <th style="text-align: left">Time From</th> <th style="text-align: left">Time To</th> <th style="text-align: left"></th> </tr> </thead>'+
+																'<tbody>'+paramsTag+'</tbody>';
+	} catch (error) {
+		console.error('Error fetching dine sessions:', error);
+		showToast('System Error: Unable to read Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
+	}
 }
 
 
 /* add new dine session */
-function addDineSession() {  
+function addDineSession() {
 
 	var paramObj = {};
 	paramObj.name = document.getElementById("add_new_dineSession_name").value;
@@ -130,81 +130,35 @@ function addDineSession() {
 	else if(Number.isNaN(paramObj.startTime) || Number.isNaN(paramObj.endTime)){
 		showToast('Warning: Invalid time value.', '#e67e22');
 		return '';
-	}	
+	}
 
   if(paramObj.endTime <= paramObj.startTime){
     showToast('Warning: End Time must be greater than Start Time', '#e67e22');
     return '';
   }
 
-      //Check if file exists
-      if(fs.existsSync('./data/static/dinesessions.json')) {
-         fs.readFile('./data/static/dinesessions.json', 'utf8', function readFileCallback(err, data){
-       if (err){
-           showToast('System Error: Unable to read Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-       } else {
-         if(data==""){
-            var obj = []
-            obj.push(paramObj); //add some data
-            var json = JSON.stringify(obj);
-            fs.writeFile('./data/static/dinesessions.json', json, 'utf8', (err) => {
-                if(err){
-                  showToast('System Error: Unable to save Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-              }
-              else{
-
-                fetchAllDineSessions(); //refresh the list
-                hideNewDineSession();
-
-              }
-            });
-         }
-         else{
-             var flag=0;
-             if(data == ''){ data = '[]'; }
-             var obj = [];
-             obj = JSON.parse(data);
-             for (var i=0; i<obj.length; i++) {
-               if (obj[i].name == paramObj.name){
-                  flag=1;
-                  break;
-               }
-             }
-             if(flag==1){
-               showToast('Warning: Parameter already exists. Please choose a different name.', '#e67e22');
-             }
-             else{
-                obj.push(paramObj);
-                var json = JSON.stringify(obj);
-                fs.writeFile('./data/static/dinesessions.json', json, 'utf8', (err) => {
-                     if(err){
-                        showToast('System Error: Unable to save Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-                    }
-		            else{
-			                fetchAllDineSessions(); //refresh the list
-			                hideNewDineSession();
-		              	
-		              }
-                  });  
-
-             }
-                 
-         }
-          
-   }});
-      } else {
-         obj.push(paramObj);
-         fs.writeFile('./data/static/dinesessions.json', obj, 'utf8', (err) => {
-            if(err){
-               showToast('System Error: Unable to save Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
-           }
-           else{
-                fetchAllDineSessions(); //refresh the list
-                hideNewDineSession();         	
-           }
-         });
+  try {
+    // Check if session already exists
+    var existingSessions = getAllDineSessions();
+    var flag = 0;
+    for (var i = 0; i < existingSessions.length; i++) {
+      if (existingSessions[i].name == paramObj.name) {
+        flag = 1;
+        break;
       }
-  
+    }
+    
+    if (flag == 1) {
+      showToast('Warning: Parameter already exists. Please choose a different name.', '#e67e22');
+    } else {
+      addDineSession(paramObj);
+      fetchAllDineSessions(); //refresh the list
+      hideNewDineSession();
+    }
+  } catch (error) {
+    console.error('Error adding dine session:', error);
+    showToast('System Error: Unable to save Dine Sessions data. Please contact Accelerate Support.', '#e74c3c');
+  }
 }
 
 
