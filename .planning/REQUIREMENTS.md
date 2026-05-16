@@ -79,31 +79,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INF-01 | Phase 0 | Pending |
-| INF-02 | Phase 0 | Pending |
-| INF-03 | Phase 1 | Pending |
-| INF-04 | Phase 2 | Pending |
-| ORD-01 | Phase 2 | Pending |
-| ORD-02 | Phase 2 | Pending |
-| ORD-03 | Phase 2 | Pending |
-| ORD-04 | Phase 2 | Pending |
-| ORD-05 | Phase 2 | Pending |
-| ORD-06 | Phase 2 | Pending |
-| ORD-07 | Phase 5 | Pending |
-| ORD-08 | Phase 5 | Pending |
-| ORD-09 | Phase 5 | Pending |
-| ORD-10 | Phase 3 | Pending |
-| ORD-11 | Phase 3 | Pending |
-| DAT-01 | Phase 1 | Pending |
-| DAT-02 | Phase 3 | Pending |
-| DAT-03 | Phase 1 | Pending |
+| INF-01 | Phase 0: Environment & Project Scaffolding | Pending |
+| INF-02 | Phase 0: Environment & Project Scaffolding | Pending |
+| INF-03 | Phase 1: Database & Data Layer | Pending |
+| DAT-01 | Phase 1: Database & Data Layer | Pending |
+| DAT-03 | Phase 1: Database & Data Layer | Pending |
+| INF-04 | Phase 2: MVVM Foundation & Menu Browsing | Pending |
+| ORD-01 | Phase 2: MVVM Foundation & Menu Browsing | Pending |
+| ORD-02 | Phase 2: MVVM Foundation & Menu Browsing | Pending |
+| ORD-03 | Phase 2: MVVM Foundation & Menu Browsing | Pending |
+| ORD-04 | Phase 3: Cart Management | Pending |
+| ORD-05 | Phase 3: Cart Management | Pending |
+| ORD-06 | Phase 3: Cart Management | Pending |
+| ORD-10 | Phase 4: Order Persistence & Confirmation | Pending |
+| ORD-11 | Phase 4: Order Persistence & Confirmation | Pending |
+| DAT-02 | Phase 4: Order Persistence & Confirmation | Pending |
+| ORD-07 | Phase 6: Remaining P1 Features | Pending |
+| ORD-08 | Phase 6: Remaining P1 Features | Pending |
+| ORD-09 | Phase 6: Remaining P1 Features | Pending |
 
 **Coverage:**
 - v1 requirements: 18 total
 - Mapped to phases: 18
 - Unmapped: 0 ✓
 
+> **Note:** Phase 5 (Order Management & Navigation Shell) and Phase 7 (Packaging & Deployment) have no direct v1 requirement mappings — they provide navigation infrastructure and deployment packaging respectively, both required to deliver v1 as a usable application.
+
 ---
 
 *Requirements defined: 2026-05-17*
-*Last updated: 2026-05-17 after initial definition*
+*Last updated: 2026-05-17 after roadmap creation*
